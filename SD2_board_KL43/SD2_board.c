@@ -34,11 +34,11 @@
  */
 
 /*==================[inclusions]=============================================*/
-#include <SD2_board.h>
-#include "fsl_port.h"
-#include "fsl_gpio.h"
-#include "fsl_clock.h"
-#include "pin_mux.h"
+#include <SD2_board.h> /* SD2 board specific definitions */
+#include "fsl_port.h" /* for PORT_SetPinConfig() and other port functions */
+#include "fsl_gpio.h" /* for GPIO_PinInit() and other GPIO functions */
+#include "fsl_clock.h" /* for clock control */
+#include "pin_mux.h" /* for pin muxing */
 
 /*==================[macros and definitions]=================================*/
 
@@ -70,10 +70,10 @@ void board_init(void)
 	gpio_pin_config_t gpio_led_config =
 	{
 		.outputLogic = 1,
-		.pinDirection = kGPIO_DigitalOutput,
+		.pinDirection = kGPIO_DigitalOutput, /* LED pins are configured as outputs */
 	};
 	gpio_pin_config_t gpio_sw_config = {
-		.pinDirection = kGPIO_DigitalInput,
+		.pinDirection = kGPIO_DigitalInput, /* SW pins are configured as inputs */
 		.outputLogic = 0U
 	};
 
@@ -103,12 +103,13 @@ void board_init(void)
 		.mux = kPORT_MuxAsGpio,
 	};
 
+	/* Enable clocks for ports used by the board */
 	CLOCK_EnableClock(kCLOCK_PortA);
 	CLOCK_EnableClock(kCLOCK_PortC);
 	CLOCK_EnableClock(kCLOCK_PortD);
 	CLOCK_EnableClock(kCLOCK_PortE);
 
-	/* inicialización de leds */
+	/* C LEDs */
 	for (i = 0 ; i < BOARD_LED_ID_TOTAL ; i++)
 	{
 		PORT_SetPinConfig(board_gpioLeds[i].port, board_gpioLeds[i].pin, &port_led_config);
@@ -117,7 +118,7 @@ void board_init(void)
 
 	PORTA->PCR[4] &= ~(7 << 8); //Desactivación de NMI en SW1
 
-	/* inicialización de SWs */
+	/* Initialize SWs */
 	for (i = 0 ; i < BOARD_SW_ID_TOTAL ; i++)
 	{
 		PORT_SetPinConfig(board_gpioSw[i].port, board_gpioSw[i].pin, &port_sw_config);
