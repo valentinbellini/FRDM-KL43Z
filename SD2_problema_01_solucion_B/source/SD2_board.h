@@ -1,7 +1,8 @@
-/* Copyright 2017, DSI FCEIA UNR - Sistemas Digitales 2
+/* Copyright 2023, DSI FCEIA UNR - Sistemas Digitales 2
  *    DSI: http://www.dsi.fceia.unr.edu.ar/
  * Copyright 2017, Diego Alegrechi
  * Copyright 2017, Gustavo Muro
+ * Copyright 2023, Guido Cicconi
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,11 +33,18 @@
  *
  */
 
+/*==================[How to use]=============================================*/
+
+/*  Obtener valor SW1: key_getPressEv(BOARD_SW_ID_1)    */
+/*  Togglear led rojo: board_setLed(BOARD_LED_ID_ROJO, BOARD_LED_MSG_TOGGLE)    */
+/*  Encender led verde: board_setLed(BOARD_LED_ID_VERDE, BOARD_LED_MSG_ON)  */
+
+
 #ifndef SD2_BOARD_H_
 #define SD2_BOARD_H_
 
 /*==================[inclusions]=============================================*/
-#include "MKL46Z4.h"
+#include "MKL43Z4.h"
 #include "stdbool.h"
 
 /*==================[cplusplus]==============================================*/
@@ -80,7 +88,7 @@ typedef struct
 
 /*==================[external functions definition]==========================*/
 
-/** \brief inicializaci�n del hardware
+/** \brief inicializacion del hardware
  **
  **/
 void board_init(void);
@@ -92,8 +100,8 @@ void board_setLed(board_ledId_enum id, board_ledMsg_enum msg);
 
 /** \brief Devuelve estado del pulsador indicado
  **
- ** \return true: si el pulsdor est� apretado
- **         false: si el pulsador no est� apretado
+ ** \return true: si el pulsdor esta apretado
+ **         false: si el pulsador no esta apretado
  **/
 bool board_getSw(board_swId_enum id);
 
