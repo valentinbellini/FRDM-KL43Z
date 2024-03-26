@@ -1,3 +1,9 @@
+/*
+    En resumen, esta función escanea periódicamente el estado de los pulsadores en la placa, 
+    detectando cuándo son presionados y cuándo son liberados, y actualiza el estado 
+    de acuerdo con eso. Esto proporciona una forma de detectar acciones de pulsado y 
+    liberación de los pulsadores en tiempo real.
+*/
 
 /*==================[inclusions]=============================================*/
 #include "key.h"
