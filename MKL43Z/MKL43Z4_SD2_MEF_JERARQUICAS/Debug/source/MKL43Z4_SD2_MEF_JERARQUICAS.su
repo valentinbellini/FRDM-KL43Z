@@ -1,7 +1,0 @@
-C:\Users\valen\Documents\MCUXpressoIDE_11.9.0_2144\workspace\MKL43Z4_SD2_MEF_JERARQUICAS\CMSIS/core_cm0plus.h:850:22:__NVIC_SetPriority	24	static
-C:\Users\valen\Documents\MCUXpressoIDE_11.9.0_2144\workspace\MKL43Z4_SD2_MEF_JERARQUICAS\CMSIS/core_cm0plus.h:1056:26:SysTick_Config	16	static
-../source/MKL43Z4_SD2_MEF_JERARQUICAS.c:47:6:mefSec	8	static
-../source/MKL43Z4_SD2_MEF_JERARQUICAS.c:86:8:mefSW1	16	static
-../source/MKL43Z4_SD2_MEF_JERARQUICAS.c:132:6:MefModo	24	static
-../source/MKL43Z4_SD2_MEF_JERARQUICAS.c:165:5:main	8	static
-../source/MKL43Z4_SD2_MEF_JERARQUICAS.c:186:6:SysTick_Handler	8	static
