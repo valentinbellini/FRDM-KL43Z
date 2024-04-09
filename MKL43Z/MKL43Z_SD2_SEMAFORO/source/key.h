@@ -49,10 +49,10 @@ extern "C" {
 /*==================[external data declaration]==============================*/
 
 /*==================[external functions definition]==========================*/
-void key_init(void);
-bool key_getPressEv(board_swId_enum id);
-void key_periodicTask1ms(void);
-
+extern void key_init(void);
+extern bool key_getPressEv(board_swId_enum id);
+extern void key_periodicTask1ms(void);
+extern void key_clearFlags(board_swId_enum id);
 
 /*==================[cplusplus]==============================================*/
 #ifdef __cplusplus

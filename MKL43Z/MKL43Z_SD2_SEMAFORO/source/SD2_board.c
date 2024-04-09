@@ -145,8 +145,7 @@ void board_setLed(board_ledId_enum id, board_ledMsg_enum msg)
     }
 }
 
-bool board_getSw(board_swId_enum id)
-{
+bool board_getSw(board_swId_enum id){
     return !GPIO_ReadPinInput(board_gpioSw[id].gpio, board_gpioSw[id].pin);
 }
 

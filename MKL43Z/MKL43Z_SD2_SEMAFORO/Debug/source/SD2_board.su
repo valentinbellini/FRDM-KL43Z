@@ -1,0 +1,8 @@
+C:\Users\valen\Documents\MCUXpressoIDE_11.9.0_2144\workspace\TP1_SD2_BELLINI_SAITTA\drivers/fsl_clock.h:438:20:CLOCK_EnableClock	24	static
+C:\Users\valen\Documents\MCUXpressoIDE_11.9.0_2144\workspace\TP1_SD2_BELLINI_SAITTA\drivers/fsl_port.h:243:20:PORT_SetPinConfig	32	static
+C:\Users\valen\Documents\MCUXpressoIDE_11.9.0_2144\workspace\TP1_SD2_BELLINI_SAITTA\drivers/fsl_gpio.h:182:20:GPIO_PortSet	16	static
+C:\Users\valen\Documents\MCUXpressoIDE_11.9.0_2144\workspace\TP1_SD2_BELLINI_SAITTA\drivers/fsl_gpio.h:193:20:GPIO_PortClear	16	static
+C:\Users\valen\Documents\MCUXpressoIDE_11.9.0_2144\workspace\TP1_SD2_BELLINI_SAITTA\drivers/fsl_gpio.h:204:20:GPIO_PortToggle	16	static
+../source/SD2_board.c:68:6:board_init	32	static
+../source/SD2_board.c:127:6:board_setLed	16	static
+../source/SD2_board.c:148:6:board_getSw	16	static

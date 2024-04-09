@@ -112,5 +112,10 @@ void key_periodicTask1ms(void)
     }
 }
 
+// Limpia los indicadores de eventos de un switch específico:
+extern void key_clearFlags(board_swId_enum id)
+{
+	pressSW[id] = 0;    // Reinicia el indicador de pulsación del switch
+s}
 
 /*==================[end of file]============================================*/
