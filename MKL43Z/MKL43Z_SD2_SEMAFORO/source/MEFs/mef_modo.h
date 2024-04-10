@@ -14,7 +14,7 @@ extern "C" {
 
 /*==================[external functions declaration]=========================*/
 extern void mef_modo_init(void);
-extern void mef_modo(void);	// True si hay que salir de la mef
+extern void mef_modo(void);
 extern void mef_modo_task1ms(void);
 /*==================[cplusplus]==============================================*/
 #ifdef __cplusplus

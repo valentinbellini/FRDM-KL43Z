@@ -2,6 +2,8 @@
  * @file    main.c
  * @brief   Application entry point.
  */
+
+/*==================[inclusions]=============================================*/
 #include <MEFs/mef_modo.h>
 #include <stdio.h>
 #include "peripherals.h"
@@ -10,28 +12,29 @@
 #include "MKL43Z4.h"
 #include "fsl_debug_console.h"
 
-/* TODO: insert other include files here. */
 #include "SD2_board.h"
 #include "board.h"
 #include "key.h"
-/* TODO: insert other definitions and declarations here. */
 
 /*
  * @brief   Application entry point.
  */
 int main(void) {
-
+	/* Inicializaciones */
+	BOARD_InitBootPins();
+	BOARD_InitBootClocks();
+	BOARD_InitBootPeripherals();
+	#ifndef BOARD_INIT_DEBUG_CONSOLE_PERIPHERAL
+	    BOARD_InitDebugConsole();
+	#endif
 	board_init();
-	BOARD_InitDebugConsole();
 	key_init();
+	mef_modo_init();
 
 	/* interrupción de systick cada 1 ms */
 	SysTick_Config(SystemCoreClock / 1000U);
 
-	mef_modo_init();
-
-	while (1)
-	{
+	while (1){
 		mef_modo();
 	}
 	return 0 ;

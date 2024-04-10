@@ -28,12 +28,15 @@ extern void mef_modo_init(void){
 extern void mef_modo(void){
     switch(estado_MEF_modo){
         case EST_MODO_HABITUAL:
+        	printf("Estado mef habitual");
         	switch(mef_habitual()){
         		case TR_TO_PEATON:
         			estado_MEF_modo = EST_MODO_PEATON;
+        			mef_peaton_reset();
         		break;
         		case TR_TO_SECUNDARIO:
         			estado_MEF_modo = EST_MODO_SECUNDARIO;
+        			mef_secundario_reset();
         		break;
         		default:
         			estado_MEF_modo = EST_MODO_HABITUAL;
@@ -41,12 +44,14 @@ extern void mef_modo(void){
         	}
         	break;
         case EST_MODO_PEATON:
+        	printf("Estado mef peaton");
             if(mef_peaton()){
             	estado_MEF_modo = EST_MODO_HABITUAL;
             	mef_habitual_init_sec_5();
             }
             break;
         case EST_MODO_SECUNDARIO:
+        	printf("Estado mef secundario");
             if(mef_secundario()){
             	estado_MEF_modo = EST_MODO_HABITUAL;
             }

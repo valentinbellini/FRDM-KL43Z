@@ -1,6 +1,7 @@
 #include "mef_habitual.h"
 #include <stdint.h>
 #include "SD2_board.h"
+#include "key.h"
 
 /*==================[macros and typedef]====================================*/
 
@@ -34,11 +35,13 @@ extern void mef_habitual_init(){
 
 extern void mef_habitual_init_sec_5(){
 	estado_MEF_habitual = EST_SEC_5;
+	key_setCountPressedEv(BOARD_SW_ID_3, 0);
 }
 
 extern tr_enum mef_habitual(void){
     switch(estado_MEF_habitual){
         case EST_SEC_1:
+        	printf("Estado habitual 1");
             board_setLed(LVR, BOARD_LED_MSG_ON);
             board_setLed(LRS, BOARD_LED_MSG_ON);
             board_setLed(LRR, BOARD_LED_MSG_OFF);
@@ -51,11 +54,12 @@ extern tr_enum mef_habitual(void){
             if(key_getPressEv(BOARD_SW_ID_1)){
             	return TR_TO_PEATON;
             }
-            if(getAutos() == 3){
+            if(key_getCountPressedEv(BOARD_SW_ID_3) >= 3){
             	return TR_TO_SECUNDARIO;
             }
             break;
         case EST_SEC_2:
+        	printf("Estado habitual 2");
             board_setLed(LRS, BOARD_LED_MSG_ON);
             board_setLed(LRR, BOARD_LED_MSG_OFF);
             board_setLed(LVS, BOARD_LED_MSG_OFF);
@@ -69,6 +73,7 @@ extern tr_enum mef_habitual(void){
             }
             break;
         case EST_SEC_3:
+        	printf("Estado habitual 3");
             board_setLed(LRR, BOARD_LED_MSG_ON);
             board_setLed(LVS, BOARD_LED_MSG_ON);
             board_setLed(LVR, BOARD_LED_MSG_OFF);
@@ -80,6 +85,7 @@ extern tr_enum mef_habitual(void){
             }
             break;
         case EST_SEC_4:
+        	printf("Estado habitual 4");
             board_setLed(LRR, BOARD_LED_MSG_ON);
             board_setLed(LRS, BOARD_LED_MSG_OFF);
             board_setLed(LVR, BOARD_LED_MSG_OFF);
@@ -92,10 +98,11 @@ extern tr_enum mef_habitual(void){
                 estado_MEF_habitual = EST_SEC_1;
                 key_clearFlags(BOARD_SW_ID_1);
                 key_clearFlags(BOARD_SW_ID_3);
-                resetAutos();
+                key_setCountPressedEv(BOARD_SW_ID_3, 0);
             }
             break;
         case EST_SEC_5:
+        	printf("Estado habitual 5");
         	board_setLed(LVR, BOARD_LED_MSG_ON);
         	board_setLed(LRS, BOARD_LED_MSG_ON);
         	board_setLed(LRR, BOARD_LED_MSG_OFF);
@@ -105,6 +112,9 @@ extern tr_enum mef_habitual(void){
             	timBlink_habitual = DURACION_BLINK;
             	estado_MEF_habitual = EST_SEC_2;
             }
+            if(key_getCountPressedEv(BOARD_SW_ID_3) >= 3){
+            	return TR_TO_SECUNDARIO;
+            }
             break;
     }
 }
@@ -112,6 +122,9 @@ extern tr_enum mef_habitual(void){
 extern void mef_habitual_task1ms(void){
     if(timSec_habitual) timSec_habitual--;
     if(timBlink_habitual) timBlink_habitual--;
+    if(estado_MEF_habitual == EST_SEC_1 || estado_MEF_habitual == EST_SEC_5){
+    	key_countPressedEv(BOARD_SW_ID_3, SUMAR);
+    }
 }
 
 /*==================[end of file]============================================*/

@@ -1,6 +1,8 @@
 #include "mef_secundario.h"
 #include <stdint.h>
 #include "SD2_board.h"
+#include "key.h"
+
 
 /*==================[macros and typedef]====================================*/
 
@@ -52,7 +54,7 @@ extern bool mef_secundario(void){
 		    board_setLed(LRS, BOARD_LED_MSG_OFF);
 		    board_setLed(LRR, BOARD_LED_MSG_ON);
 		    board_setLed(LVS, BOARD_LED_MSG_ON);
-            if(getAutos() == 0){ /* Definir getAutos() que devuelva un entero de autos contadoss */
+            if(key_getCountPressedEv(BOARD_SW_ID_3) == 0){
                 timSec_secundario = DURACION_EST_BLINK_2;
                 timBlink_secundario = DURACION_BLINK;
                 estado_MEF_secundario = EST_BLINK_2;
@@ -77,6 +79,9 @@ extern bool mef_secundario(void){
 extern void mef_secundario_task1ms(void){ 		/* Cada 1ms decrementa los contadores de tiempo */
     if(timSec_secundario) timSec_secundario--;
     if(timBlink_secundario) timBlink_secundario--;
+    if(estado_MEF_secundario == EST_PASO){
+       key_countPressedEv(BOARD_SW_ID_3, RESTAR);
+    }
 }
 
 /*==================[end of file]============================================*/

@@ -47,6 +47,7 @@ typedef enum
 
 static estPul_enum estSW[BOARD_SW_ID_TOTAL];
 static bool eventSW[BOARD_SW_ID_TOTAL];
+static uint16_t count_pressed[BOARD_SW_ID_TOTAL];
 
 /*==================[internal functions declaration]=========================*/
 
@@ -58,19 +59,18 @@ static bool eventSW[BOARD_SW_ID_TOTAL];
 
 /*==================[external functions definition]==========================*/
 
-void key_init(void)
-{
+void key_init(void){
     int32_t i;
 
     for (i = 0 ; i < BOARD_SW_ID_TOTAL ; i++)
     {
         estSW[i] = ESPERANDO_ACTIVACION;
         eventSW[i] = 0;
+        key_setCountPressedEv(i,0);
     }
 }
 
-bool key_getPressEv(board_swId_enum id)
-{
+bool key_getPressEv(board_swId_enum id){
     bool ret = false;
 
     if (eventSW[id])
@@ -82,8 +82,25 @@ bool key_getPressEv(board_swId_enum id)
     return ret;
 }
 
-void key_periodicTask1ms(void)
-{
+void key_countPressedEv(board_swId_enum id, key_count_mode_enum mode){
+	if(key_getPressEv(id)){
+		if(mode == SUMAR)	count_pressed[id]++;
+		else{
+			if(count_pressed[id])	count_pressed[id]--;
+		}
+	}
+}
+
+uint16_t key_getCountPressedEv(board_swId_enum id){
+	return count_pressed[id];
+}
+
+void key_setCountPressedEv(board_swId_enum id, uint8_t setValue){
+	count_pressed[id] = setValue;
+}
+
+
+void key_periodicTask1ms(void){
     int32_t i;
 
     for (i = 0 ; i < BOARD_SW_ID_TOTAL ; i++)
@@ -115,7 +132,7 @@ void key_periodicTask1ms(void)
 // Limpia los indicadores de eventos de un switch específico:
 extern void key_clearFlags(board_swId_enum id)
 {
-	pressSW[id] = 0;    // Reinicia el indicador de pulsación del switch
-s}
+	eventSW[id] = 0;    // Reinicia el indicador de pulsación del switch
+}
 
 /*==================[end of file]============================================*/

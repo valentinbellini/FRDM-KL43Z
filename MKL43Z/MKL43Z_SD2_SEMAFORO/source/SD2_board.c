@@ -44,16 +44,16 @@
 /*==================[internal data declaration]==============================*/
 static const board_gpioInfo_type board_gpioLeds[] =
 {
-    {PORTE, GPIOE, 29},     /* LED ROJO */
+    {PORTE, GPIOE, 31},     /* LED ROJO */
     {PORTD, GPIOD, 5},      /* LED VERDE */
-	{}, /* LED VERDE EXTERNO */
-	{}, /* LED ROJO EXTERNO */
+	{PORTE, GPIOE, 20},		/* LED ROJO EXTERIOR */
+	{PORTB, GPIOB, 0},		/* LED VERDE EXTERIOR */
 };
 
 static const board_gpioInfo_type board_gpioSw[] =
 {
-    {PORTC, GPIOC, 3},      /* SW1 */
-    {PORTC, GPIOC, 12},     /* SW3 */
+    {PORTA, GPIOA, 4},      /* SW1 */
+    {PORTC, GPIOC, 3},     /* SW3 */
 };
 
 /*==================[internal functions declaration]=========================*/
@@ -105,6 +105,7 @@ void board_init(void)
 	};
 
 	CLOCK_EnableClock(kCLOCK_PortA);
+	CLOCK_EnableClock(kCLOCK_PortB);
 	CLOCK_EnableClock(kCLOCK_PortC);
 	CLOCK_EnableClock(kCLOCK_PortD);
 	CLOCK_EnableClock(kCLOCK_PortE);
@@ -145,8 +146,9 @@ void board_setLed(board_ledId_enum id, board_ledMsg_enum msg)
     }
 }
 
-bool board_getSw(board_swId_enum id){
-    return !GPIO_ReadPinInput(board_gpioSw[id].gpio, board_gpioSw[id].pin);
+bool board_getSw(board_swId_enum id)
+{
+    return !GPIO_PinRead(board_gpioSw[id].gpio, board_gpioSw[id].pin);
 }
 
 /*==================[end of file]============================================*/

@@ -45,13 +45,19 @@ extern "C" {
 /*==================[macros]=================================================*/
 
 /*==================[typedef]================================================*/
-
+typedef enum{
+	SUMAR,
+	RESTAR
+} key_count_mode_enum;
 /*==================[external data declaration]==============================*/
 
 /*==================[external functions definition]==========================*/
 extern void key_init(void);
 extern bool key_getPressEv(board_swId_enum id);
 extern void key_periodicTask1ms(void);
+extern void key_countPressedEv(board_swId_enum id, key_count_mode_enum mode);
+extern uint16_t key_getCountPressedEv(board_swId_enum id);
+extern void key_setCountPressedEv(board_swId_enum id, uint8_t setValue);
 extern void key_clearFlags(board_swId_enum id);
 
 /*==================[cplusplus]==============================================*/
