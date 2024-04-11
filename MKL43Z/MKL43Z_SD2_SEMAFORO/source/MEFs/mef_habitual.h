@@ -21,6 +21,7 @@ typedef enum {
 /*==================[external functions declaration]=========================*/
 
 extern void mef_habitual_init(void);
+extern void mef_habitual_reset(void);
 extern void mef_habitual_init_sec_5(void);
 extern tr_enum mef_habitual(void);
 extern void mef_habitual_task1ms(void);

@@ -5,9 +5,9 @@
 
 /*==================[macros and typedef]====================================*/
 
-#define DURACION_EST_BLINK_1 	10000	//10 seg
-#define DURACION_EST_PASO 		60000	//1 min
-#define DURACION_EST_BLINK_2 	10000   //10 seg
+#define DURACION_EST_BLINK_1 	5000	//10 seg
+#define DURACION_EST_PASO 		10000	//1 min
+#define DURACION_EST_BLINK_2 	5000   //10 seg
 #define DURACION_BLINK 			200 	// 200 ms
 
 typedef enum{
@@ -40,7 +40,6 @@ extern bool mef_peaton(void){ /* Bool porque tengo que evaluarla para ver si sal
             board_setLed(LRS, BOARD_LED_MSG_ON);
 		    board_setLed(LRR, BOARD_LED_MSG_OFF);
 		    board_setLed(LVS, BOARD_LED_MSG_OFF);
-
             if(timBlink_peaton == 0){
                 timBlink_peaton = DURACION_BLINK;
                 board_setLed(LVR, BOARD_LED_MSG_TOGGLE);
@@ -55,6 +54,7 @@ extern bool mef_peaton(void){ /* Bool porque tengo que evaluarla para ver si sal
 		    board_setLed(LRS, BOARD_LED_MSG_OFF);
 		    board_setLed(LRR, BOARD_LED_MSG_ON);
 		    board_setLed(LVS, BOARD_LED_MSG_ON);
+		    count_setCarCount(BOARD_SW_ID_3, 0); // Seteo la cuenta en 0 --> Pasan todos los autos (nuestra elección)
             if(timSec_peaton == 0) {
                 timSec_peaton = DURACION_EST_BLINK_2;
                 timBlink_peaton = DURACION_BLINK;
@@ -70,7 +70,7 @@ extern bool mef_peaton(void){ /* Bool porque tengo que evaluarla para ver si sal
                 board_setLed(LRR, BOARD_LED_MSG_TOGGLE);
             }
             if(timSec_peaton == 0){
-                return true;
+                return true;		// Devuelve true para que la mef_modo habilite ir hacia la mef_habitual estado SEC5
             }
             break;
     }

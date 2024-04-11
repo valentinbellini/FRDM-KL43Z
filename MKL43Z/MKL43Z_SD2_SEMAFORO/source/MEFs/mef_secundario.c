@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include "SD2_board.h"
 #include "key.h"
+#include "cont_autos.h"
 
 
 /*==================[macros and typedef]====================================*/
@@ -34,7 +35,6 @@ extern void mef_secundario_reset(void){
 	estado_MEF_secundario = EST_BLINK_1;
 }
 
-
 extern bool mef_secundario(void){
     switch(estado_MEF_secundario){
         case EST_BLINK_1:
@@ -54,7 +54,8 @@ extern bool mef_secundario(void){
 		    board_setLed(LRS, BOARD_LED_MSG_OFF);
 		    board_setLed(LRR, BOARD_LED_MSG_ON);
 		    board_setLed(LVS, BOARD_LED_MSG_ON);
-            if(key_getCountPressedEv(BOARD_SW_ID_3) == 0){
+		    count_updateCarCount(BOARD_SW_ID_3, RESTAR);
+            if(count_getCarCount(BOARD_SW_ID_3) == 0){
                 timSec_secundario = DURACION_EST_BLINK_2;
                 timBlink_secundario = DURACION_BLINK;
                 estado_MEF_secundario = EST_BLINK_2;
@@ -79,9 +80,9 @@ extern bool mef_secundario(void){
 extern void mef_secundario_task1ms(void){ 		/* Cada 1ms decrementa los contadores de tiempo */
     if(timSec_secundario) timSec_secundario--;
     if(timBlink_secundario) timBlink_secundario--;
-    if(estado_MEF_secundario == EST_PASO){
-       key_countPressedEv(BOARD_SW_ID_3, RESTAR);
-    }
+//    if(estado_MEF_secundario == EST_PASO){
+//    	count_updateCarCount(BOARD_SW_ID_3, RESTAR);
+//    }
 }
 
 /*==================[end of file]============================================*/
