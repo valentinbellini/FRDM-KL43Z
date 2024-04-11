@@ -3,7 +3,7 @@
 #include <stdint.h>
 #include "SD2_board.h"
 
-/*==================[macros and typedef]====================================*/
+/*==================[macros and typedef]==================================== */
 
 #define DURACION_EST_BLINK_1 	5000	//10 seg
 #define DURACION_EST_PASO 		10000	//1 min
@@ -16,7 +16,7 @@ typedef enum{
 	EST_BLINK_2			// Estado blink_2: Blink LRR
 } estMefPeaton_enum;
 
-/*==================[internal data definition]==============================*/
+/*==================[internal data definition]============================== */
 
 static estMefPeaton_enum estado_MEF_peaton;
 static uint32_t timSec_peaton;				// Timer de secuencia

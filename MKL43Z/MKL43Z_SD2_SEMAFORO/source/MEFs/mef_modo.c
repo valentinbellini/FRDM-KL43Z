@@ -10,7 +10,7 @@
 #include "cont_autos.h"
 
 /*==================[macros and typedef]====================================*/
-typedef enum {
+typedef enum { // MEF states
     EST_MODO_HABITUAL = 0,
     EST_MODO_PEATON,
     EST_MODO_SECUNDARIO,
@@ -18,22 +18,21 @@ typedef enum {
 
 /*==================[internal data definition]==============================*/
 static estMefModo_enum estado_MEF_modo;
-
 /*==================[external functions definition]=========================*/
 
-extern void mef_modo_init(void){
-    estado_MEF_modo = EST_MODO_HABITUAL;
-    count_resetCarCount(BOARD_SW_ID_3); // Setting car count at initial value: 0
-    /* Inicializacion de sub-mefs */
+void mef_modo_init(void){
+    estado_MEF_modo = EST_MODO_HABITUAL;	// Initial State
+    count_resetCarCount(BOARD_SW_ID_3); 	// Setting car count at initial value: 0
+    /* sub-mefs initialization */
     mef_habitual_init();
     mef_peaton_init();
     mef_secundario_init();
 }
 
-extern void mef_modo(void){
+void mef_modo(void){
     switch(estado_MEF_modo){
         case EST_MODO_HABITUAL:
-        	switch(mef_habitual()){
+        	switch(mef_habitual()){		// MEF evaluation return tr_enum type
         		case TR_TO_PEATON:
         			estado_MEF_modo = EST_MODO_PEATON;
         			mef_peaton_reset();
@@ -42,22 +41,19 @@ extern void mef_modo(void){
         			estado_MEF_modo = EST_MODO_SECUNDARIO;
         			mef_secundario_reset();
         		break;
-        		case TR_NONE:
-        			estado_MEF_modo = EST_MODO_HABITUAL;
-        		break;
         		default:
         			estado_MEF_modo = EST_MODO_HABITUAL;
         		break;
         	}
         	break;
         case EST_MODO_PEATON:
-            if(mef_peaton()){
+            if(mef_peaton()){			// MEF evaluation return bool
             	estado_MEF_modo = EST_MODO_HABITUAL;
             	mef_habitual_init_sec_5();
             }
             break;
         case EST_MODO_SECUNDARIO:
-            if(mef_secundario()){
+            if(mef_secundario()){		// MEF evaluation return bool
             	estado_MEF_modo = EST_MODO_HABITUAL;
             	mef_habitual_reset();
             }
@@ -65,7 +61,7 @@ extern void mef_modo(void){
     }
 }
 
-extern void mef_modo_task1ms(void){
+void mef_modo_task1ms(void){
     if (estado_MEF_modo == EST_MODO_HABITUAL) mef_habitual_task1ms();
     if (estado_MEF_modo == EST_MODO_PEATON) mef_peaton_task1ms();
     if (estado_MEF_modo == EST_MODO_SECUNDARIO) mef_secundario_task1ms();

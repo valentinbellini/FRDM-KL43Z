@@ -1,6 +1,7 @@
 /**
  * @file    main.c
  * @brief   Application entry point.
+ * @autor	Valentin Bellini & Iván Saitta
  */
 
 /*==================[inclusions]=============================================*/
@@ -16,11 +17,8 @@
 #include "board.h"
 #include "key.h"
 
-/*
- * @brief   Application entry point.
- */
 int main(void) {
-	/* Inicializaciones */
+	/* ================== [ initialization ] ==================================== */
 	BOARD_InitBootPins();
 	BOARD_InitBootClocks();
 	BOARD_InitBootPeripherals();
@@ -31,7 +29,7 @@ int main(void) {
 	key_init();
 	mef_modo_init();
 
-	/* interrupción de systick cada 1 ms */
+	/* Interrupción de systick seteada cada 1 ms */
 	SysTick_Config(SystemCoreClock / 1000U);
 
 	while (1){
@@ -39,7 +37,6 @@ int main(void) {
 	}
 	return 0 ;
 }
-
 
 void SysTick_Handler(void){
 	key_periodicTask1ms();
