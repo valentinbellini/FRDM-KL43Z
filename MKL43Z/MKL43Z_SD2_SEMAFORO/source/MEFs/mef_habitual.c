@@ -6,19 +6,19 @@
 
 /*==================[macros and typedef]====================================*/
 
-#define DURACION_SEC_1				20000	// 2 min
-#define DURACION_SEC_2				5000	// 5 seg
-#define DURACION_SEC_3				10000 	// 30 seg
-#define DURACION_SEC_4				5000	// 5 seg
-#define DURACION_BLINK    			200     // 200ms
+#define DURACION_SEC_1				20000
+#define DURACION_SEC_2				5000
+#define DURACION_SEC_3				10000
+#define DURACION_SEC_4				5000
+#define DURACION_BLINK    			100
 
 
 typedef enum{
-	EST_SEC_1 = 0,
-	EST_SEC_2,
-	EST_SEC_3,
-    EST_SEC_4,
-	EST_SEC_5
+	EST_SEC_1 = 0, 	// Paso por la ruta principal (LVR ON)
+	EST_SEC_2,		// Blink LVR indicando cambio de paso
+	EST_SEC_3,		// Paso por el camino secundario (LRR ON)
+    EST_SEC_4,		// Blink LVS indicando cambio de paso
+	EST_SEC_5		// Idem SEC_1 pero no se puede pasar a la MEF_PEATONAL
 } estMefHabitual_enum;
 
 /*==================[internal data definition]==============================*/
@@ -40,7 +40,7 @@ extern void mef_habitual_reset(){
 
 extern void mef_habitual_init_sec_5(){
 	estado_MEF_habitual = EST_SEC_5;
-	count_setCarCount(BOARD_SW_ID_3, 0);
+	count_resetCarCount(BOARD_SW_ID_3);
 }
 
 extern tr_enum mef_habitual(void){
@@ -63,6 +63,7 @@ extern tr_enum mef_habitual(void){
             if(count_getCarCount(BOARD_SW_ID_3) >= 3){
             	return TR_TO_SECUNDARIO;
             }
+            return TR_NONE;
             break;
         case EST_SEC_2:
         	printf("Estado habitual 2");
@@ -77,6 +78,7 @@ extern tr_enum mef_habitual(void){
             	timSec_habitual = DURACION_SEC_3;
                 estado_MEF_habitual = EST_SEC_3;
             }
+            return TR_NONE;
             break;
         case EST_SEC_3:
         	printf("Estado habitual 3");
@@ -89,6 +91,7 @@ extern tr_enum mef_habitual(void){
                 estado_MEF_habitual = EST_SEC_4;
                 timBlink_habitual = DURACION_BLINK;
             }
+            else return TR_NONE;
             break;
         case EST_SEC_4:
         	printf("Estado habitual 4");
@@ -102,10 +105,11 @@ extern tr_enum mef_habitual(void){
             if(timSec_habitual == 0){
             	key_clearFlags(BOARD_SW_ID_1);
             	key_clearFlags(BOARD_SW_ID_3);
-            	count_setCarCount(BOARD_SW_ID_3, 0);
+            	count_resetCarCount(BOARD_SW_ID_3);
                 timSec_habitual = DURACION_SEC_1;
                 estado_MEF_habitual = EST_SEC_1;
             }
+            return TR_NONE;
             break;
         case EST_SEC_5: // Se entra solo si se ejecuta mef_habitual_init_sec_5()
         	printf("Estado habitual 5");
@@ -122,6 +126,7 @@ extern tr_enum mef_habitual(void){
             if(count_getCarCount(BOARD_SW_ID_3) >= 3){
             	return TR_TO_SECUNDARIO;
             }
+            return TR_NONE;
             break;
     }
 }

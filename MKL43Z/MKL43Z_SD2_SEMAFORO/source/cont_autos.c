@@ -4,22 +4,22 @@
 /*==================[macros and definitions]=================================*/
 
 /*==================[internal data declaration]==============================*/
-static uint8_t count_pressed;
+static uint8_t car_count;
 
 /*==================[external functions definition]==========================*/
-void count_updateCarCount(board_swId_enum id, key_count_mode_enum mode){
+void count_updateCarCount(board_swId_enum id, car_count_mode_enum mode){
 	if(key_getPressEv(BOARD_SW_ID_3)){
-		if(mode == SUMAR)	count_pressed++;
+		if(mode == SUMAR)	car_count++;
 		else{
-			if(count_pressed)	count_pressed--;
+			if(car_count)	car_count--;
 		}
 	}
 }
 
 uint8_t count_getCarCount(board_swId_enum id){
-	return count_pressed;
+	return car_count;
 }
 
-void count_setCarCount(board_swId_enum id, uint8_t setValue){
-	count_pressed= setValue;
+void count_resetCarCount(board_swId_enum id){
+	car_count = 0;
 }

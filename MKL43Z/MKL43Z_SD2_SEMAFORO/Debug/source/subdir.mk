@@ -5,6 +5,7 @@
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
 ../source/SD2_board.c \
+../source/cont_autos.c \
 ../source/key.c \
 ../source/main.c \
 ../source/mtb.c \
@@ -12,6 +13,7 @@ C_SRCS += \
 
 C_DEPS += \
 ./source/SD2_board.d \
+./source/cont_autos.d \
 ./source/key.d \
 ./source/main.d \
 ./source/mtb.d \
@@ -19,6 +21,7 @@ C_DEPS += \
 
 OBJS += \
 ./source/SD2_board.o \
+./source/cont_autos.o \
 ./source/key.o \
 ./source/main.o \
 ./source/mtb.o \
@@ -37,7 +40,7 @@ source/%.o: ../source/%.c source/subdir.mk
 clean: clean-source
 
 clean-source:
-	-$(RM) ./source/SD2_board.d ./source/SD2_board.o ./source/key.d ./source/key.o ./source/main.d ./source/main.o ./source/mtb.d ./source/mtb.o ./source/semihost_hardfault.d ./source/semihost_hardfault.o
+	-$(RM) ./source/SD2_board.d ./source/SD2_board.o ./source/cont_autos.d ./source/cont_autos.o ./source/key.d ./source/key.o ./source/main.d ./source/main.o ./source/mtb.d ./source/mtb.o ./source/semihost_hardfault.d ./source/semihost_hardfault.o
 
 .PHONY: clean-source
 

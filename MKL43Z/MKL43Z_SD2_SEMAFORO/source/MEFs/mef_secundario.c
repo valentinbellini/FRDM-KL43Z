@@ -9,7 +9,7 @@
 
 #define DURACION_EST_BLINK_1   		5000	// 5seg
 #define DURACION_EST_BLINK_2   		5000	// 5seg
-#define DURACION_BLINK    			200     // 200ms
+#define DURACION_BLINK    			500     // 200ms
 
 typedef enum{
 	EST_BLINK_1 = 0, 	// Estado inicial: Blink LVR

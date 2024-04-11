@@ -3,7 +3,10 @@
 #include <MEFs/mef_peaton.h>
 #include <MEFs/mef_secundario.h>
 #include <stdint.h>
+#include <stdbool.h>
+
 #include "SD2_board.h"
+#include "key.h"
 #include "cont_autos.h"
 
 /*==================[macros and typedef]====================================*/
@@ -20,7 +23,7 @@ static estMefModo_enum estado_MEF_modo;
 
 extern void mef_modo_init(void){
     estado_MEF_modo = EST_MODO_HABITUAL;
-    count_setCarCount(BOARD_SW_ID_3,0); // Setting car count at initial value: 0
+    count_resetCarCount(BOARD_SW_ID_3); // Setting car count at initial value: 0
     /* Inicializacion de sub-mefs */
     mef_habitual_init();
     mef_peaton_init();
@@ -38,6 +41,9 @@ extern void mef_modo(void){
         		case TR_TO_SECUNDARIO:
         			estado_MEF_modo = EST_MODO_SECUNDARIO;
         			mef_secundario_reset();
+        		break;
+        		case TR_NONE:
+        			estado_MEF_modo = EST_MODO_HABITUAL;
         		break;
         		default:
         			estado_MEF_modo = EST_MODO_HABITUAL;

@@ -16,6 +16,7 @@ extern "C" {
 extern void mef_modo_init(void);
 extern void mef_modo(void);
 extern void mef_modo_task1ms(void);
+// extern: para indicar que la definición de la función se encuentra en otro archivo de código fuente
 /*==================[cplusplus]==============================================*/
 #ifdef __cplusplus
 }

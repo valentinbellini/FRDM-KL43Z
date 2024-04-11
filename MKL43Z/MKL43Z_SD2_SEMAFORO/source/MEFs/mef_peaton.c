@@ -54,7 +54,7 @@ extern bool mef_peaton(void){ /* Bool porque tengo que evaluarla para ver si sal
 		    board_setLed(LRS, BOARD_LED_MSG_OFF);
 		    board_setLed(LRR, BOARD_LED_MSG_ON);
 		    board_setLed(LVS, BOARD_LED_MSG_ON);
-		    count_setCarCount(BOARD_SW_ID_3, 0); // Seteo la cuenta en 0 --> Pasan todos los autos (nuestra elección)
+		    count_resetCarCount(BOARD_SW_ID_3); // Seteo la cuenta en 0 --> Pasan todos los autos (nuestra elección)
             if(timSec_peaton == 0) {
                 timSec_peaton = DURACION_EST_BLINK_2;
                 timBlink_peaton = DURACION_BLINK;

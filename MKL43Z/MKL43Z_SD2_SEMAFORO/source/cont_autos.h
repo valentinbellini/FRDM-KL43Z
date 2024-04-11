@@ -3,6 +3,7 @@
 
 /*==================[inclusions]=============================================*/
 #include "SD2_board.h"
+#include <stdint.h>
 
 /*==================[cplusplus]==============================================*/
 #ifdef __cplusplus
@@ -15,14 +16,14 @@ extern "C" {
 typedef enum{
 	SUMAR,
 	RESTAR
-} key_count_mode_enum;
+} car_count_mode_enum;
  /*==================[external data declaration]==============================*/
 
 /*==================[external functions definition]==========================*/
 
-extern void count_updateCarCount(board_swId_enum id, key_count_mode_enum mode);
+extern void count_updateCarCount(board_swId_enum id, car_count_mode_enum mode);
 extern uint8_t count_getCarCount(board_swId_enum id);
-extern void count_setCarCount(board_swId_enum id, uint8_t setValue);
+extern void count_resetCarCount(board_swId_enum id);
 
 /*==================[cplusplus]==============================================*/
 #ifdef __cplusplus

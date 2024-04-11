@@ -1,3 +1,4 @@
-../source/key.c:61:6:key_init	16	static
-../source/key.c:72:6:key_getPressEv	24	static
-../source/key.c:85:6:key_periodicTask1ms	16	static
+../source/key.c:54:6:key_init	16	static
+../source/key.c:64:6:key_getPressEv	24	static
+../source/key.c:76:6:key_periodicTask1ms	16	static
+../source/key.c:106:13:key_clearFlags	16	static
