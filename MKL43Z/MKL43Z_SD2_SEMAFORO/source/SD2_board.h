@@ -48,10 +48,10 @@ extern "C" {
 
 typedef enum
 {
-    LRR = 0,
-    LVR,
-	LRS,
-	LVS,
+    LRR = 0,		// Led Rojo Ruta
+    LVR,			// Led Verde Ruta
+	LRS,			// Led Rojo secundario
+	LVS,			// Led Verde secundario
     BOARD_LED_ID_TOTAL
 }board_ledId_enum;
 
@@ -82,7 +82,7 @@ typedef struct
 
 /*==================[external functions definition]==========================*/
 
-/** \brief inicializaci�n del hardware
+/** \brief inicializacion del hardware
  **
  **/
 void board_init(void);
@@ -94,8 +94,8 @@ void board_setLed(board_ledId_enum id, board_ledMsg_enum msg);
 
 /** \brief Devuelve estado del pulsador indicado
  **
- ** \return true: si el pulsdor est� apretado
- **         false: si el pulsador no est� apretado
+ ** \return true: si el pulsdor esta apretado
+ **         false: si el pulsador no esta apretado
  **/
 bool board_getSw(board_swId_enum id);
 

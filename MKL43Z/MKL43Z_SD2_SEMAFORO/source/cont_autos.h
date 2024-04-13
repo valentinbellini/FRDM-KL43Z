@@ -1,9 +1,16 @@
+/**
+ * @file    cont_autos.h
+ * @brief   Car counting thru the switches.
+ * @autor	Valentin Bellini & Iván Saitta
+ */
+
 #ifndef CONT_AUTOS_H
 #define CONT_AUTOS_H
 
 /*==================[inclusions]=============================================*/
-#include "SD2_board.h"
+#include "SD2_board.h" 	// Import for board_swId_enum
 #include <stdint.h>
+#include "key.h"		// Import for key_getPressEv(board_swId_enum)
 
 /*==================[cplusplus]==============================================*/
 #ifdef __cplusplus

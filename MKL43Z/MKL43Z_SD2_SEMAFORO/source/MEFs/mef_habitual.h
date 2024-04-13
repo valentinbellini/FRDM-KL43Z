@@ -1,3 +1,9 @@
+/**
+ * @file    mef_habitual.h
+ * @brief   MEF for Normal Operation
+ * @autor	Valentin Bellini & Iván Saitta
+ */
+
 #ifndef MEF_HABITUAL_H_
 #define MEF_HABITUAL_H_
 

@@ -1,3 +1,9 @@
+/**
+ * @file    mef_peaton.h
+ * @brief   MEF for the pedestrian crossing
+ * @autor	Valentin Bellini & Iván Saitta
+ */
+
 #ifndef MEF_PEATON_H_
 #define MEF_PEATON_H_
 
@@ -15,7 +21,7 @@ extern "C" {
 /*==================[external functions declaration]=========================*/
 extern void mef_peaton_init(void);
 extern void mef_peaton_reset(void);
-extern bool mef_peaton();	// True si hay que salir de la mef
+extern bool mef_peaton();				// True for move on to MEF_Habitual
 extern void mef_peaton_task1ms(void);
 /*==================[cplusplus]==============================================*/
 #ifdef __cplusplus

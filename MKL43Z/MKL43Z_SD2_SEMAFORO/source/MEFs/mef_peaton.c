@@ -1,26 +1,35 @@
+/**
+ * @file    mef_peaton.c
+ * @brief   MEF for the pedestrian crossing
+ * @autor	Valentin Bellini & Iván Saitta
+ */
 
+/*==================[inclusions]=============================================*/
 #include "mef_peaton.h"
 #include <stdint.h>
 #include "SD2_board.h"
+#include "cont_autos.h"
 
 /*==================[macros and typedef]==================================== */
 
-#define DURACION_EST_BLINK_1 	5000	//10 seg
-#define DURACION_EST_PASO 		10000	//1 min
-#define DURACION_EST_BLINK_2 	5000   //10 seg
-#define DURACION_BLINK 			200 	// 200 ms
+
+#define DURATION_EST_BLINK_1 	5000
+#define DURATION_EST_PASO 		10000
+#define DURATION_EST_BLINK_2 	5000
+#define DURATION_BLINK 			200
+// Times in mS.
 
 typedef enum{
-	EST_BLINK_1 = 0,	// Estado inicial: Blink LVR
-	EST_PASO,			// Estado paso: Cruce peatonal en ruta habilitado
-	EST_BLINK_2			// Estado blink_2: Blink LRR
+	EST_BLINK_1 = 0,	// Initial state (blink_1): Blink LVR
+	EST_PASO,			// "Paso" state: Pedestrian crossing on main route enabled
+	EST_BLINK_2			// blink_2 state: Blink LRR
 } estMefPeaton_enum;
 
 /*==================[internal data definition]============================== */
 
 static estMefPeaton_enum estado_MEF_peaton;
-static uint32_t timSec_peaton;				// Timer de secuencia
-static uint32_t timBlink_peaton;			// Timer de blink led
+static uint32_t timSec_peaton;				// Timer to move on differents states.
+static uint32_t timBlink_peaton;			// Timer to blink leds.
 
 /*==================[external functions definition]=========================*/
 
@@ -29,23 +38,24 @@ extern void mef_peaton_init(void){
 }
 
 extern void mef_peaton_reset(void){
-    timSec_peaton = DURACION_EST_BLINK_1;
-    timBlink_peaton = DURACION_BLINK;
+    timSec_peaton = DURATION_EST_BLINK_1;
+    timBlink_peaton = DURATION_BLINK;
     estado_MEF_peaton = EST_BLINK_1;
 }
 
-extern bool mef_peaton(void){ /* Bool porque tengo que evaluarla para ver si salgo o no*/
+/* mef_peaton: Return bool True to move on to MEF_Habitual */
+extern bool mef_peaton(void){
     switch(estado_MEF_peaton){
         case EST_BLINK_1:
             board_setLed(LRS, BOARD_LED_MSG_ON);
 		    board_setLed(LRR, BOARD_LED_MSG_OFF);
 		    board_setLed(LVS, BOARD_LED_MSG_OFF);
             if(timBlink_peaton == 0){
-                timBlink_peaton = DURACION_BLINK;
+                timBlink_peaton = DURATION_BLINK;
                 board_setLed(LVR, BOARD_LED_MSG_TOGGLE);
             }
             if(timSec_peaton == 0) {
-                timSec_peaton = DURACION_EST_PASO;
+                timSec_peaton = DURATION_EST_PASO;
                 estado_MEF_peaton = EST_PASO;
             }
             break;
@@ -54,10 +64,10 @@ extern bool mef_peaton(void){ /* Bool porque tengo que evaluarla para ver si sal
 		    board_setLed(LRS, BOARD_LED_MSG_OFF);
 		    board_setLed(LRR, BOARD_LED_MSG_ON);
 		    board_setLed(LVS, BOARD_LED_MSG_ON);
-		    count_resetCarCount(BOARD_SW_ID_3); // Seteo la cuenta en 0 --> Pasan todos los autos (nuestra elección)
+		    count_resetCarCount(BOARD_SW_ID_3); // Car Count set to 0 --> All cars pass without press switch when secondary route is enabled.
             if(timSec_peaton == 0) {
-                timSec_peaton = DURACION_EST_BLINK_2;
-                timBlink_peaton = DURACION_BLINK;
+                timSec_peaton = DURATION_EST_BLINK_2;
+                timBlink_peaton = DURATION_BLINK;
                 estado_MEF_peaton = EST_BLINK_2;
             }
             break;
@@ -66,15 +76,15 @@ extern bool mef_peaton(void){ /* Bool porque tengo que evaluarla para ver si sal
 		    board_setLed(LRS, BOARD_LED_MSG_OFF);
 		    board_setLed(LVS, BOARD_LED_MSG_ON);
             if(timBlink_peaton == 0){
-                timBlink_peaton = DURACION_BLINK;
+                timBlink_peaton = DURATION_BLINK;
                 board_setLed(LRR, BOARD_LED_MSG_TOGGLE);
             }
             if(timSec_peaton == 0){
-                return true;		// Devuelve true para que la mef_modo habilite ir hacia la mef_habitual estado SEC5
+                return true;		// Returns true for the mef_modo to enable go to the mef_habitual SEC_5 state
             }
             break;
     }
-    return false;
+    return false; // By default the MEF returns false.
 }
 
 extern void mef_peaton_task1ms(void){
