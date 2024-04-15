@@ -5,8 +5,8 @@
  */
 
 /*==================[inclusions]=============================================*/
-#include "mef_habitual.h"
 #include <stdint.h>
+#include "mef_habitual.h"
 #include "SD2_board.h"
 #include "key.h"
 #include "cont_autos.h"
@@ -50,6 +50,8 @@ extern void mef_habitual_reset(){
 
 extern void mef_habitual_init_sec_5(){
 	estado_MEF_habitual = EST_SEC_5;
+	key_clearFlags(BOARD_SW_ID_1);
+	key_clearFlags(BOARD_SW_ID_3);
 	count_resetCarCount(BOARD_SW_ID_3);
 }
 
@@ -60,19 +62,21 @@ extern tr_enum mef_habitual(void){
             board_setLed(LRS, BOARD_LED_MSG_ON);
             board_setLed(LRR, BOARD_LED_MSG_OFF);
             board_setLed(LVS, BOARD_LED_MSG_OFF);
-            count_updateCarCount(BOARD_SW_ID_3, SUMAR); // Add a car to the count if the switch flags is True
+
+            if(key_getPressEv(BOARD_SW_ID_3)) count_updateCarCount(BOARD_SW_ID_3, SUMAR); // Add a car to the count if the switch flags is True
+            if(key_getPressEv(BOARD_SW_ID_1)) return TR_TO_PEATON;	// Return transition to mef_peaton
+            if(count_getCarCount(BOARD_SW_ID_3) >= CAR_COUNT_MAX)return TR_TO_SECUNDARIO;	// Return transition to mef_secundario
             if(timSec_habitual == 0){
-                timSec_habitual = DURATION_SEC_2;
+            	timSec_habitual = DURATION_SEC_2;
                 estado_MEF_habitual = EST_SEC_2;
                 timBlink_habitual = DURATION_BLINK;
             }
-            if(key_getPressEv(BOARD_SW_ID_1)) return TR_TO_PEATON;	// Return transition to mef_peaton
-            else if(count_getCarCount(BOARD_SW_ID_3) >= CAR_COUNT_MAX)return TR_TO_SECUNDARIO;	// Return transition to mef_secundario
             break;
         case EST_SEC_2:
             board_setLed(LRS, BOARD_LED_MSG_ON);
             board_setLed(LRR, BOARD_LED_MSG_OFF);
             board_setLed(LVS, BOARD_LED_MSG_OFF);
+
             if(timBlink_habitual == 0){
             	board_setLed(LVR, BOARD_LED_MSG_TOGGLE);
                 timBlink_habitual = DURATION_BLINK;
@@ -87,6 +91,7 @@ extern tr_enum mef_habitual(void){
             board_setLed(LVS, BOARD_LED_MSG_ON);
             board_setLed(LVR, BOARD_LED_MSG_OFF);
             board_setLed(LRS, BOARD_LED_MSG_OFF);
+
             if(timSec_habitual == 0){
                 timSec_habitual = DURATION_SEC_4;
                 estado_MEF_habitual = EST_SEC_4;
@@ -97,6 +102,7 @@ extern tr_enum mef_habitual(void){
             board_setLed(LRR, BOARD_LED_MSG_ON);
             board_setLed(LRS, BOARD_LED_MSG_OFF);
             board_setLed(LVR, BOARD_LED_MSG_OFF);
+
             if(timBlink_habitual == 0){
             	board_setLed(LVS, BOARD_LED_MSG_TOGGLE);
                 timBlink_habitual = DURATION_BLINK;
@@ -114,13 +120,14 @@ extern tr_enum mef_habitual(void){
         	board_setLed(LRS, BOARD_LED_MSG_ON);
         	board_setLed(LRR, BOARD_LED_MSG_OFF);
             board_setLed(LVS, BOARD_LED_MSG_OFF);
-            count_updateCarCount(BOARD_SW_ID_3, SUMAR); // Add a car to the count if the switch flags is True
-            if(timSec_habitual == 0){
-            	timSec_habitual = DURATION_SEC_2;
-            	estado_MEF_habitual = EST_SEC_2;
-            	timBlink_habitual = DURATION_BLINK;
-            }
+
+            if(key_getPressEv(BOARD_SW_ID_3)) count_updateCarCount(BOARD_SW_ID_3, SUMAR); // Add a car to the count if the switch flags is True
             if(count_getCarCount(BOARD_SW_ID_3) >= CAR_COUNT_MAX) return TR_TO_SECUNDARIO; // Return transition to mef_secundario
+            if(timSec_habitual == 0){
+				timSec_habitual = DURATION_SEC_2;
+				estado_MEF_habitual = EST_SEC_2;
+				timBlink_habitual = DURATION_BLINK;
+            }
             break;
     }
     return TR_NONE;	// By default the MEF returns none transition

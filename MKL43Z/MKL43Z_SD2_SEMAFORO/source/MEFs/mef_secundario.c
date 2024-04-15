@@ -4,12 +4,13 @@
  * @autor	Valentin Bellini & Iván Saitta
  */
 
-#include "mef_secundario.h"
+/*==================[inclusions]=============================================*/
+
 #include <stdint.h>
 #include "SD2_board.h"
 #include "key.h"
 #include "cont_autos.h"
-
+#include "mef_secundario.h"
 
 /*==================[macros and typedef]====================================*/
 
@@ -49,20 +50,20 @@ extern bool mef_secundario(void){
             board_setLed(LRS, BOARD_LED_MSG_ON);
 		    board_setLed(LRR, BOARD_LED_MSG_OFF);
 		    board_setLed(LVS, BOARD_LED_MSG_OFF);
+
             if(timBlink_secundario == 0){
                 timBlink_secundario = DURATION_BLINK;
                 board_setLed(LVR, BOARD_LED_MSG_TOGGLE);
             }
-            if(timSec_secundario == 0){
-                estado_MEF_secundario = EST_PASO;
-            }
+            if(timSec_secundario == 0)	estado_MEF_secundario = EST_PASO;
             break;
         case EST_PASO:
             board_setLed(LVR, BOARD_LED_MSG_OFF);
 		    board_setLed(LRS, BOARD_LED_MSG_OFF);
 		    board_setLed(LRR, BOARD_LED_MSG_ON);
 		    board_setLed(LVS, BOARD_LED_MSG_ON);
-		    count_updateCarCount(BOARD_SW_ID_3, RESTAR);
+
+		    if(key_getPressEv(BOARD_SW_ID_3)) count_updateCarCount(BOARD_SW_ID_3, RESTAR);
             if(count_getCarCount(BOARD_SW_ID_3) == 0){	// Will stay on this state until the switch is been pressed three times (Car Count in 0).
                 timSec_secundario = DURATION_EST_BLINK_2;
                 timBlink_secundario = DURATION_BLINK;
@@ -73,13 +74,12 @@ extern bool mef_secundario(void){
             board_setLed(LRS, BOARD_LED_MSG_OFF);
 		    board_setLed(LRR, BOARD_LED_MSG_ON);
 		    board_setLed(LVR, BOARD_LED_MSG_OFF);
+
             if(timBlink_secundario == 0){
                 timBlink_secundario = DURATION_BLINK;
                 board_setLed(LVS, BOARD_LED_MSG_TOGGLE);
             }
-            if(timSec_secundario == 0){
-                return true;	// Returns true for the mef_modo to enable go to the mef_habitual
-            }
+            if(timSec_secundario == 0)	return true;	// Returns true for the mef_modo to enable go to the mef_habitual
             break;
     }
     return false;	// By default the MEF returns false.

@@ -10,7 +10,6 @@
 #include <MEFs/mef_peaton.h>
 #include <MEFs/mef_secundario.h>
 #include <stdint.h>
-#include <stdbool.h>
 
 #include "SD2_board.h"
 #include "key.h"
@@ -26,7 +25,6 @@ typedef enum { // MEF states
 /*==================[internal data definition]==============================*/
 static estMefModo_enum estado_MEF_modo;
 /*==================[external functions definition]=========================*/
-
 void mef_modo_init(void){
     estado_MEF_modo = EST_MODO_HABITUAL;	// Initial State
     count_resetCarCount(BOARD_SW_ID_3); 	// Setting car count at initial value: 0
@@ -60,7 +58,7 @@ void mef_modo(void){
             }
             break;
         case EST_MODO_SECUNDARIO:
-            if(mef_secundario()){		// MEF evaluation return bool.
+            if(mef_secundario()){		// MEF evaluation return bool. True if car count is 0.
             	estado_MEF_modo = EST_MODO_HABITUAL;
             	mef_habitual_reset();	// Transition with Reset.
             }

@@ -1,3 +1,3 @@
 ../source/cont_autos.c:18:6:count_updateCarCount	16	static
-../source/cont_autos.c:27:9:count_getCarCount	16	static
-../source/cont_autos.c:31:6:count_resetCarCount	16	static
+../source/cont_autos.c:25:9:count_getCarCount	16	static
+../source/cont_autos.c:29:6:count_resetCarCount	16	static

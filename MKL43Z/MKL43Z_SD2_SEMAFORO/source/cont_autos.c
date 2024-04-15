@@ -10,17 +10,15 @@
 
 /*==================[internal data declaration]==============================*/
 
-static uint8_t car_count[BOARD_SW_ID_TOTAL]; // Contador de autos como array
+static uint8_t car_count[BOARD_SW_ID_TOTAL];	// One car counter for every switch in the array definition (SD_board.c)
 
 /*==================[external functions definition]==========================*/
 
-/* updateCarCount actualiza el valor de la cuenta del pulsador que enviamos según el MODO que enviamos */
+/* updateCarCount update the selected switch count with the selected mode. */
 void count_updateCarCount(board_swId_enum id, car_count_mode_enum mode){
-	if(key_getPressEv(id)){
-		if(mode == SUMAR)	car_count[id]++;
-		else{
-			if(car_count[id])	car_count[id]--;
-		}
+	if(mode == SUMAR)	car_count[id]++;
+	else{
+		if(car_count[id])	car_count[id]--;
 	}
 }
 

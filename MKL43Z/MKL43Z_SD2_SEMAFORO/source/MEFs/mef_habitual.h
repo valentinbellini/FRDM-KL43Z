@@ -8,7 +8,7 @@
 #define MEF_HABITUAL_H_
 
 /*==================[inclusions]=============================================*/
-#include <stdbool.h>
+// #include <stdbool.h>
 /*==================[cplusplus]==============================================*/
 #ifdef __cplusplus
 extern "C" {

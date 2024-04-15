@@ -5,16 +5,16 @@
  */
 
 /*==================[inclusions]=============================================*/
-#include <MEFs/mef_modo.h>
 #include <stdio.h>
 #include "peripherals.h"
 #include "pin_mux.h"
 #include "clock_config.h"
 #include "MKL43Z4.h"
 #include "fsl_debug_console.h"
-
-#include "SD2_board.h"
 #include "board.h"
+
+#include <MEFs/mef_modo.h>
+#include "SD2_board.h"
 #include "key.h"
 
 int main(void) {

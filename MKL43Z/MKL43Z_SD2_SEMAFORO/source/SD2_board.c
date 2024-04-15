@@ -79,7 +79,7 @@ void board_init(void)
 	};
 
 	const port_pin_config_t port_led_config = {
-			/* Internal pull-up/down resistor is disabled */
+		/* Internal pull-up/down resistor is disabled */
 		.pullSelect = kPORT_PullDisable,
 		/* Slow slew rate is configured */
 		.slewRate = kPORT_SlowSlewRate,
@@ -116,6 +116,8 @@ void board_init(void)
 		PORT_SetPinConfig(board_gpioLeds[i].port, board_gpioLeds[i].pin, &port_led_config);
 		GPIO_PinInit(board_gpioLeds[i].gpio, board_gpioLeds[i].pin, &gpio_led_config);
 	}
+
+	// PORTA->PCR[4] &= ~(7 << 8); //Desactivación de NMI en SW1
 
 	/* inicialización de SWs */
 	for (i = 0 ; i < BOARD_SW_ID_TOTAL ; i++)

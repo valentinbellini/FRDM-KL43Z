@@ -1,4 +1,4 @@
-../source/MEFs/mef_secundario.c:35:13:mef_secundario_init	8	static
-../source/MEFs/mef_secundario.c:39:13:mef_secundario_reset	8	static
-../source/MEFs/mef_secundario.c:46:13:mef_secundario	8	static
+../source/MEFs/mef_secundario.c:36:13:mef_secundario_init	8	static
+../source/MEFs/mef_secundario.c:40:13:mef_secundario_reset	8	static
+../source/MEFs/mef_secundario.c:47:13:mef_secundario	8	static
 ../source/MEFs/mef_secundario.c:88:13:mef_secundario_task1ms	8	static

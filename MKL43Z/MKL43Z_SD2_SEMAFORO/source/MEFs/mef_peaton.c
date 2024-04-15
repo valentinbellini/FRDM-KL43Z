@@ -5,13 +5,12 @@
  */
 
 /*==================[inclusions]=============================================*/
-#include "mef_peaton.h"
+
 #include <stdint.h>
 #include "SD2_board.h"
-#include "cont_autos.h"
+#include "mef_peaton.h"
 
 /*==================[macros and typedef]==================================== */
-
 
 #define DURATION_EST_BLINK_1 	5000
 #define DURATION_EST_PASO 		10000
@@ -50,6 +49,7 @@ extern bool mef_peaton(void){
             board_setLed(LRS, BOARD_LED_MSG_ON);
 		    board_setLed(LRR, BOARD_LED_MSG_OFF);
 		    board_setLed(LVS, BOARD_LED_MSG_OFF);
+
             if(timBlink_peaton == 0){
                 timBlink_peaton = DURATION_BLINK;
                 board_setLed(LVR, BOARD_LED_MSG_TOGGLE);
@@ -64,7 +64,7 @@ extern bool mef_peaton(void){
 		    board_setLed(LRS, BOARD_LED_MSG_OFF);
 		    board_setLed(LRR, BOARD_LED_MSG_ON);
 		    board_setLed(LVS, BOARD_LED_MSG_ON);
-		    count_resetCarCount(BOARD_SW_ID_3); // Car Count set to 0 --> All cars pass without press switch when secondary route is enabled.
+
             if(timSec_peaton == 0) {
                 timSec_peaton = DURATION_EST_BLINK_2;
                 timBlink_peaton = DURATION_BLINK;
@@ -75,13 +75,12 @@ extern bool mef_peaton(void){
             board_setLed(LVR, BOARD_LED_MSG_OFF);
 		    board_setLed(LRS, BOARD_LED_MSG_OFF);
 		    board_setLed(LVS, BOARD_LED_MSG_ON);
+
             if(timBlink_peaton == 0){
                 timBlink_peaton = DURATION_BLINK;
                 board_setLed(LRR, BOARD_LED_MSG_TOGGLE);
             }
-            if(timSec_peaton == 0){
-                return true;		// Returns true for the mef_modo to enable go to the mef_habitual SEC_5 state
-            }
+            if(timSec_peaton == 0) return true;	// Returns true for the mef_modo to enable go to the mef_habitual SEC_5 state
             break;
     }
     return false; // By default the MEF returns false.
