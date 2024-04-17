@@ -51,6 +51,7 @@ extern bool mef_secundario(void){
 		    board_setLed(LRR, BOARD_LED_MSG_OFF);
 		    board_setLed(LVS, BOARD_LED_MSG_OFF);
 
+            if(key_getPressEv(BOARD_SW_ID_3)) count_updateCarCount(BOARD_SW_ID_3, SUMAR); // Add a car to the count if the switch flags is True
             if(timBlink_secundario == 0){
                 timBlink_secundario = DURATION_BLINK;
                 board_setLed(LVR, BOARD_LED_MSG_TOGGLE);

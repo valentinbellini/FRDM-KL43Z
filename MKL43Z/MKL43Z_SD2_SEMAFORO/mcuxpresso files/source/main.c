@@ -42,3 +42,4 @@ void SysTick_Handler(void){ // Handler de interrupciones del SysTick
 	key_periodicTask1ms();
 	mef_modo_task1ms();
 }
+

@@ -1,3 +1,0 @@
-../source/MEFs/mef_modo.c:29:6:mef_modo_init	8	static
-../source/MEFs/mef_modo.c:38:6:mef_modo	8	static
-../source/MEFs/mef_modo.c:70:6:mef_modo_task1ms	8	static

@@ -1,4 +1,0 @@
-../source/MEFs/mef_peaton.c:36:13:mef_peaton_init	8	static
-../source/MEFs/mef_peaton.c:40:13:mef_peaton_reset	8	static
-../source/MEFs/mef_peaton.c:47:13:mef_peaton	8	static
-../source/MEFs/mef_peaton.c:91:13:mef_peaton_task1ms	8	static

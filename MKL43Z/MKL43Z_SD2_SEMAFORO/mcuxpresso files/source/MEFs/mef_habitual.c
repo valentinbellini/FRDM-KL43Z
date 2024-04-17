@@ -14,7 +14,7 @@
 /*==================[macros and typedef]====================================*/
 
 // time duration macros definition
-#define DURATION_SEC_1				20000
+#define DURATION_SEC_1				15000
 #define DURATION_SEC_2				5000
 #define DURATION_SEC_3				10000
 #define DURATION_SEC_4				5000
