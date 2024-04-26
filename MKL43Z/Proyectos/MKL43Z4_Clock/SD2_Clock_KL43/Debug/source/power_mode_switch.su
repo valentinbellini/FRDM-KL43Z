@@ -1,0 +1,7 @@
+fsl_clock.h:629:20:CLOCK_SetSimSafeDivs	8	static
+fsl_smc.h:275:33:SMC_GetPowerModeState	16	static
+power_mode_switch.c:30:6:APP_SetClockRunFromVlpr	32	static
+power_mode_switch.c:50:6:APP_SetClockVlpr	32	static
+power_mode_switch.c:71:6:APP_ShowPowerMode	16	static
+power_mode_switch.c:91:6:APP_CheckPowerMode	24	static
+power_mode_switch.c:145:6:APP_PowerModeSwitch	32	static
