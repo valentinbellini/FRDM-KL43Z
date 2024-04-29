@@ -1,0 +1,7 @@
+C:\Users\ivans\Documents\MCUXpressoIDE_11.8.1_1197\workspace\Trabajo_Practico_3\drivers/fsl_uart.h:503:20:UART_EnableTx	16	static
+C:\Users\ivans\Documents\MCUXpressoIDE_11.8.1_1197\workspace\Trabajo_Practico_3\drivers/fsl_uart.h:523:20:UART_EnableRx	16	static
+../drivers/freertos/fsl_uart_freertos.c:19:13:UART_RTOS_Callback	40	static
+../drivers/freertos/fsl_uart_freertos.c:67:5:UART_RTOS_Init	40	static
+../drivers/freertos/fsl_uart_freertos.c:172:5:UART_RTOS_Deinit	16	static
+../drivers/freertos/fsl_uart_freertos.c:209:5:UART_RTOS_Send	40	static
+../drivers/freertos/fsl_uart_freertos.c:272:5:UART_RTOS_Receive	48	static

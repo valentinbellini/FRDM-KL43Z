@@ -1,0 +1,13 @@
+../drivers/fsl_flexio_spi.h:404:24:FLEXIO_SPI_GetTxDataRegisterAddress	16	static
+../drivers/fsl_flexio_spi.h:428:24:FLEXIO_SPI_GetRxDataRegisterAddress	16	static
+../drivers/fsl_dma.h:351:20:DMA_DisableInterrupts	16	static
+../drivers/fsl_dma.h:418:24:DMA_GetRemainingBytes	16	static
+../drivers/fsl_dma.h:535:20:DMA_StartTransfer	16	static
+../drivers/fsl_flexio_spi_dma.c:75:13:FLEXIO_SPI_TxDMACallback	32	static
+../drivers/fsl_flexio_spi_dma.c:99:13:FLEXIO_SPI_RxDMACallback	32	static
+../drivers/fsl_flexio_spi_dma.c:123:13:FLEXIO_SPI_DMAConfig	48	static
+../drivers/fsl_flexio_spi_dma.c:236:10:FLEXIO_SPI_MasterTransferCreateHandleDMA	32	static
+../drivers/fsl_flexio_spi_dma.c:302:10:FLEXIO_SPI_MasterTransferDMA	32	static
+../drivers/fsl_flexio_spi_dma.c:356:10:FLEXIO_SPI_MasterTransferGetCountDMA	32	static
+../drivers/fsl_flexio_spi_dma.c:385:6:FLEXIO_SPI_MasterTransferAbortDMA	16	static
+../drivers/fsl_flexio_spi_dma.c:415:10:FLEXIO_SPI_SlaveTransferDMA	32	static

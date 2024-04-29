@@ -1,0 +1,16 @@
+C:\Users\ivans\Documents\MCUXpressoIDE_11.8.1_1197\workspace\Trabajo_Practico_3\CMSIS/core_cm0plus.h:741:22:__NVIC_EnableIRQ	16	static
+C:\Users\ivans\Documents\MCUXpressoIDE_11.8.1_1197\workspace\Trabajo_Practico_3\CMSIS/core_cm0plus.h:850:22:__NVIC_SetPriority	24	static
+../source/Trabajo_Practico_3.c:26:5:main	8	static
+../source/Trabajo_Practico_3.c:45:6:PIT_IRQHandler	8	static
+../source/Trabajo_Practico_3.c:58:6:ADC0_IRQHandler	8	static
+../source/Trabajo_Practico_3.c:72:6:TPM1_IRQHandler	8	static
+../source/Trabajo_Practico_3.c:78:6:Init_PIT	8	static
+../source/Trabajo_Practico_3.c:89:6:Init_Switch	8	static
+../source/Trabajo_Practico_3.c:118:6:Init_Reloj_TPM	8	static
+../source/Trabajo_Practico_3.c:127:6:Init_TPM_Led_Rojo	8	static
+../source/Trabajo_Practico_3.c:136:6:Init_PWM_Led_Verde	8	static
+../source/Trabajo_Practico_3.c:145:6:Init_ADC_Luz_y_Pote	8	static
+../source/Trabajo_Practico_3.c:160:6:Sistema_1	48	static
+../source/Trabajo_Practico_3.c:197:6:Sistema_2	48	static
+../source/Trabajo_Practico_3.c:234:6:Sistema_3	32	static
+../source/Trabajo_Practico_3.c:255:6:Establecer_LEDS	8	static

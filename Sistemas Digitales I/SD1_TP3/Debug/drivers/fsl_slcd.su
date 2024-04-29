@@ -1,0 +1,16 @@
+C:\Users\ivans\Documents\MCUXpressoIDE_11.8.1_1197\workspace\Trabajo_Practico_3\CMSIS/core_cm0plus.h:741:22:__NVIC_EnableIRQ	16	static
+C:\Users\ivans\Documents\MCUXpressoIDE_11.8.1_1197\workspace\Trabajo_Practico_3\CMSIS/core_cm0plus.h:779:22:__NVIC_DisableIRQ	16	static
+../drivers/fsl_clock.h:438:20:CLOCK_EnableClock	24	static
+../drivers/fsl_clock.h:449:20:CLOCK_DisableClock	24	static
+../drivers/fsl_common.h:484:28:EnableIRQ	16	static
+../drivers/fsl_common.h:522:28:DisableIRQ	16	static
+../drivers/fsl_slcd.h:360:20:SLCD_StopDisplay	16	static
+../drivers/fsl_slcd.c:50:17:SLCD_GetInstance	24	static
+../drivers/fsl_slcd.c:81:6:SLCD_Init	32	static
+../drivers/fsl_slcd.c:180:6:SLCD_Deinit	24	static
+../drivers/fsl_slcd.c:213:6:SLCD_GetDefaultConfig	16	static
+../drivers/fsl_slcd.c:243:6:SLCD_StartBlinkMode	24	static
+../drivers/fsl_slcd.c:274:6:SLCD_EnableInterrupts	24	static
+../drivers/fsl_slcd.c:298:6:SLCD_DisableInterrupts	24	static
+../drivers/fsl_slcd.c:325:6:SLCD_ClearInterruptStatus	16	static
+../drivers/fsl_slcd.c:348:10:SLCD_GetInterruptStatus	24	static
