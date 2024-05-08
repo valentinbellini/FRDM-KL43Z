@@ -1,0 +1,5 @@
+C:\Users\valen\Documents\MCUXpressoIDE_11.9.0_2144\workspace\TP2_V1\drivers/fsl_smc.h:275:33:SMC_GetPowerModeState	16	static
+../source/App/mef.c:63:13:mef_init	8	static
+../source/App/mef.c:84:13:mef_Tr_To_Bajo_Consumo	8	static
+../source/App/mef.c:89:13:mef	24	static
+../source/App/mef.c:173:13:mef_task1ms	8	static

@@ -1,0 +1,4 @@
+../source/App/mef.c:74:13:mef_init	8	static
+../source/App/mef.c:98:13:mef_Tr_To_Bajo_Consumo	8	static
+../source/App/mef.c:103:13:mef	40	static
+../source/App/mef.c:178:13:mef_task1ms	0	static

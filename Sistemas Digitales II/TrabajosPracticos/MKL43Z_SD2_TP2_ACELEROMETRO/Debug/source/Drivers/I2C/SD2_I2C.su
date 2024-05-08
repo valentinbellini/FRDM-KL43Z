@@ -1,0 +1,7 @@
+C:\Users\valen\Documents\MCUXpressoIDE_11.9.0_2144\workspace\TP2_V1\drivers/fsl_clock.h:438:20:CLOCK_EnableClock	24	static
+C:\Users\valen\Documents\MCUXpressoIDE_11.9.0_2144\workspace\TP2_V1\drivers/fsl_port.h:243:20:PORT_SetPinConfig	32	static
+C:\Users\valen\Documents\MCUXpressoIDE_11.9.0_2144\workspace\TP2_V1\drivers/fsl_gpio.h:162:20:GPIO_PinWrite	32	static
+../source/Drivers/I2C/SD2_I2C.c:66:13:i2c_release_bus_delay	16	static
+../source/Drivers/I2C/SD2_I2C.c:82:13:I2C_releaseBus	16	static
+../source/Drivers/I2C/SD2_I2C.c:133:13:I2C_configPins	16	static
+../source/Drivers/I2C/SD2_I2C.c:164:6:SD2_I2C_init	24	static

@@ -1,0 +1,3 @@
+C:\Users\valen\Documents\MCUXpressoIDE_11.9.0_2144\workspace\TP2_V1\drivers/fsl_clock.h:470:20:CLOCK_SetLpuart0Clock	16	static
+C:\Users\valen\Documents\MCUXpressoIDE_11.9.0_2144\workspace\TP2_V1\utilities/fsl_debug_console.h:134:24:DbgConsole_Init	24	static
+../board/board.c:25:6:BOARD_InitDebugConsole	16	static
