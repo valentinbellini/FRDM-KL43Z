@@ -21,6 +21,7 @@ extern "C" {
 #define OUT_Z_MSB_ADDRESS		0X05	// expressed as 2's
 #define OUT_Z_LSB_ADDRESS		0X06	// complement numbers.
 #define INT_SOURCE_ADDRESS   	0X0C
+#define XYZ_DATA_CFG_ADDRESS	0x0E
 #define FF_MT_CFG_ADDRESS		0X15
 #define FF_MT_SRC_ADDRESS		0X16
 #define FF_MT_THS_ADDRESS		0X17
@@ -64,6 +65,21 @@ typedef union
     };
     uint8_t data;
 }INT_SOURCE_t;	// 0x0C -- pag 25
+
+// XYZ_DATA_CGF_t --> Dynamic range settings (2g, 4g, 8g)
+typedef union
+{
+    struct
+    {
+        unsigned FormatScale:2;
+        unsigned :2;
+        unsigned HPF_out:1;
+        unsigned :3;
+
+    };
+    uint8_t data;
+}XYZ_DATA_CFG_t;
+
 
 // FF_MT_CGF_t This is the freefall/motion configuration register for setting up the conditions of the freefall or motion function
 typedef union

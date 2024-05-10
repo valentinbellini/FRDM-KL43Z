@@ -33,6 +33,9 @@
  */
 
 /*==================[inclusions]=============================================*/
+#include "fsl_debug_console.h"
+#include "fsl_smc.h"
+
 #include <Drivers/MMA8451/mma8451.h>
 #include "stdint.h"
 #include "stdbool.h"
@@ -163,13 +166,14 @@ void mma8451_freefall_config(void){
 	FF_MT_THS_t FF_MT_THS_reg;
 	FF_MT_COUNT_t FF_MT_COUNT_reg;
 
+//	mma8451_write_reg(0x2B, 64); 		// RST the MMA8451
+//	while(mma8451_read_reg(0x2B)){
+//		 // Espero a que el reset termine
+//	}
+
 	/* Put the device in Standby Mode: Register 0x2A CTRL_REG1 */
 	ctrl_reg1.ACTIVE = 0;
-	// DR Default = 000 --> ODR 800MHZ Period 1.25ms
 	mma8451_write_reg(CTRL_REG1_ADDRESS, ctrl_reg1.data);
-	#ifdef DEBUG_MODE /* Verificación */
-		ctrl_reg1.data = mma8451_read_reg(CTRL_REG1_ADDRESS);
-	#endif
 
 	/* Configuration Register set for Freefall Detection enabling “AND” condition, OAE = 0, Enabling X, Y, Z and the Latch */
 	FF_MT_CFG_reg.XEFE = 1 ; // Estos 3 registros X Y Z se ponen en 1 para que levanten una bandera cuando la acc supera el threshold
@@ -178,51 +182,36 @@ void mma8451_freefall_config(void){
 	FF_MT_CFG_reg.OAE = 0 ; // Motion detect/freefall detect flag selection. Default 0 (Freefall flag)
 	FF_MT_CFG_reg.ELE = 1 ; // Event latch enable. Hace clear a la bandera cuando se lee el source register
 	mma8451_write_reg(FF_MT_CFG_ADDRESS,FF_MT_CFG_reg.data);
-	#ifdef DEBUG_MODE /* Verificación */
-		FF_MT_CFG_reg.data = mma8451_read_reg(FF_MT_CFG_ADDRESS);
-	#endif
+
+	// Test
+	mma8451_write_reg(0x0E, 0x01); // Write the 4g dynamic range value into register 0x0E --> a 8 bit 0.032g/LSB
 
 	// Threshold Setting Value for the resulting acceleration < 0.2g
-	FF_MT_THS_reg.data = 0x03; // Note: The step count is 0.063g/count --  0.2g/0.063g = 3.17 counts //Round to 3 counts
+	FF_MT_THS_reg.data = 0x06; // Note: The step count is 0.032g/count --  0.2g/0.032g = 6.25 counts //Round to 6 counts
 	mma8451_write_reg(FF_MT_THS_ADDRESS,FF_MT_THS_reg.data);
-	#ifdef DEBUG_MODE /* Verificación */
-		FF_MT_THS_reg.data = mma8451_read_reg(FF_MT_THS_ADDRESS);
-	#endif
 
-	// Set the debounce counter to eliminate false positive readings for 50Hz sample rate with a
-	// requirement of 120 ms timer, assuming Normal Mode.
-	FF_MT_COUNT_reg.data = 0x06; // Note: 120 ms/20 ms (steps) = 6 counts
+	// Set the debounce counter to eliminate false positive readings for 200Hz sample rate with a
+	// requirement of 120 ms timer.
+	FF_MT_COUNT_reg.data = 24; // Note: 120 ms/5 ms (steps) = 24 counts (0x18)
 	mma8451_write_reg(FF_MT_COUNT_ADRESS,FF_MT_COUNT_reg.data);
-	#ifdef DEBUG_MODE /* Verificación */
-		FF_MT_COUNT_reg.data = mma8451_read_reg(FF_MT_COUNT_ADRESS);
-	#endif
 
 	//Enable Motion/Freefall Interrupt Function in the System (CTRL_REG4)
 	ctrl_reg4.INT_EN_DRDY = 0;  //Desactivo la interrupcion por Data ready en caso de que venga activada
 	ctrl_reg4.INT_EN_FF_MT = 1; //Activo la interrupcion por FreeFall
 	mma8451_write_reg(CTRL_REG4_ADDRESS, ctrl_reg4.data);
-	#ifdef DEBUG_MODE /* Verificación */
-		ctrl_reg4.data = mma8451_read_reg(CTRL_REG4_ADDRESS);
-	#endif
 
-	// Route the Motion/Freefall Interrupt Function to INT2 hardware pin (CTRL_REG5)
+	// Route the Motion/Freefall Interrupt Function to INT1 hardware pin (CTRL_REG5)
 	ctrl_reg5.INT_CFG_DRDY = 0;  // Interrupt del dready en el pin INT2 para evitar problemas
 	ctrl_reg5.INT_CFG_FF_MT = 1; // Interrupt Freefall Pin 1
 	mma8451_write_reg(CTRL_REG5_ADDRESS, ctrl_reg5.data);
-	#ifdef DEBUG_MODE /* Verificación */
-		ctrl_reg5.data = mma8451_read_reg(CTRL_REG5_ADDRESS);
-	#endif
 
-	// Put the device in Active Mode, 50 Hz
-	ctrl_reg1.ACTIVE = 1; // en 0 es stanby
-	ctrl_reg1.DR = 0B010; // Dr 000, 200HZ 5ms Hz output data rate
+	// Put the device in Active Mode, 200 Hz
+	ctrl_reg1.ACTIVE = 1; // en 0 es stanby, 1 es active.
+	ctrl_reg1.DR = 0B010; // Dr 010, 200HZ 5ms Hz output data rate
 	ctrl_reg1.ASLP_RATE = 0B00;
-	ctrl_reg1.F_READ = 0;
-	ctrl_reg1.LNOISE = 1; // Low noise
+	ctrl_reg1.F_READ = 1;	// Fast-read mode (8 bits) --> Menor resolución pero mayor velocidad
+	ctrl_reg1.LNOISE = 0;
 	mma8451_write_reg(CTRL_REG1_ADDRESS, ctrl_reg1.data);
-	#ifdef DEBUG_MODE /* Verificación */
-		ctrl_reg1.data = mma8451_read_reg(CTRL_REG1_ADDRESS);
-	#endif
 
 	config_port_int1();
 }
@@ -230,8 +219,8 @@ void mma8451_dataReady_config(void){
 	CTRL_REG1_t ctrl_reg1;
 	CTRL_REG4_t ctrl_reg4;
 	CTRL_REG5_t ctrl_reg5;
-
 	FF_MT_CFG_t FF_MT_CFG_reg;
+	XYZ_DATA_CFG_t data_cfg;
 
 	ctrl_reg1.ACTIVE = 0; // Lo pone en standby para configurar el  registro
 	mma8451_write_reg(CTRL_REG1_ADDRESS, ctrl_reg1.data);
@@ -240,8 +229,8 @@ void mma8451_dataReady_config(void){
 	FF_MT_CFG_reg.XEFE =0 ;
 	FF_MT_CFG_reg.YEFE =0 ;
 	FF_MT_CFG_reg.ZEFE =0 ;
-	FF_MT_CFG_reg.OAE =0 ;
-	FF_MT_CFG_reg.ELE =0 ;
+	FF_MT_CFG_reg.OAE = 0 ;
+	FF_MT_CFG_reg.ELE = 0 ;
 	mma8451_write_reg(FF_MT_CFG_ADDRESS,FF_MT_CFG_reg.data);
 
 	//REGISTROS DE CONTROL
@@ -253,11 +242,17 @@ void mma8451_dataReady_config(void){
 	ctrl_reg5.INT_CFG_FF_MT = 0; // Interrupt del freefall en el pin INT2 para evitar problemas
 	mma8451_write_reg(CTRL_REG5_ADDRESS, ctrl_reg5.data);
 
-	ctrl_reg1.ACTIVE = 1; // en 0 es stanby
-	ctrl_reg1.DR = 0b100; // Dr 000, 200HZ 5ms Hz output data rate
+	// Test
+	//mma8451_write_reg(0x0E, 0x01); // Write the 4g dynamic range value into register 0x0E
+	data_cfg.FormatScale = 0;   // Rango de 8G
+	data_cfg.HPF_out = 0;
+	mma8451_write_reg(XYZ_DATA_CFG_ADDRESS, data_cfg.data);
+
+	ctrl_reg1.ACTIVE = 1; 		// En 0 es stanby, en 1 es active.
+	ctrl_reg1.DR = 0b100; 		// Dr 010, 200HZ 5ms Hz output data rate
 	ctrl_reg1.ASLP_RATE = 0B00;
-	ctrl_reg1.F_READ = 0;
-	ctrl_reg1.LNOISE = 1; // Low noise
+	ctrl_reg1.F_READ = 0; 		//
+	ctrl_reg1.LNOISE = 1; 		//
 	mma8451_write_reg(CTRL_REG1_ADDRESS, ctrl_reg1.data);
 
 	config_port_int1();
@@ -272,6 +267,7 @@ void mma8451_clearInterruptions_config(void){
 	ctrl_reg1.ACTIVE = 0; // Lo pone en standby
 	mma8451_write_reg(CTRL_REG1_ADDRESS, ctrl_reg1.data);
 
+	// Deshabilito ambas interrupciones
 	ctrl_reg4.INT_EN_DRDY = 0;
 	ctrl_reg4.INT_EN_FF_MT = 0;
 	mma8451_write_reg(CTRL_REG4_ADDRESS, ctrl_reg4.data);
@@ -297,6 +293,16 @@ bool mma8451_getDataReadyInterruptStatus(void) {
 	return ret;
 }
 
+//int16_t mma8451_getAcX(void){
+//	return (int16_t)(((int32_t)read.X * 100) / (int32_t)4096); // Para 14 bits con 2g (por defecto). Divido por la mitad del maximo para que esté entre -2g y 2g. Luego la multiplicacion por 100 es para tener la representacion de g en centésimas.
+//}
+//int16_t mma8451_getAcY(void){
+//	return (int16_t)(((int32_t)read.Y * 100) / (int32_t)4096); // Para 14 bits con 2g (por defecto). Divido por la mitad del maximo para que esté entre -2g y 2g. Luego la multiplicacion por 100 es para tener la representacion de g en centésimas.
+//}
+//int16_t mma8451_getAcZ(void){
+//	return (int16_t)(((int32_t)read.Z * 100) / (int32_t)4096); // Para 14 bits con 2g (por defecto). Divido por la mitad del maximo para que esté entre -2g y 2g. Luego la multiplicacion por 100 es para tener la representacion de g en centésimas.
+//}
+
 int16_t mma8451_getAcX(void){
 	return (int16_t)(((int32_t)read.X * 100) / (int32_t)4096); // Para 14 bits con 2g (por defecto). Divido por la mitad del maximo para que esté entre -2g y 2g. Luego la multiplicacion por 100 es para tener la representacion de g en centésimas.
 }
@@ -313,15 +319,15 @@ void readAccsFromRegisters(void) // Leer los 6 registros de las 3 aceleraciones
 	int16_t readGravity;
 	mma8451_read_multiple_reg(OUT_X_MSB_ADDRESS, bufAcc, sizeof(bufAcc));
 	readGravity	=  (int16_t)bufAcc[0] << 8;
-	readGravity	|= (int16_t)bufAcc[1];
+	readGravity	|= bufAcc[1];
 	read.X = readGravity >> 2;
 
 	readGravity   = (int16_t)bufAcc[2] << 8;
-	readGravity  |= (int16_t)bufAcc[3];
+	readGravity  |= bufAcc[3];
 	read.Y = readGravity >> 2;
 
 	readGravity   = (int16_t)bufAcc[4] << 8;
-	readGravity  |= (int16_t)bufAcc[5];
+	readGravity  |= bufAcc[5];
 	read.Z = readGravity >> 2;
 }
 
@@ -329,13 +335,17 @@ void readAccsFromRegisters(void) // Leer los 6 registros de las 3 aceleraciones
 void PORTC_PORTD_IRQHandler(void){
 
     INT_SOURCE_t intSource;
+    STATUS_t status;
     intSource.data = mma8451_read_reg(INT_SOURCE_ADDRESS);	/* The bits are set by a low to high transition
     															and are cleared by reading the
 																appropriate interrupt source register */
 
     if (intSource.SRC_DRDY){				// Interrupt from Data Ready
-    	readAccsFromRegisters();
-        isInterruptionByDR = true;			// Set in false by reading
+    	status.data = mma8451_read_reg(STATUS_ADDRESS);
+    	 if (status.ZYXDR){
+    		 readAccsFromRegisters();
+    		 isInterruptionByDR = true;			// Set in false by reading
+    	 }
     } else if (intSource.SRC_FF_MT) {		// Interrupt from Freefall
     	isInterruptionByFreeFall = true;	// Set in false by reading
     	APP_PowerModeSwitch(kSMC_PowerStateVlpr, kAPP_PowerModeRun);

@@ -15,6 +15,7 @@ RM := rm -rf
 -include source/Drivers/Key/subdir.mk
 -include source/Drivers/I2C/subdir.mk
 -include source/Drivers/Board/subdir.mk
+-include source/Drivers/subdir.mk
 -include source/App/subdir.mk
 -include source/subdir.mk
 -include drivers/subdir.mk

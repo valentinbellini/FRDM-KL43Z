@@ -26,6 +26,7 @@ source/Drivers/I2C \
 source/Drivers/Key \
 source/Drivers/MMA8451 \
 source/Drivers/PowerMode \
+source/Drivers \
 source \
 startup \
 utilities \
