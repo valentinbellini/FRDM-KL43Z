@@ -24,7 +24,8 @@ source/main.o source/main.d: ../source/main.c \
  C:\Users\valen\Documents\MCUXpressoIDE_11.9.0_2144\workspace\TP2_V1\device/MKL43Z4.h \
  ../source/Drivers/Key/key.h \
  C:\Users\valen\Documents\MCUXpressoIDE_11.9.0_2144\workspace\TP2_V1\source/Drivers/Board/SD2_board.h \
- ../source/Drivers/I2C/SD2_I2C.h ../source/Drivers/time.h \
+ ../source/Drivers/I2C/SD2_I2C.h ../source/Drivers/SSD1306/oled.h \
+ ../source/Drivers/time.h \
  C:\Users\valen\Documents\MCUXpressoIDE_11.9.0_2144\workspace\TP2_V1\source/App/mef.h
 C:\Users\valen\Documents\MCUXpressoIDE_11.9.0_2144\workspace\TP2_V1\board/board.h:
 C:\Users\valen\Documents\MCUXpressoIDE_11.9.0_2144\workspace\TP2_V1\board/clock_config.h:
@@ -52,5 +53,6 @@ C:\Users\valen\Documents\MCUXpressoIDE_11.9.0_2144\workspace\TP2_V1\device/MKL43
 ../source/Drivers/Key/key.h:
 C:\Users\valen\Documents\MCUXpressoIDE_11.9.0_2144\workspace\TP2_V1\source/Drivers/Board/SD2_board.h:
 ../source/Drivers/I2C/SD2_I2C.h:
+../source/Drivers/SSD1306/oled.h:
 ../source/Drivers/time.h:
 C:\Users\valen\Documents\MCUXpressoIDE_11.9.0_2144\workspace\TP2_V1\source/App/mef.h:

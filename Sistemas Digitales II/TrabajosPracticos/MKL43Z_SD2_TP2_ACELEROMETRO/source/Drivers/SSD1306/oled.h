@@ -1,8 +1,11 @@
-/* Copyright 2017, DSI FCEIA UNR - Sistemas Digitales 2
+/*****************************************************************************
+ *   oled.h:  Header file for SSD1306 OLED Display
+ *
+ *   Copyright 2009, Embedded Artists AB
+ *   Copyright 2023, DSI FCEIA UNR - Sistemas Digitales 2
  *    DSI: http://www.dsi.fceia.unr.edu.ar/
- * Copyright 2017, Diego Alegrechi
- * Copyright 2017, Gustavo Muro
- * All rights reserved.
+ *   Copyright 2023, Guido Cicconi
+ *   All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -31,74 +34,47 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  */
-
-#ifndef MMA8451_H_
-#define MMA8451_H_
+#ifndef __OLED_H
+#define __OLED_H
 
 /*==================[inclusions]=============================================*/
-#include "stdint.h"
-#include "stdbool.h"
-#include "Drivers/MMA8451/mma8451_registers.h"
+#include <stdint.h>
+
 /*==================[cplusplus]==============================================*/
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /*==================[macros]=================================================*/
+typedef enum
+{
+    OLED_COLOR_BLACK,
+    OLED_COLOR_WHITE
+} oled_color_t;
 
-#define MMA8451_I2C     I2C0 	// brief: puerto I2C utilizado en el acelerómetro
-
-#define INT1_PORT       PORTC
-#define INT1_GPIO       GPIOC
-#define INT1_PIN        5
-
-#define INT2_PORT       PORTD
-#define INT2_GPIO       GPIOD
-#define INT2_PIN        1
+#define OLED_DISPLAY_WIDTH  128
+#define OLED_DISPLAY_HEIGHT 64
 
 /*==================[typedef]================================================*/
-
-typedef enum{ // DR_enum
-    DR_800hz = 0b000,
-    DR_400hz = 0b001,
-    DR_200hz = 0b010,
-    DR_100hz = 0b011,
-    DR_50hz = 0b100,
-    DR_12p5hz = 0b101,
-    DR_6p25hz = 0b110,
-    DR_1p56hz = 0b111,
-}DR_enum;
-
-typedef enum{
-	// Set dynamic range en Format Scale (default 2G)
-	FS_2G = 0b00,
-	FS_4G = 0b01,
-	FS_8G = 0b10,
-}FS_enum;
-
-
 
 /*==================[external data declaration]==============================*/
 
 /*==================[external functions definition]==========================*/
 
-/* ---------------- [FUNCIONES DE REGISTROS] ------------------------------ */
+void oled_init (void);
+void oled_putPixel(uint8_t x, uint8_t y, oled_color_t color);
+void oled_line(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, oled_color_t color);
+void oled_circle(uint8_t x0, uint8_t y0, uint8_t r, oled_color_t color);
+void oled_rect(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, oled_color_t color);
+void oled_fillRect(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, oled_color_t color);
+void oled_clearScreen(oled_color_t color);
+void oled_putString(uint8_t x, uint8_t y, uint8_t *pStr, oled_color_t fb, oled_color_t bg);
+uint8_t oled_putChar(uint8_t x, uint8_t y, uint8_t ch, oled_color_t fb, oled_color_t bg);
+void oled_setContrast(uint8_t contrast);
 
-void readAccsFromRegisters(void);
+/*==================[cplusplus]==============================================*/
+#ifdef __cplusplus
+}
+#endif
 
-/* ---------------- [FUNCIONES DE CONFIGURACIONES] ------------------------------ */
-void mma8451_freefall_config(void);
-void mma8451_dataReady_config(void);
-void mma8451_clearInterruptions_config(void);
-
-/* ---------------- [FUNCIONES GETTERS] ------------------------------ */
-int16_t mma8451_getAcX(void);	// Lee lectura en eje X, devuelve lectura en centecimas de g
-int16_t mma8451_getAcY(void);	// Lee lectura en eje Y, devuelve lectura en centecimas de g
-int16_t mma8451_getAcZ(void);	// Lee lectura en eje Z, devuelve lectura en centecimas de g
-
-
-bool mma8451_getFreefallInterruptStatus(void);
-bool mma8451_getDataReadyInterruptStatus(void);
-
-/*==================[end of file]============================================*/
-#endif /* MMA8451_H_ */
+#endif /* end __OLED_H */

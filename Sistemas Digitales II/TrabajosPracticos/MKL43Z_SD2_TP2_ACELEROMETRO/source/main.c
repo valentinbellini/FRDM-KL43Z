@@ -9,7 +9,9 @@
 #include "Drivers/Board/SD2_board.h"
 #include "Drivers/Key/key.h"
 #include "Drivers/I2C/SD2_I2C.h"
+#include "Drivers/SSD1306/oled.h"
 #include "Drivers/time.h"
+
 #include <App/mef.h>
 
 void init_clocks_and_power_mode(){
@@ -46,6 +48,18 @@ int main(void) {
 
     /* Se inicializa funciones de la placa */
     board_init();
+
+    /* Inicialización de SPI y display OLED */
+    //board_configSPI0();
+    board_configSPI1();
+    oled_init();
+    oled_setContrast(16);
+    oled_clearScreen(OLED_COLOR_BLACK);
+    /* Drawing */
+	oled_fillRect(32, 16, 32+64, 16+32, OLED_COLOR_WHITE);
+	oled_fillRect(32+8, 16+8, 32+64-8, 16+32-8, OLED_COLOR_BLACK);
+	oled_putString(56, 29, (uint8_t *)"SD2", OLED_COLOR_WHITE, OLED_COLOR_BLACK);
+	oled_circle(64, 32, 31, OLED_COLOR_WHITE);
 
     /* Inicialización del I2C */
     SD2_I2C_init();

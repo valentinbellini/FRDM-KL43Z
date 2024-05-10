@@ -34,12 +34,35 @@
 
 /*==================[inclusions]=============================================*/
 #include "SD2_board.h"
+
 #include "fsl_port.h"
 #include "fsl_gpio.h"
 #include "fsl_clock.h"
 #include "pin_mux.h"
+#include "fsl_spi.h"
 
 /*==================[macros and definitions]=================================*/
+#define SPI_MASTER              	SPI0
+#define SPI_MASTER_SOURCE_CLOCK 	kCLOCK_BusClk
+#define SPI_MASTER_CLK_FREQ     	CLOCK_GetFreq(kCLOCK_BusClk)
+
+#define SPI1_MASTER              	SPI1
+#define SPI1_MASTER_SOURCE_CLOCK 	kCLOCK_BusClk
+#define SPI1_MASTER_CLK_FREQ     	CLOCK_GetFreq(kCLOCK_BusClk)
+
+#define SPI0_SS_PORT				PORTC
+#define SPI0_SS_PIN					4
+#define SPI0_SCK_PORT				PORTC
+#define SPI0_SCK_PIN				5
+#define SPI0_MOSI_PORT				PORTC
+#define SPI0_MOSI_PIN				6
+
+#define SPI1_SS_PORT				PORTD
+#define SPI1_SS_PIN					4
+#define SPI1_SCK_PORT				PORTD
+#define SPI1_SCK_PIN				5
+#define SPI1_MOSI_PORT				PORTD
+#define SPI1_MOSI_PIN				6
 
 /*==================[internal data declaration]==============================*/
 static const board_gpioInfo_type board_gpioLeds[] =
@@ -47,13 +70,21 @@ static const board_gpioInfo_type board_gpioLeds[] =
     {PORTE, GPIOE, 31},     /* LED ROJO */
     {PORTD, GPIOD, 5},      /* LED VERDE */
 };
-
 static const board_gpioInfo_type board_gpioSw[] =
 {
     {PORTA, GPIOA, 4},      /* SW1 */
     {PORTC, GPIOC, 3},      /* SW3 */
 };
+static const board_gpioInfo_type board_gpioOled[] =
+{
+    {PORTC, GPIOC, 0},      /* RST */
+    {PORTC, GPIOC, 7},      /* DATA/CMD */
+	/*
+	 *
+	 *
+	 * */
 
+};
 /*==================[internal functions declaration]=========================*/
 
 /*==================[internal data definition]===============================*/
@@ -74,6 +105,11 @@ void board_init(void)
 	gpio_pin_config_t gpio_sw_config = {
 		.pinDirection = kGPIO_DigitalInput,
 		.outputLogic = 0U
+	};
+	gpio_pin_config_t gpio_oled_config =
+	{
+		.outputLogic = 0,
+		.pinDirection = kGPIO_DigitalOutput,
 	};
 
 	const port_pin_config_t port_led_config = {
@@ -102,6 +138,19 @@ void board_init(void)
 		.mux = kPORT_MuxAsGpio,
 	};
 
+	const port_pin_config_t port_oled_config = {
+		/* Internal pull-up/down resistor is disabled */
+		.pullSelect = kPORT_PullDisable,
+		/* Fast slew rate is configured */
+		.slewRate = kPORT_FastSlewRate,
+		/* Passive filter is disabled */
+		.passiveFilterEnable = kPORT_PassiveFilterDisable,
+		/* Low drive strength is configured */
+		.driveStrength = kPORT_LowDriveStrength,
+		/* Pin is configured as GPIO */
+		.mux = kPORT_MuxAsGpio,
+	};
+
 	CLOCK_EnableClock(kCLOCK_PortA);
 	CLOCK_EnableClock(kCLOCK_PortC);
 	CLOCK_EnableClock(kCLOCK_PortD);
@@ -114,7 +163,7 @@ void board_init(void)
 		GPIO_PinInit(board_gpioLeds[i].gpio, board_gpioLeds[i].pin, &gpio_led_config);
 	}
 
-	PORTA->PCR[4] &= ~(7 << 8); //Desactivo NMI en SW1
+	PORTA->PCR[4] &= ~(7 << 8); //Desactivación de NMI en SW1
 
 	/* inicialización de SWs */
 	for (i = 0 ; i < BOARD_SW_ID_TOTAL ; i++)
@@ -122,79 +171,14 @@ void board_init(void)
 		PORT_SetPinConfig(board_gpioSw[i].port, board_gpioSw[i].pin, &port_sw_config);
 		GPIO_PinInit(board_gpioSw[i].gpio, board_gpioSw[i].pin, &gpio_sw_config);
 	}
+
+	/*Inicialización de los pines GPIO necesarios para manejar el display OLED*/
+	for (i = 0 ; i < OLED_TOTAL ; i++){
+		PORT_SetPinConfig(board_gpioOled[i].port, board_gpioOled[i].pin, &port_oled_config);
+		GPIO_PinInit(board_gpioOled[i].gpio, board_gpioOled[i].pin, &gpio_oled_config);
+	}
 }
 
-void adc_init(void){
-
-	SIM->SCGC6 |= 1<<27; //Le doy clock al ADC
-
-	ADC0->CFG1 |= (0b10)<<2; //Modo 10-bit
-	//ADC0->SC3 |= 1<<2; //Promedio por hardware (4 muestras por defecto)
-	//ADC0->SC3 |= (0b01); //Promedio 8 muestras
-	//ADC0->SCE |= 1<<3;  //Conversión continua
-
-	PORTE->PCR[22] |= PORT_PCR_MUX(0); //Pin 22E como entrada analógica (sensor de luz)
-	NVIC_EnableIRQ(ADC0_IRQn); //Habilito la interrupción en NVIC
-
-	ADC0->SC1[0] = 0b1000011; //Habilito interrupción, configuro lectura en canal 3 (sensor de luz)
-
-}
-
-void redPWM_init(void) {
-
-#ifndef PWM_INIT
-#define PWM_INIT
-
-	CLOCK_EnableClock(kCLOCK_Tpm0); //Le doy clock al TPM0
-	CLOCK_SetTpmClock(3); //Fuente de clock: MCGIRCLK
-
-	TPM0->SC |= 0b111; //Prescaler por 128
-	TPM0->SC |= 1 << 3; //Habilito el contador
-
-	// Quiero un PWM de frecuencia 1KHz, por lo que necesito que el contador llegue a MOD 1000 veces por segundo
-	// Por eso MOD debe ser CLOCK_GetFreq(kCLOCK_McgInternalRefClk)/128/1000
-	TPM0->MOD = CLOCK_GetFreq(kCLOCK_McgInternalRefClk) / 128 / 1000;
-
-#endif
-
-	TPM0->CONTROLS[4].CnSC |= (0b1011) << 2; // Configuro el canal 4 (LED Rojo) como PWM Edge-Aligned Low-true pulses
-
-	TPM0->CONTROLS[4].CnV = 0; //Arrancamos en duty 0%
-
-	TPM0->CNT = 0; //Reseteo la cuenta
-
-	PORTE->PCR[31] &= ~PORT_PCR_MUX(15); //Limpio
-	PORTE->PCR[31] |= PORT_PCR_MUX(3); //PTE31 (LED Rojo) configurado para TPM0_CH4
-
-}
-
-void greenPWM_init(void) {
-
-#ifndef PWM_INIT
-#define PWM_INIT
-
-	CLOCK_EnableClock(kCLOCK_Tpm0); //Le doy clock al TPM0
-	CLOCK_SetTpmClock(3); //Fuente de clock: MCGIRCLK
-
-	TPM0->SC |= 0b111; //Prescaler por 128
-	TPM0->SC |= 1<<3; //Habilito el contador
-
-	// Quiero un PWM de frecuencia 1KHz, por lo que necesito que el contador llegue a MOD 1000 veces por segundo
-	// Por eso MOD debe ser CLOCK_GetFreq(kCLOCK_McgInternalRefClk)/128/1000
-	TPM0->MOD = CLOCK_GetFreq(kCLOCK_McgInternalRefClk)/128/1000;
-
-#endif
-
-	TPM0->CONTROLS[5].CnSC |= (0b1011) << 2; // Configuro el canal 5 (LED Verde) como PWM Edge-Aligned Low-true pulses
-
-	TPM0->CONTROLS[5].CnV = 0; //Arrancamos en duty 0%
-
-	TPM0->CNT = 0; //Reseteo la cuenta
-
-	PORTD->PCR[5] &= ~PORT_PCR_MUX(15); //Limpio
-	PORTD->PCR[5] |= PORT_PCR_MUX(4); //PTD5 (LED Verde) configurado para TPM0_CH5
-
-}
 
 void board_setLed(board_ledId_enum id, board_ledMsg_enum msg)
 {
@@ -225,6 +209,118 @@ bool board_getSw(board_swId_enum id)
 bool board_getLed(board_ledId_enum id)
 {
     return !GPIO_PinRead(board_gpioLeds[id].gpio, board_gpioLeds[id].pin);
+}
+
+void board_setOledPin(board_oledPin_enum oledPin, uint8_t state)
+{
+	GPIO_PinWrite(board_gpioOled[oledPin].gpio, board_gpioOled[oledPin].pin, state);
+}
+void board_configSPI0(){
+	const port_pin_config_t port_spi_config = {
+		/* Internal pull-up resistor is disabled */
+		.pullSelect = kPORT_PullDisable,
+		/* Fast slew rate is configured */
+		.slewRate = kPORT_FastSlewRate,
+		/* Passive filter is disabled */
+		.passiveFilterEnable = kPORT_PassiveFilterDisable,
+		/* Low drive strength is configured */
+		.driveStrength = kPORT_LowDriveStrength,
+		/* Pin is configured as SPI0_x */
+		.mux = kPORT_MuxAlt2,
+	};
+	PORT_SetPinConfig(SPI0_SS_PORT, SPI0_SS_PIN, &port_spi_config); 	//SPI0_SS		PORTC PIN 4
+	PORT_SetPinConfig(SPI0_SCK_PORT, SPI0_SCK_PIN, &port_spi_config); 	//SPI0_SCK		PORTC PIN 5
+	PORT_SetPinConfig(SPI0_MOSI_PORT, SPI0_MOSI_PIN, &port_spi_config);	//SPI0_MOSI 	PORTC PIN 6
+
+	CLOCK_EnableClock(kCLOCK_Spi0);
+
+	spi_master_config_t userConfig;
+
+	SPI_MasterGetDefaultConfig(&userConfig);
+
+	/*
+	userConfig.enableMaster         = true;
+	userConfig.enableStopInWaitMode = false;
+	userConfig.polarity             = kSPI_ClockPolarityActiveHigh;
+	userConfig.phase                = kSPI_ClockPhaseFirstEdge;
+	userConfig.direction            = kSPI_MsbFirst;
+	userConfig.dataMode 			 = kSPI_8BitMode;
+	userConfig.txWatermark 		 = kSPI_TxFifoOneHalfEmpty;
+	userConfig.rxWatermark 		 = kSPI_RxFifoOneHalfFull;
+	userConfig.pinMode      		 = kSPI_PinModeNormal;
+	userConfig.outputMode   		 = kSPI_SlaveSelectAutomaticOutput;
+	userConfig.baudRate_Bps 		 = 500000U;
+	*/
+
+	userConfig.polarity             = kSPI_ClockPolarityActiveLow;
+	userConfig.phase                = kSPI_ClockPhaseSecondEdge;
+	userConfig.baudRate_Bps 		= 4000000U;
+
+	SPI_MasterInit(SPI_MASTER, &userConfig, SPI_MASTER_CLK_FREQ);
+}
+
+void board_configSPI1(){
+	const port_pin_config_t port_spi_config = {
+		/* Internal pull-up resistor is disabled */
+		.pullSelect = kPORT_PullDisable,
+		/* Fast slew rate is configured */
+		.slewRate = kPORT_FastSlewRate,
+		/* Passive filter is disabled */
+		.passiveFilterEnable = kPORT_PassiveFilterDisable,
+		/* Low drive strength is configured */
+		.driveStrength = kPORT_LowDriveStrength,
+		/* Pin is configured as SPI0_x */
+		.mux = kPORT_MuxAlt2,
+	};
+	PORT_SetPinConfig(SPI1_SS_PORT, SPI1_SS_PIN, &port_spi_config); 	//SPI1_SS		PORTD PIN 4
+	PORT_SetPinConfig(SPI1_SCK_PORT, SPI1_SCK_PIN, &port_spi_config); 	//SPI1_SCK		PORTD PIN 5
+	PORT_SetPinConfig(SPI1_MOSI_PORT, SPI1_MOSI_PIN, &port_spi_config);	//SPI1_MOSI 	PORTD PIN 6
+
+	CLOCK_EnableClock(kCLOCK_Spi1);
+
+	spi_master_config_t userConfig;
+
+	SPI_MasterGetDefaultConfig(&userConfig);
+
+	/*
+	userConfig.enableMaster         = true;
+	userConfig.enableStopInWaitMode = false;
+	userConfig.polarity             = kSPI_ClockPolarityActiveHigh;
+	userConfig.phase                = kSPI_ClockPhaseFirstEdge;
+	userConfig.direction            = kSPI_MsbFirst;
+	userConfig.dataMode 			 = kSPI_8BitMode;
+	userConfig.txWatermark 		 = kSPI_TxFifoOneHalfEmpty;
+	userConfig.rxWatermark 		 = kSPI_RxFifoOneHalfFull;
+	userConfig.pinMode      		 = kSPI_PinModeNormal;
+	userConfig.outputMode   		 = kSPI_SlaveSelectAutomaticOutput;
+	userConfig.baudRate_Bps 		 = 500000U;
+	*/
+
+	userConfig.polarity             = kSPI_ClockPolarityActiveLow;
+	userConfig.phase                = kSPI_ClockPhaseSecondEdge;
+	userConfig.baudRate_Bps 		= 4000000U;
+
+	SPI_MasterInit(SPI1_MASTER, &userConfig, SPI1_MASTER_CLK_FREQ);
+}
+
+void board_SPI1Send(uint8_t* buf, size_t len){
+	spi_transfer_t xfer;
+
+	xfer.txData = buf;
+	xfer.rxData = NULL;
+	xfer.dataSize  = len;
+
+	SPI_MasterTransferBlocking(SPI1_MASTER, &xfer);
+}
+
+void board_SPISend(uint8_t* buf, size_t len){
+	spi_transfer_t xfer;
+
+	xfer.txData = buf;
+	xfer.rxData = NULL;
+	xfer.dataSize  = len;
+
+	SPI_MasterTransferBlocking(SPI_MASTER, &xfer);
 }
 /* ----------------------------------------------------------------------------------------------------- */
 

@@ -100,6 +100,7 @@ static void config_port_int1(void){
 	NVIC_SetPriority(PORTC_PORTD_IRQn, 0);
 }
 
+// Funciones de lectura y escritura del acelerómetro mediante I2C:
 static uint8_t mma8451_read_reg(uint8_t addr){
 	i2c_master_transfer_t masterXfer;
     uint8_t ret;
@@ -110,14 +111,13 @@ static uint8_t mma8451_read_reg(uint8_t addr){
 	masterXfer.subaddress = addr;
 	masterXfer.subaddressSize = 1;
 	masterXfer.data = &ret;
-	masterXfer.dataSize = 1;	// Longitud de la lectura
+	masterXfer.dataSize = 1;
 	masterXfer.flags = kI2C_TransferDefaultFlag;
 
 	I2C_MasterTransferBlocking(I2C0, &masterXfer);
 
 	return ret;
 }
-
 static void mma8451_read_multiple_reg(uint8_t addr, uint8_t *pbuffer, uint8_t size){ // size_t size
 	// La funcino carga los datos leidos en el buffer
 	// Ej: Leer desde 0x01 a 0x06 (size 6 desde address inicial: 0x01)
@@ -127,16 +127,14 @@ static void mma8451_read_multiple_reg(uint8_t addr, uint8_t *pbuffer, uint8_t si
 	masterXfer.slaveAddress = MMA8451_I2C_ADDRESS;
 	masterXfer.direction = kI2C_Read;
 	masterXfer.subaddress = addr;
-	masterXfer.subaddressSize = 1; // Direccion despues del registro.
+	masterXfer.subaddressSize = 1; 			// Direccion despues del registro.
 	masterXfer.data = pbuffer;
 	masterXfer.dataSize = size;
 	masterXfer.flags = kI2C_TransferDefaultFlag;
 
 	I2C_MasterTransferBlocking(I2C0, &masterXfer);
 }
-
-static void mma8451_write_reg(uint8_t addr, uint8_t data) // Mandar un dato de 8 bits al acelerometro e indicarle la dirección
-{
+static void mma8451_write_reg(uint8_t addr, uint8_t data){
 	i2c_master_transfer_t masterXfer;
 
     memset(&masterXfer, 0, sizeof(masterXfer));
@@ -150,9 +148,8 @@ static void mma8451_write_reg(uint8_t addr, uint8_t data) // Mandar un dato de 8
 	masterXfer.dataSize = 1;						/*!< A transfer size. */
 	masterXfer.flags = kI2C_TransferDefaultFlag;	/*!< A transfer flag which controls the transfer. Tipo de transferencia que envias (normalmente la estandar, podria decirse que no termine con stop u otras cosas) */
 
-    I2C_MasterTransferBlocking(I2C0, &masterXfer); // Transferencia blocking: mas facil de usar pero mas ineficiente desde el punto de vista del procesador. Pregunta al i2c si termino todo el tiempo.
+    I2C_MasterTransferBlocking(I2C0, &masterXfer); // Transferencia blocking: más fácil de usar pero mas ineficiente desde el punto de vista del procesador. Pregunta al i2c si termino todo el tiempo.
 }
-
 
 /*==================[external functions definition]==========================*/
 
@@ -165,6 +162,7 @@ void mma8451_freefall_config(void){
 	FF_MT_CFG_t FF_MT_CFG_reg;
 	FF_MT_THS_t FF_MT_THS_reg;
 	FF_MT_COUNT_t FF_MT_COUNT_reg;
+	XYZ_DATA_CFG_t data_cfg;
 
 //	mma8451_write_reg(0x2B, 64); 		// RST the MMA8451
 //	while(mma8451_read_reg(0x2B)){
@@ -183,8 +181,12 @@ void mma8451_freefall_config(void){
 	FF_MT_CFG_reg.ELE = 1 ; // Event latch enable. Hace clear a la bandera cuando se lee el source register
 	mma8451_write_reg(FF_MT_CFG_ADDRESS,FF_MT_CFG_reg.data);
 
-	// Test
-	mma8451_write_reg(0x0E, 0x01); // Write the 4g dynamic range value into register 0x0E --> a 8 bit 0.032g/LSB
+	// Format Scale (2g, 4g u 8g)
+	//mma8451_write_reg(XYZ_DATA_CFG_ADDRESS, 0x01); // Write the 4g dynamic range value into register 0x0E --> a 8 bit 0.032g/LSB
+	data_cfg.FormatScale = FS_4G;
+	data_cfg.HPF_out = 0;
+	mma8451_write_reg(XYZ_DATA_CFG_ADDRESS, data_cfg.data);
+
 
 	// Threshold Setting Value for the resulting acceleration < 0.2g
 	FF_MT_THS_reg.data = 0x06; // Note: The step count is 0.032g/count --  0.2g/0.032g = 6.25 counts //Round to 6 counts
@@ -207,7 +209,7 @@ void mma8451_freefall_config(void){
 
 	// Put the device in Active Mode, 200 Hz
 	ctrl_reg1.ACTIVE = 1; // en 0 es stanby, 1 es active.
-	ctrl_reg1.DR = 0B010; // Dr 010, 200HZ 5ms Hz output data rate
+	ctrl_reg1.DR = DR_200hz; // Dr 010, 200HZ 5ms Hz output data rate
 	ctrl_reg1.ASLP_RATE = 0B00;
 	ctrl_reg1.F_READ = 1;	// Fast-read mode (8 bits) --> Menor resolución pero mayor velocidad
 	ctrl_reg1.LNOISE = 0;
@@ -244,12 +246,12 @@ void mma8451_dataReady_config(void){
 
 	// Test
 	//mma8451_write_reg(0x0E, 0x01); // Write the 4g dynamic range value into register 0x0E
-	data_cfg.FormatScale = 0;   // Rango de 8G
+	data_cfg.FormatScale = FS_8G;   // Rango de 8G
 	data_cfg.HPF_out = 0;
 	mma8451_write_reg(XYZ_DATA_CFG_ADDRESS, data_cfg.data);
 
 	ctrl_reg1.ACTIVE = 1; 		// En 0 es stanby, en 1 es active.
-	ctrl_reg1.DR = 0b100; 		// Dr 010, 200HZ 5ms Hz output data rate
+	ctrl_reg1.DR = DR_200hz; 	// Dr 010, 200HZ 5ms Hz output data rate
 	ctrl_reg1.ASLP_RATE = 0B00;
 	ctrl_reg1.F_READ = 0; 		//
 	ctrl_reg1.LNOISE = 1; 		//
@@ -293,15 +295,6 @@ bool mma8451_getDataReadyInterruptStatus(void) {
 	return ret;
 }
 
-//int16_t mma8451_getAcX(void){
-//	return (int16_t)(((int32_t)read.X * 100) / (int32_t)4096); // Para 14 bits con 2g (por defecto). Divido por la mitad del maximo para que esté entre -2g y 2g. Luego la multiplicacion por 100 es para tener la representacion de g en centésimas.
-//}
-//int16_t mma8451_getAcY(void){
-//	return (int16_t)(((int32_t)read.Y * 100) / (int32_t)4096); // Para 14 bits con 2g (por defecto). Divido por la mitad del maximo para que esté entre -2g y 2g. Luego la multiplicacion por 100 es para tener la representacion de g en centésimas.
-//}
-//int16_t mma8451_getAcZ(void){
-//	return (int16_t)(((int32_t)read.Z * 100) / (int32_t)4096); // Para 14 bits con 2g (por defecto). Divido por la mitad del maximo para que esté entre -2g y 2g. Luego la multiplicacion por 100 es para tener la representacion de g en centésimas.
-//}
 
 int16_t mma8451_getAcX(void){
 	return (int16_t)(((int32_t)read.X * 100) / (int32_t)4096); // Para 14 bits con 2g (por defecto). Divido por la mitad del maximo para que esté entre -2g y 2g. Luego la multiplicacion por 100 es para tener la representacion de g en centésimas.
@@ -313,8 +306,8 @@ int16_t mma8451_getAcZ(void){
 	return (int16_t)(((int32_t)read.Z * 100) / (int32_t)4096); // Para 14 bits con 2g (por defecto). Divido por la mitad del maximo para que esté entre -2g y 2g. Luego la multiplicacion por 100 es para tener la representacion de g en centésimas.
 }
 
-void readAccsFromRegisters(void) // Leer los 6 registros de las 3 aceleraciones
-{
+/* Brief: Leer los 6 registros de las 3 aceleraciones y cargarlas en un buffer */
+void readAccsFromRegisters(void){
 	uint8_t bufAcc[6]; // Se puede hacer un buffer de 7 y tambien guardar el Status
 	int16_t readGravity;
 	mma8451_read_multiple_reg(OUT_X_MSB_ADDRESS, bufAcc, sizeof(bufAcc));
@@ -333,25 +326,25 @@ void readAccsFromRegisters(void) // Leer los 6 registros de las 3 aceleraciones
 
 /* --------- IRQ HANDLER ------------------ */
 void PORTC_PORTD_IRQHandler(void){
-
     INT_SOURCE_t intSource;
     STATUS_t status;
     intSource.data = mma8451_read_reg(INT_SOURCE_ADDRESS);	/* The bits are set by a low to high transition
     															and are cleared by reading the
 																appropriate interrupt source register */
 
-    if (intSource.SRC_DRDY){				// Interrupt from Data Ready
+    /* Chequeamos de donde viene la interrupción */
+    if (intSource.SRC_DRDY){
     	status.data = mma8451_read_reg(STATUS_ADDRESS);
     	 if (status.ZYXDR){
     		 readAccsFromRegisters();
-    		 isInterruptionByDR = true;			// Set in false by reading
+    		 isInterruptionByDR = true;		// Set in false by reading
     	 }
-    } else if (intSource.SRC_FF_MT) {		// Interrupt from Freefall
+    } else if (intSource.SRC_FF_MT) {
     	isInterruptionByFreeFall = true;	// Set in false by reading
     	APP_PowerModeSwitch(kSMC_PowerStateVlpr, kAPP_PowerModeRun);
     }
 
-    mma8451_read_reg(FF_MT_SRC_ADDRESS); //?
+    mma8451_read_reg(FF_MT_SRC_ADDRESS);
     mma8451_read_reg(INT_SOURCE_ADDRESS);
 
     PORT_ClearPinsInterruptFlags(INT1_PORT, 1<<INT1_PIN);
@@ -363,44 +356,81 @@ void PORTC_PORTD_IRQHandler(void){
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-/* Esta funcion es particular de ese ejercicio. */
-void mma8451_setDataRate(DR_enum rate)
-{
-    CTRL_REG1_t ctr_reg1;
-    bool estAct;
-
-    /* antes de modificar data rate es necesario poner ACTIVE = 0 */
-    ctr_reg1.data = mma8451_read_reg(CTRL_REG1_ADDRESS);
-
-    /* guarda valor que tiene ACTIVE y luego pone a cero */
-    estAct = ctr_reg1.ACTIVE;
-    ctr_reg1.ACTIVE = 0;
-
-	mma8451_write_reg(CTRL_REG1_ADDRESS, ctr_reg1.data);
-
-	/* actualiza DR y en la misma escritura va a restaurar ACTIVE */
-	ctr_reg1.DR = rate;
-	ctr_reg1.ACTIVE = estAct;
-
-	mma8451_write_reg(CTRL_REG1_ADDRESS, ctr_reg1.data);
-
-	/* verificación */
-	ctr_reg1.data = mma8451_read_reg(CTRL_REG1_ADDRESS);
+uint16_t getResolutionInCountsXG(void){
+	XYZ_DATA_CFG_t data_cfg;
+	CTRL_REG1_t ctrl_reg1;
+	uint16_t countsxg = 0;
+	data_cfg.data = mma8451_read_reg(XYZ_DATA_CFG_ADDRESS);
+	ctrl_reg1.data = mma8451_read_reg(CTRL_REG1_ADDRESS);
+	bool modoConv = ctrl_reg1.F_READ; // 1: 8 bits ; 0:14 bits ?
+	switch(data_cfg.FormatScale){
+		case FS_2G:
+			if(modoConv) countsxg = 64; // 64 counts/g --> 15.6 mg/LSB
+			else countsxg = 4096;		// 4096 count/g --> 0.25 mg/LSB
+		break;
+		case FS_4G:
+			if(modoConv) countsxg = 32; // 32 counts/g --> 31.25 mg/LSB
+			else countsxg = 2048;		// 2048 count/g --> 0.5 mg/LSB
+		break;
+		case FS_8G:
+			if(modoConv) countsxg = 16; // 16 counts/g --> 62.5 mg/LSB
+			else countsxg = 1024;		// 4096 count/g --> 1 mg/LSB
+		break;
+	}
+	return countsxg;
 }
 
-// Para el ejercicio usaban este:
+void setThreshold(int mg_threshold){
+	FF_MT_THS_t FF_MT_THS_reg;
+	uint16_t resolutionxg = getResolutionInCountsXG();
+	int counts_in_threshold = (int) (mg_threshold + resolutionxg / 2) / resolutionxg;
+	FF_MT_THS_reg.data = counts_in_threshold;
+	mma8451_write_reg(FF_MT_THS_ADDRESS,FF_MT_THS_reg.data);
+}
+
+void setDebounceCounter(int debounceCountermS){
+	CTRL_REG1_t ctrl_reg1;
+	FF_MT_COUNT_t FF_MT_COUNT_reg;
+	int debounceCount = 0;
+	ctrl_reg1.DR = mma8451_read_reg(FF_MT_COUNT_ADRESS);
+	switch(ctrl_reg1.DR){
+		case DR_800hz:
+			debounceCount = debounceCountermS/1.25;
+		break;
+		case DR_400hz:
+			debounceCount = debounceCountermS/2.5;
+		break;
+		case DR_200hz:
+			debounceCount = debounceCountermS/5;
+		break;
+		case DR_100hz:
+			debounceCount = debounceCountermS/10;
+		break;
+		case DR_50hz:
+			debounceCount = debounceCountermS/20;
+		break;
+		case DR_12p5hz:
+			debounceCount = debounceCountermS/80;
+		break;
+		case DR_6p25hz:
+			debounceCount = debounceCountermS/160;
+		break;
+		case DR_1p56hz:
+			debounceCount = debounceCountermS/640;
+		break;
+		FF_MT_COUNT_reg.data = debounceCount;
+		mma8451_write_reg(FF_MT_COUNT_ADRESS,FF_MT_COUNT_reg.data);
+	}
+
+}
+
+
+
+
+
+
+
+
 void mma8451_init(void)
 {
 	// Se definen variables del tipo de los registros a modificar.
@@ -435,19 +465,15 @@ void mma8451_init(void)
 
 	mma8451_write_reg(CTRL_REG5_ADDRESS, ctrl_reg5.data);
 
-	/* verificación */
-	ctrl_reg5.data = mma8451_read_reg(CTRL_REG5_ADDRESS);
 
 	ctrl_reg1.ACTIVE = 1;
 	ctrl_reg1.F_READ = 0;
 	ctrl_reg1.LNOISE = 1;
-	ctrl_reg1.DR = 0B101;		// Ver que valor ponerle para saber desde que medida toma la caida libre. Habria que saber las cuentas y el tiempo por conversión. Por que no puso "DR_12p5hz"?
+	ctrl_reg1.DR = 0B101;		// Ver que valor ponerle para saber desde que medida toma la caida libre. Habria que saber las cuentas y el tiempo por conversión.
 	ctrl_reg1.ASLP_RATE = 0B00;
 
     mma8451_write_reg(CTRL_REG1_ADDRESS, ctrl_reg1.data);
 
-    /* verificación */
-    ctrl_reg1.data = mma8451_read_reg(CTRL_REG1_ADDRESS);
 
     config_port_int1();
 }

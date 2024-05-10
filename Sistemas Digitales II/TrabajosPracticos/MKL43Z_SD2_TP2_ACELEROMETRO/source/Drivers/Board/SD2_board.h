@@ -67,6 +67,13 @@ typedef enum
     BOARD_LED_MSG_TOGGLE
 }board_ledMsg_enum;
 
+typedef enum
+{
+	OLED_RST_PIN = 0,
+    OLED_DATA_CMD_PIN,
+	OLED_TOTAL
+}board_oledPin_enum;
+
 typedef struct
 {
     PORT_Type *port;
@@ -101,11 +108,22 @@ bool board_getSw(board_swId_enum id);
 
 bool board_getLed(board_ledId_enum id);
 
-/**/
 
-void adc_init(void);
-void greenPWM_init(void);
-void redPWM_init(void);
+
+/** \brief Inicializa el SPI0
+ **
+ **/
+void board_configSPI0();
+
+/** \Envia un dato por SPI
+ **
+ **/
+void board_SPISend(uint8_t* buf, size_t len);
+
+/** \Setea al valor indicado el pin del OLED indicado
+ **
+ **/
+void board_setOledPin(board_oledPin_enum oledPin, uint8_t state);
 
 /*==================[cplusplus]==============================================*/
 #ifdef __cplusplus

@@ -3,9 +3,13 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
+#include <string.h>
 #include <math.h>
+
 #include "fsl_debug_console.h"
 #include "fsl_smc.h"
+#include "board.h"
 
 #include <App/mef.h>
 #include "Drivers/PowerMode/power_mode_switch.h"
@@ -13,7 +17,7 @@
 #include "Drivers/Key/key.h"
 #include "Drivers/MMA8451/mma8451.h"
 #include "Drivers/time.h"
-//#include "./Drivers/oled.h"
+#include "Drivers/SSD1306/oled.h"
 
 /*==================[macros and typedef]=====================================*/
 /* ------------------------- Macros IO ------------------------- */
@@ -21,17 +25,10 @@
 #define LR_OFF 				board_setLed(BOARD_LED_ID_ROJO, BOARD_LED_MSG_OFF)
 #define LR_TOGGLE 			board_setLed(BOARD_LED_ID_ROJO, BOARD_LED_MSG_TOGGLE)
 
-#define LV_ON				board_setLed(BOARD_LED_ID_VERDE, BOARD_LED_MSG_ON)
-#define LV_OFF				board_setLed(BOARD_LED_ID_VERDE, BOARD_LED_MSG_OFF)
-#define LV_TOGGLE 			board_setLed(BOARD_LED_ID_VERDE, BOARD_LED_MSG_TOGGLE)
-
 #define GET_SW1 			key_getPressEv(BOARD_SW_ID_1)
-#define GET_SW3 			key_getPressEv(BOARD_SW_ID_3)
 /* ------------------------- Macros Timers ------------------------- */
 #define T_BLINK				500
 #define T_SEC				10000
-/* ------------------------- Macros Display ------------------------- */
-//#define DISPLAY_OFF 		oled_clearScreen(OLED_COLOR_BLACK)
 /* ------------------------- Macros Acelerómetro ------------------------- */
 #define CONFIG_FREEFALL		mma8451_freefall_config()				// Configura Interrupciones por freefall
 #define CONFIG_DATAREADY	mma8451_dataReady_config()				// Configura Interrupciones por data ready
@@ -56,59 +53,7 @@ static MEF_State state;
 
 uint32_t freq = 0;
 smc_power_state_t currentPowerState;
-
 uint32_t timTranscurrido;
-
-
-// Definición de la estructura para un nodo de la lista
-typedef struct Node {
-    int data;           // Datos almacenados en el nodo
-    struct Node *next;  // Puntero al siguiente nodo en la lista
-} Node;
-
-Node *head = NULL;  // Inicialmente la lista está vacía
-// Función para agregar un nuevo elemento al final de la lista
-void append(Node **head, int data) {
-    Node *newNode = (Node *)malloc(sizeof(Node));  // Crear un nuevo nodo
-    if (newNode == NULL) {
-        fprintf(stderr, "Error: No se pudo asignar memoria para el nuevo nodo\n");
-        exit(EXIT_FAILURE);
-    }
-    newNode->data = data;   // Asignar los datos al nuevo nodo
-    newNode->next = NULL;   // Establecer el siguiente nodo como NULL
-
-    // Si la lista está vacía, el nuevo nodo será el primer nodo
-    if (*head == NULL) {
-        *head = newNode;
-        return;
-    }
-
-    // Buscar el último nodo y agregar el nuevo nodo al final
-    Node *current = *head;
-    while (current->next != NULL) {
-        current = current->next;
-    }
-    current->next = newNode;
-}
-
-// Función para imprimir los elementos de la lista
-void printList(Node *head) {
-    Node *current = head;
-    while (current != NULL) {
-        PRINTF("%d ", current->data);
-        current = current->next;
-    }
-    PRINTF("\n");
-}
-
-void clearList(Node **head) {
-    while (*head != NULL) {
-        Node *temp = *head;       // Guarda una referencia al nodo actual
-        *head = (*head)->next;    // Avanza al siguiente nodo
-        free(temp);               // Libera la memoria del nodo actual
-    }
-    *head = NULL; // Establece head en NULL para indicar que la lista está vacía
-}
 
 /*==================[external data definition]===============================*/
 
@@ -120,12 +65,14 @@ extern void mef_init(){
 	LastAccValue = 0;
 	NewAccValue = 0;
 	cuenta = 0;
-//	DISPLAY_OFF;
 	CONFIG_FREEFALL;
 	LR_OFF;
 	timBlink = T_BLINK;
 	timSec = T_SEC;
 	state = BAJO_CONSUMO;
+//	oled_clearScreen(OLED_COLOR_BLACK);
+//	oled_fillRect(0+8, 16+8, 0+128-8, 16+32-8, OLED_COLOR_WHITE);
+//	oled_putString(20, 29, (uint8_t*)"Bajo Consumo" , OLED_COLOR_WHITE, OLED_COLOR_BLACK);
 
 	PRINTF("    Estado: Bajo consumo\n");
 	APP_PowerModeSwitch(kSMC_PowerStateRun, kAPP_PowerModeVlpr);
@@ -135,8 +82,8 @@ extern void mef_init(){
 	freq = CLOCK_GetFreq(kCLOCK_CoreSysClk);
 	PRINTF("    Core Clock = %dMHz \r\r", freq/1000000);
 
-	head = NULL;
-	clearList(&head); // Limpia la lista y establece head en NULL
+//	head = NULL;
+//	clearList(&head); // Limpia la lista y establece head en NULL
 
 }
 
@@ -146,8 +93,10 @@ extern void mef_Tr_To_Bajo_Consumo(){
 
 
 extern void mef(){
+	char max_acc_str[16];
 	switch(state){
 		case BAJO_CONSUMO:
+
 			// Transición
 			if(IS_FREEFALL){ // Si se está en caida libre
 				state = CAIDA_LIBRE;
@@ -160,11 +109,11 @@ extern void mef(){
 				PRINTF("    Core Clock = %dMHz \r\r", freq/1000000);
 
 				time_restart();
-
 			}
 
 		break;
 		case CAIDA_LIBRE:
+			//oled_fillRect(32+8, 16+8, 32+64-8, 16+32-8, OLED_COLOR_BLACK);
 			// Acciones
 			if (timBlink == 0){
 				LR_TOGGLE;
@@ -183,11 +132,7 @@ extern void mef(){
 				// Si el nuevo valor de medición es mayor al máximo, se setea como el nuevo máximo
 				if(NewAccValue >= MaxAccValue) MaxAccValue = NewAccValue;
 
-				// Por otro lado, para detectar una finalización de la caida, se compara sumando una
-				// cuenta, cada vez que de manera consecutiva, llegan nuevos datos que varian en
-				// menos de un 10% del dato anterior.
-				if (NewAccValue < 1.1 * LastAccValue && NewAccValue > 0.9 * LastAccValue)
-				{
+				if (NewAccValue < 1.1 * LastAccValue && NewAccValue > 0.9 * LastAccValue){
 					cuenta++;
 				} else {
 					cuenta = 0;
@@ -204,18 +149,19 @@ extern void mef(){
 				timSec = T_SEC; // Tiempo en 10 segundos para salir del estado
 				MaxAccValue = sqrt(MaxAccValue); // Ahora si aplicamos la raiz
 
-				// DISPLAY_ON;
-				// Imprimir en OLED
-
 				key_clearFlags(BOARD_SW_ID_1); // Limpio la flag del SW1 por si fue presionada antes.
 				state = SHOW_DISPLAY;
 
 				PRINTF("    Max Aceleration en cg = %d \r\r\n",MaxAccValue);
 				PRINTF("    Max Aceleration = %d.%d g \r\r", MaxAccValue/10,MaxAccValue%10);
 				PRINTF("    Tiempo transcurrido en caida: %d ms \r\r",timTranscurrido/1000);
-				 // Imprimir la lista
 				//PRINTF("Lista: ");
 				//printList(head);
+
+				oled_fillRect(32, 16, 32+64, 16+32, OLED_COLOR_WHITE);
+				oled_fillRect(32+8, 16+8, 32+64-8, 16+32-8, OLED_COLOR_BLACK);
+				oled_putString(56, 29, (uint8_t *)"SD3", OLED_COLOR_WHITE, OLED_COLOR_BLACK);
+				oled_circle(64, 32, 31, OLED_COLOR_WHITE);
 			}
 
 		break;
