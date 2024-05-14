@@ -164,11 +164,6 @@ void mma8451_freefall_config(void){
 	FF_MT_COUNT_t FF_MT_COUNT_reg;
 	XYZ_DATA_CFG_t data_cfg;
 
-//	mma8451_write_reg(0x2B, 64); 		// RST the MMA8451
-//	while(mma8451_read_reg(0x2B)){
-//		 // Espero a que el reset termine
-//	}
-
 	/* Put the device in Standby Mode: Register 0x2A CTRL_REG1 */
 	ctrl_reg1.ACTIVE = 0;
 	mma8451_write_reg(CTRL_REG1_ADDRESS, ctrl_reg1.data);
@@ -189,7 +184,7 @@ void mma8451_freefall_config(void){
 
 
 	// Threshold Setting Value for the resulting acceleration < 0.2g
-	FF_MT_THS_reg.data = 0x06; // Note: The step count is 0.032g/count --  0.2g/0.032g = 6.25 counts //Round to 6 counts
+	FF_MT_THS_reg.data = 0x05; // Note: The step count is 0.032g/count --  0.2g/0.032g = 6.25 counts //Round to 6 counts
 	mma8451_write_reg(FF_MT_THS_ADDRESS,FF_MT_THS_reg.data);
 
 	// Set the debounce counter to eliminate false positive readings for 200Hz sample rate with a
@@ -227,12 +222,12 @@ void mma8451_dataReady_config(void){
 	ctrl_reg1.ACTIVE = 0; // Lo pone en standby para configurar el  registro
 	mma8451_write_reg(CTRL_REG1_ADDRESS, ctrl_reg1.data);
 
-	// REGISTROS DE FREEFALL, todo en valores deafult
-	FF_MT_CFG_reg.XEFE =0 ;
-	FF_MT_CFG_reg.YEFE =0 ;
-	FF_MT_CFG_reg.ZEFE =0 ;
-	FF_MT_CFG_reg.OAE = 0 ;
-	FF_MT_CFG_reg.ELE = 0 ;
+	// REGISTROS DE FREEFALL, valores deafult
+	FF_MT_CFG_reg.XEFE = 0 ;
+	FF_MT_CFG_reg.YEFE = 0 ;
+	FF_MT_CFG_reg.ZEFE = 0 ;
+	FF_MT_CFG_reg.OAE =  0 ;
+	FF_MT_CFG_reg.ELE =  0 ;
 	mma8451_write_reg(FF_MT_CFG_ADDRESS,FF_MT_CFG_reg.data);
 
 	//REGISTROS DE CONTROL
@@ -244,17 +239,15 @@ void mma8451_dataReady_config(void){
 	ctrl_reg5.INT_CFG_FF_MT = 0; // Interrupt del freefall en el pin INT2 para evitar problemas
 	mma8451_write_reg(CTRL_REG5_ADDRESS, ctrl_reg5.data);
 
-	// Test
-	//mma8451_write_reg(0x0E, 0x01); // Write the 4g dynamic range value into register 0x0E
-	data_cfg.FormatScale = FS_8G;   // Rango de 8G
+	data_cfg.FormatScale = FS_4G;   // Rango de 4G a 8 bit conv: 31.25 mg/LSB
 	data_cfg.HPF_out = 0;
 	mma8451_write_reg(XYZ_DATA_CFG_ADDRESS, data_cfg.data);
 
 	ctrl_reg1.ACTIVE = 1; 		// En 0 es stanby, en 1 es active.
 	ctrl_reg1.DR = DR_200hz; 	// Dr 010, 200HZ 5ms Hz output data rate
 	ctrl_reg1.ASLP_RATE = 0B00;
-	ctrl_reg1.F_READ = 0; 		//
-	ctrl_reg1.LNOISE = 1; 		//
+	ctrl_reg1.F_READ = 1; 		// When selected, the auto increment counter will skip over the LSB data bytes. (8 bits)
+	ctrl_reg1.LNOISE = 0; 		//
 	mma8451_write_reg(CTRL_REG1_ADDRESS, ctrl_reg1.data);
 
 	config_port_int1();
@@ -297,16 +290,16 @@ bool mma8451_getDataReadyInterruptStatus(void) {
 
 
 int16_t mma8451_getAcX(void){
-	return (int16_t)(((int32_t)read.X * 100) / (int32_t)4096); // Para 14 bits con 2g (por defecto). Divido por la mitad del maximo para que esté entre -2g y 2g. Luego la multiplicacion por 100 es para tener la representacion de g en centésimas.
+	return (int16_t)(((int16_t)read.X * 100) / (int16_t)32); // Para 8 bits con 4g (por defecto). Divido por la mitad del maximo para que esté entre -2g y 2g. Luego la multiplicacion por 100 es para tener la representacion de g en centésimas.
 }
 int16_t mma8451_getAcY(void){
-	return (int16_t)(((int32_t)read.Y * 100) / (int32_t)4096); // Para 14 bits con 2g (por defecto). Divido por la mitad del maximo para que esté entre -2g y 2g. Luego la multiplicacion por 100 es para tener la representacion de g en centésimas.
+	return (int16_t)(((int16_t)read.Y * 100) / (int16_t)32); // Para 8 bits con 4g (por defecto). Divido por la mitad del maximo para que esté entre -2g y 2g. Luego la multiplicacion por 100 es para tener la representacion de g en centésimas.
 }
 int16_t mma8451_getAcZ(void){
-	return (int16_t)(((int32_t)read.Z * 100) / (int32_t)4096); // Para 14 bits con 2g (por defecto). Divido por la mitad del maximo para que esté entre -2g y 2g. Luego la multiplicacion por 100 es para tener la representacion de g en centésimas.
+	return (int16_t)(((int16_t)read.Z * 100) / (int16_t)32); // Para 8 bits con 4g (por defecto). Divido por la mitad del maximo para que esté entre -4g y 4g. Luego la multiplicacion por 100 es para tener la representacion de g en centésimas.
 }
 
-/* Brief: Leer los 6 registros de las 3 aceleraciones y cargarlas en un buffer */
+/* Brief: Leer los 6 registros de las 3 aceleraciones y cargarlsas en un buffer */
 void readAccsFromRegisters(void){
 	uint8_t bufAcc[6]; // Se puede hacer un buffer de 7 y tambien guardar el Status
 	int16_t readGravity;
@@ -323,6 +316,15 @@ void readAccsFromRegisters(void){
 	readGravity  |= bufAcc[5];
 	read.Z = readGravity >> 2;
 }
+void fastReadAcelerationsFromRegister(void){
+	// Operate in Fast Read Mode (resolution: 8 bits)
+	uint8_t buffer[3];
+	mma8451_read_multiple_reg(OUT_X_MSB_ADDRESS, buffer, sizeof(buffer));
+	read.X = (int8_t)buffer[0];
+	read.Y = (int8_t)buffer[1];
+	read.Z = (int8_t)buffer[2];
+}
+
 
 /* --------- IRQ HANDLER ------------------ */
 void PORTC_PORTD_IRQHandler(void){
@@ -336,7 +338,7 @@ void PORTC_PORTD_IRQHandler(void){
     if (intSource.SRC_DRDY){
     	status.data = mma8451_read_reg(STATUS_ADDRESS);
     	 if (status.ZYXDR){
-    		 readAccsFromRegisters();
+    		 fastReadAcelerationsFromRegister();
     		 isInterruptionByDR = true;		// Set in false by reading
     	 }
     } else if (intSource.SRC_FF_MT) {
@@ -351,6 +353,16 @@ void PORTC_PORTD_IRQHandler(void){
 }
 
 /*==================[end of file]============================================*/
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -425,55 +437,3 @@ void setDebounceCounter(int debounceCountermS){
 }
 
 
-
-
-
-
-
-
-void mma8451_init(void)
-{
-	// Se definen variables del tipo de los registros a modificar.
-    CTRL_REG1_t ctrl_reg1;
-    CTRL_REG4_t ctrl_reg4;
-    CTRL_REG5_t ctrl_reg5;
-
-    // Se escribe en la variable que simula el registro 4.
-	ctrl_reg4.INT_EN_DRDY = 1;
-	ctrl_reg4.INT_EN_FF_MT = 0; /// Habilitar pedido de interrupción cuando se da Free Fall (poner en 1) - Antes hay que deshabilitar la interrupción de GPIO
-	ctrl_reg4.INT_EN_PULSE = 0;
-	ctrl_reg4.INT_EN_LNDPRT = 0;
-	ctrl_reg4.INT_EN_TRANS = 0;
-	ctrl_reg4.INT_EN_FIFO = 0;
-	ctrl_reg4.INT_EN_ASLP = 0;
-
-	// Escribe la estructura anterior en el registro
-	mma8451_write_reg(CTRL_REG4_ADDRESS, ctrl_reg4.data);
-	/// ej: mma8451_write_reg(0X2D, 0x04) -->  Freefall/motion interrupt enabled
-
-	/* verificación para fines didacticos (en debugging) */
-	ctrl_reg4.data = mma8451_read_reg(CTRL_REG4_ADDRESS);
-
-	// Se escribe en la estructura del registro 5
-	ctrl_reg5.INT_CFG_DRDY = 1;
-	ctrl_reg5.INT_CFG_FF_MT = 0;
-	ctrl_reg5.INT_CFG_PULSE = 0;
-	ctrl_reg5.INT_CFG_LNDPRT = 0;
-	ctrl_reg5.INT_CFG_TRANS = 0;
-	ctrl_reg5.INT_CFG_FIFO = 0;
-	ctrl_reg5.INT_CFG_ASLP = 0;
-
-	mma8451_write_reg(CTRL_REG5_ADDRESS, ctrl_reg5.data);
-
-
-	ctrl_reg1.ACTIVE = 1;
-	ctrl_reg1.F_READ = 0;
-	ctrl_reg1.LNOISE = 1;
-	ctrl_reg1.DR = 0B101;		// Ver que valor ponerle para saber desde que medida toma la caida libre. Habria que saber las cuentas y el tiempo por conversión.
-	ctrl_reg1.ASLP_RATE = 0B00;
-
-    mma8451_write_reg(CTRL_REG1_ADDRESS, ctrl_reg1.data);
-
-
-    config_port_int1();
-}

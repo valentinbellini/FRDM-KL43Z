@@ -42,20 +42,9 @@
 #include "fsl_spi.h"
 
 /*==================[macros and definitions]=================================*/
-#define SPI_MASTER              	SPI0
-#define SPI_MASTER_SOURCE_CLOCK 	kCLOCK_BusClk
-#define SPI_MASTER_CLK_FREQ     	CLOCK_GetFreq(kCLOCK_BusClk)
-
 #define SPI1_MASTER              	SPI1
 #define SPI1_MASTER_SOURCE_CLOCK 	kCLOCK_BusClk
 #define SPI1_MASTER_CLK_FREQ     	CLOCK_GetFreq(kCLOCK_BusClk)
-
-#define SPI0_SS_PORT				PORTC
-#define SPI0_SS_PIN					4
-#define SPI0_SCK_PORT				PORTC
-#define SPI0_SCK_PIN				5
-#define SPI0_MOSI_PORT				PORTC
-#define SPI0_MOSI_PIN				6
 
 #define SPI1_SS_PORT				PORTD
 #define SPI1_SS_PIN					4
@@ -79,10 +68,6 @@ static const board_gpioInfo_type board_gpioOled[] =
 {
     {PORTC, GPIOC, 0},      /* RST */
     {PORTC, GPIOC, 7},      /* DATA/CMD */
-	/*
-	 *
-	 *
-	 * */
 
 };
 /*==================[internal functions declaration]=========================*/
@@ -215,49 +200,6 @@ void board_setOledPin(board_oledPin_enum oledPin, uint8_t state)
 {
 	GPIO_PinWrite(board_gpioOled[oledPin].gpio, board_gpioOled[oledPin].pin, state);
 }
-void board_configSPI0(){
-	const port_pin_config_t port_spi_config = {
-		/* Internal pull-up resistor is disabled */
-		.pullSelect = kPORT_PullDisable,
-		/* Fast slew rate is configured */
-		.slewRate = kPORT_FastSlewRate,
-		/* Passive filter is disabled */
-		.passiveFilterEnable = kPORT_PassiveFilterDisable,
-		/* Low drive strength is configured */
-		.driveStrength = kPORT_LowDriveStrength,
-		/* Pin is configured as SPI0_x */
-		.mux = kPORT_MuxAlt2,
-	};
-	PORT_SetPinConfig(SPI0_SS_PORT, SPI0_SS_PIN, &port_spi_config); 	//SPI0_SS		PORTC PIN 4
-	PORT_SetPinConfig(SPI0_SCK_PORT, SPI0_SCK_PIN, &port_spi_config); 	//SPI0_SCK		PORTC PIN 5
-	PORT_SetPinConfig(SPI0_MOSI_PORT, SPI0_MOSI_PIN, &port_spi_config);	//SPI0_MOSI 	PORTC PIN 6
-
-	CLOCK_EnableClock(kCLOCK_Spi0);
-
-	spi_master_config_t userConfig;
-
-	SPI_MasterGetDefaultConfig(&userConfig);
-
-	/*
-	userConfig.enableMaster         = true;
-	userConfig.enableStopInWaitMode = false;
-	userConfig.polarity             = kSPI_ClockPolarityActiveHigh;
-	userConfig.phase                = kSPI_ClockPhaseFirstEdge;
-	userConfig.direction            = kSPI_MsbFirst;
-	userConfig.dataMode 			 = kSPI_8BitMode;
-	userConfig.txWatermark 		 = kSPI_TxFifoOneHalfEmpty;
-	userConfig.rxWatermark 		 = kSPI_RxFifoOneHalfFull;
-	userConfig.pinMode      		 = kSPI_PinModeNormal;
-	userConfig.outputMode   		 = kSPI_SlaveSelectAutomaticOutput;
-	userConfig.baudRate_Bps 		 = 500000U;
-	*/
-
-	userConfig.polarity             = kSPI_ClockPolarityActiveLow;
-	userConfig.phase                = kSPI_ClockPhaseSecondEdge;
-	userConfig.baudRate_Bps 		= 4000000U;
-
-	SPI_MasterInit(SPI_MASTER, &userConfig, SPI_MASTER_CLK_FREQ);
-}
 
 void board_configSPI1(){
 	const port_pin_config_t port_spi_config = {
@@ -283,17 +225,17 @@ void board_configSPI1(){
 	SPI_MasterGetDefaultConfig(&userConfig);
 
 	/*
-	userConfig.enableMaster         = true;
-	userConfig.enableStopInWaitMode = false;
-	userConfig.polarity             = kSPI_ClockPolarityActiveHigh;
-	userConfig.phase                = kSPI_ClockPhaseFirstEdge;
-	userConfig.direction            = kSPI_MsbFirst;
-	userConfig.dataMode 			 = kSPI_8BitMode;
-	userConfig.txWatermark 		 = kSPI_TxFifoOneHalfEmpty;
-	userConfig.rxWatermark 		 = kSPI_RxFifoOneHalfFull;
-	userConfig.pinMode      		 = kSPI_PinModeNormal;
-	userConfig.outputMode   		 = kSPI_SlaveSelectAutomaticOutput;
-	userConfig.baudRate_Bps 		 = 500000U;
+	userConfig.enableMaster         	= true;
+	userConfig.enableStopInWaitMode 	= false;
+	userConfig.polarity             	= kSPI_ClockPolarityActiveHigh;
+	userConfig.phase                	= kSPI_ClockPhaseFirstEdge;
+	userConfig.direction            	= kSPI_MsbFirst;
+	userConfig.dataMode 			 	= kSPI_8BitMode;
+	userConfig.txWatermark 		 		= kSPI_TxFifoOneHalfEmpty;
+	userConfig.rxWatermark 		 		= kSPI_RxFifoOneHalfFull;
+	userConfig.pinMode      		 	= kSPI_PinModeNormal;
+	userConfig.outputMode   			= kSPI_SlaveSelectAutomaticOutput;
+	userConfig.baudRate_Bps 		 	= 500000U;
 	*/
 
 	userConfig.polarity             = kSPI_ClockPolarityActiveLow;
@@ -313,15 +255,6 @@ void board_SPI1Send(uint8_t* buf, size_t len){
 	SPI_MasterTransferBlocking(SPI1_MASTER, &xfer);
 }
 
-void board_SPISend(uint8_t* buf, size_t len){
-	spi_transfer_t xfer;
-
-	xfer.txData = buf;
-	xfer.rxData = NULL;
-	xfer.dataSize  = len;
-
-	SPI_MasterTransferBlocking(SPI_MASTER, &xfer);
-}
 /* ----------------------------------------------------------------------------------------------------- */
 
 

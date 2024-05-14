@@ -45,12 +45,16 @@ extern "C" {
 
 /*==================[macros]=================================================*/
 
-/*==================[typedef]================================================*/
 
 /*==================[external data declaration]==============================*/
+#define I2C0_SCL_PORT   PORTE
+#define I2C0_SCL_PIN    24
+#define I2C0_SDA_PORT   PORTE
+#define I2C0_SDA_PIN    25
 
 /*==================[external functions definition]==========================*/
 void SD2_I2C_init(void);
+
 /*==================[cplusplus]==============================================*/
 #ifdef __cplusplus
 }

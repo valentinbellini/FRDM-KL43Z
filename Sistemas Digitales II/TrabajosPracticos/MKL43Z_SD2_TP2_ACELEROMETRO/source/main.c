@@ -1,3 +1,10 @@
+/**
+ * @file    main.c
+ * @brief   Application entry point.
+ * @autor	Valentin Bellini & Iván Saitta
+ */
+
+/*==================[inclusiones]==========================*/
 
 #include <stdio.h>
 #include "board.h"
@@ -18,7 +25,7 @@ void init_clocks_and_power_mode(){
 	uint32_t freq = 0;
 	smc_power_state_t currentPowerState;
 
-	PRINTF("\r\n####################  TRABAJO PRACTICO 2 - SD2 ####################\n\r\n");
+	PRINTF("\r\n####################  TRABAJO PRACTICO 2 - SD2 - Bellini, Saitta ####################\n\r\n");
 
 	currentPowerState = SMC_GetPowerModeState(SMC);
 	APP_ShowPowerMode(currentPowerState);
@@ -50,16 +57,10 @@ int main(void) {
     board_init();
 
     /* Inicialización de SPI y display OLED */
-    //board_configSPI0();
     board_configSPI1();
     oled_init();
     oled_setContrast(16);
     oled_clearScreen(OLED_COLOR_BLACK);
-    /* Drawing */
-	oled_fillRect(32, 16, 32+64, 16+32, OLED_COLOR_WHITE);
-	oled_fillRect(32+8, 16+8, 32+64-8, 16+32-8, OLED_COLOR_BLACK);
-	oled_putString(56, 29, (uint8_t *)"SD2", OLED_COLOR_WHITE, OLED_COLOR_BLACK);
-	oled_circle(64, 32, 31, OLED_COLOR_WHITE);
 
     /* Inicialización del I2C */
     SD2_I2C_init();

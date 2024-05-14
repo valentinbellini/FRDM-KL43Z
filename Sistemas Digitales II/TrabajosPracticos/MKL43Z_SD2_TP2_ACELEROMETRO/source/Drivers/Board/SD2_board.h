@@ -110,15 +110,15 @@ bool board_getLed(board_ledId_enum id);
 
 
 
-/** \brief Inicializa el SPI0
+/** \brief Inicializa el SPI1
  **
  **/
-void board_configSPI0();
+void board_configSPI1();
 
-/** \Envia un dato por SPI
+/** \Envia un dato por SPI1
  **
  **/
-void board_SPISend(uint8_t* buf, size_t len);
+void board_SPI1Send(uint8_t* buf, size_t len);
 
 /** \Setea al valor indicado el pin del OLED indicado
  **
