@@ -17,7 +17,6 @@
 #include "Drivers/Key/key.h"
 #include "Drivers/I2C/SD2_I2C.h"
 #include "Drivers/SSD1306/oled.h"
-#include "Drivers/time.h"
 
 #include <App/mef.h>
 
@@ -50,26 +49,23 @@ int main(void) {
 	/* Inicialización de clocks a máxima frecuencia y micro en modo RUN a 48MHz */
 	init_clocks_and_power_mode();
 
-    /* Init FSL debug console. */
+    /* Inicialización FSL debug console. */
     BOARD_InitDebugConsole();
 
-    /* Se inicializa funciones de la placa */
+    /* Inicialización de funciones de la placa */
     board_init();
 
     /* Inicialización de SPI y display OLED */
     board_configSPI1();
     oled_init();
     oled_setContrast(16);
-    oled_clearScreen(OLED_COLOR_BLACK);
+	oled_clearScreen(OLED_COLOR_BLACK);
 
     /* Inicialización del I2C */
     SD2_I2C_init();
 
-    /* Se inicializa la MEF de pulsadores*/
+    /* Inicialización MEF de pulsadores*/
     key_init();
-
-    /* Inicialización del timMeasure con PIT */
-	time_init();
 
     /* Se configura interrupción de systick */
     SysTick_Config(SystemCoreClock / 1000U);

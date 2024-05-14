@@ -49,11 +49,11 @@
  * Defines and typedefs
  *****************************************************************************/
 
-#define OLED_DATA()   board_setOledPin(OLED_DATA_CMD_PIN, 1) //GPIOC7 --> OLED DATA/CMD pin
-#define OLED_CMD()    board_setOledPin(OLED_DATA_CMD_PIN, 0)
+#define OLED_DATA()   	board_setOledPin(OLED_DATA_CMD_PIN, 1) //GPIOC7 --> OLED DATA/CMD pin
+#define OLED_CMD()    	board_setOledPin(OLED_DATA_CMD_PIN, 0)
 
-#define OLED_ENABLE() board_setOledPin(OLED_RST_PIN, 1) //GPIOC0 --> OLED reset pin
-#define OLED_DISABLE() board_setOledPin(OLED_RST_PIN, 0)
+#define OLED_ENABLE() 	board_setOledPin(OLED_RST_PIN, 1) //GPIOC0 --> OLED reset pin
+#define OLED_DISABLE() 	board_setOledPin(OLED_RST_PIN, 0)
 
 
 #define X_OFFSET 0

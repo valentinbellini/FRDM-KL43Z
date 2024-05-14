@@ -155,7 +155,16 @@ static void mma8451_write_reg(uint8_t addr, uint8_t data){
 
 /* --------- Configuraciones de registros ------------------ */
 void mma8451_freefall_config(void){
-	// Registers definitions
+	/*
+	 * Brief: Esta función setea al acelerómetro para interrupir cuando detecte caida libre.
+	 * - threshold seteado en 0.15 g
+	 * - Format Scale en 4g
+	 * - ODR en 200Hz (5ms)
+	 * - FastRead en 1 (conversión rápida a 8 bits)
+	 * - Debouncer en 140ms
+	 * */
+
+	/* Registers definitions */
 	CTRL_REG1_t ctrl_reg1;
 	CTRL_REG4_t ctrl_reg4;
 	CTRL_REG5_t ctrl_reg5;
@@ -176,37 +185,36 @@ void mma8451_freefall_config(void){
 	FF_MT_CFG_reg.ELE = 1 ; // Event latch enable. Hace clear a la bandera cuando se lee el source register
 	mma8451_write_reg(FF_MT_CFG_ADDRESS,FF_MT_CFG_reg.data);
 
-	// Format Scale (2g, 4g u 8g)
-	//mma8451_write_reg(XYZ_DATA_CFG_ADDRESS, 0x01); // Write the 4g dynamic range value into register 0x0E --> a 8 bit 0.032g/LSB
-	data_cfg.FormatScale = FS_4G;
+	/* Format Scale (2g, 4g u 8g) */
+	data_cfg.FormatScale = FS_2G;
 	data_cfg.HPF_out = 0;
 	mma8451_write_reg(XYZ_DATA_CFG_ADDRESS, data_cfg.data);
 
 
-	// Threshold Setting Value for the resulting acceleration < 0.2g
-	FF_MT_THS_reg.data = 0x05; // Note: The step count is 0.032g/count --  0.2g/0.032g = 6.25 counts //Round to 6 counts
+	/* Threshold Setting Value for the resulting acceleration < 0.2g */
+	FF_MT_THS_reg.THS = 0x07; // Note: The step count is 15.6mg/count - 0.2g/15.6mg = 12.82 counts (Round to 12 or counts)
+	FF_MT_THS_reg.DBCNTM = 1;
 	mma8451_write_reg(FF_MT_THS_ADDRESS,FF_MT_THS_reg.data);
 
-	// Set the debounce counter to eliminate false positive readings for 200Hz sample rate with a
-	// requirement of 120 ms timer.
-	FF_MT_COUNT_reg.data = 24; // Note: 120 ms/5 ms (steps) = 24 counts (0x18)
+	/* Set debounce counter to eliminate false positive readings for 200Hz sample rate with a requirement of 120 ms timer. */
+	FF_MT_COUNT_reg.data = 0x18; // Note: 120 ms/5 ms (steps) = 24 counts (0x18)
 	mma8451_write_reg(FF_MT_COUNT_ADRESS,FF_MT_COUNT_reg.data);
 
-	//Enable Motion/Freefall Interrupt Function in the System (CTRL_REG4)
+	/* Enable Motion/Freefall Interrupt Function in the System (CTRL_REG4) */
 	ctrl_reg4.INT_EN_DRDY = 0;  //Desactivo la interrupcion por Data ready en caso de que venga activada
 	ctrl_reg4.INT_EN_FF_MT = 1; //Activo la interrupcion por FreeFall
 	mma8451_write_reg(CTRL_REG4_ADDRESS, ctrl_reg4.data);
 
-	// Route the Motion/Freefall Interrupt Function to INT1 hardware pin (CTRL_REG5)
-	ctrl_reg5.INT_CFG_DRDY = 0;  // Interrupt del dready en el pin INT2 para evitar problemas
-	ctrl_reg5.INT_CFG_FF_MT = 1; // Interrupt Freefall Pin 1
+	/* Route the Motion/Freefall Interrupt Function to INT1 hardware pin (CTRL_REG5) */
+	ctrl_reg5.INT_CFG_DRDY = 0;  // Interrupt Data Ready en el pin INT2
+	ctrl_reg5.INT_CFG_FF_MT = 1; // Interrupt Freefall en el Pin INT1
 	mma8451_write_reg(CTRL_REG5_ADDRESS, ctrl_reg5.data);
 
-	// Put the device in Active Mode, 200 Hz
+	/* Put the device in Active Mode, 200 Hz, Fast-Read mode */
 	ctrl_reg1.ACTIVE = 1; // en 0 es stanby, 1 es active.
 	ctrl_reg1.DR = DR_200hz; // Dr 010, 200HZ 5ms Hz output data rate
 	ctrl_reg1.ASLP_RATE = 0B00;
-	ctrl_reg1.F_READ = 1;	// Fast-read mode (8 bits) --> Menor resolución pero mayor velocidad
+	ctrl_reg1.F_READ = 1;	// Fast-Read mode (8 bits) --> Menor resolución pero mayor velocidad
 	ctrl_reg1.LNOISE = 0;
 	mma8451_write_reg(CTRL_REG1_ADDRESS, ctrl_reg1.data);
 
@@ -219,10 +227,11 @@ void mma8451_dataReady_config(void){
 	FF_MT_CFG_t FF_MT_CFG_reg;
 	XYZ_DATA_CFG_t data_cfg;
 
-	ctrl_reg1.ACTIVE = 0; // Lo pone en standby para configurar el  registro
+	/* Put the device in Standby Mode: Register 0x2A CTRL_REG1 */
+	ctrl_reg1.ACTIVE = 0;
 	mma8451_write_reg(CTRL_REG1_ADDRESS, ctrl_reg1.data);
 
-	// REGISTROS DE FREEFALL, valores deafult
+	/* REGISTROS DE FREEFALL, valores default */
 	FF_MT_CFG_reg.XEFE = 0 ;
 	FF_MT_CFG_reg.YEFE = 0 ;
 	FF_MT_CFG_reg.ZEFE = 0 ;
@@ -230,19 +239,22 @@ void mma8451_dataReady_config(void){
 	FF_MT_CFG_reg.ELE =  0 ;
 	mma8451_write_reg(FF_MT_CFG_ADDRESS,FF_MT_CFG_reg.data);
 
-	//REGISTROS DE CONTROL
+	/* Enable Data Ready Interrupt Function in the System (CTRL_REG4) */
 	ctrl_reg4.INT_EN_DRDY = 1;  // Interrupciones activas por DataReady
 	ctrl_reg4.INT_EN_FF_MT = 0; // Interrupciones desactivadas por FreeFall
 	mma8451_write_reg(CTRL_REG4_ADDRESS, ctrl_reg4.data);
 
-	ctrl_reg5.INT_CFG_DRDY = 1;  // Data Ready para interrumpir en pin 1
-	ctrl_reg5.INT_CFG_FF_MT = 0; // Interrupt del freefall en el pin INT2 para evitar problemas
+	/* Route the Dara Ready Interrupt Function to INT1 hardware pin (CTRL_REG5) */
+	ctrl_reg5.INT_CFG_DRDY = 1;  // Interrupt Data Ready en pin INT1
+	ctrl_reg5.INT_CFG_FF_MT = 0; // Interrupt Freefall en pin INT2
 	mma8451_write_reg(CTRL_REG5_ADDRESS, ctrl_reg5.data);
 
-	data_cfg.FormatScale = FS_4G;   // Rango de 4G a 8 bit conv: 31.25 mg/LSB
+	/* Format Scale (2g, 4g u 8g) */
+	data_cfg.FormatScale = FS_4G;
 	data_cfg.HPF_out = 0;
 	mma8451_write_reg(XYZ_DATA_CFG_ADDRESS, data_cfg.data);
 
+	/* Put the device in Active Mode, 200 Hz, Fast-Read mode */
 	ctrl_reg1.ACTIVE = 1; 		// En 0 es stanby, en 1 es active.
 	ctrl_reg1.DR = DR_200hz; 	// Dr 010, 200HZ 5ms Hz output data rate
 	ctrl_reg1.ASLP_RATE = 0B00;
