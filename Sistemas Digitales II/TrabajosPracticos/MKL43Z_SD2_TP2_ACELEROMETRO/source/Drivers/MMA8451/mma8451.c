@@ -259,7 +259,7 @@ void mma8451_dataReady_config(void){
 	ctrl_reg1.DR = DR_200hz; 	// Dr 010, 200HZ 5ms Hz output data rate
 	ctrl_reg1.ASLP_RATE = 0B00;
 	ctrl_reg1.F_READ = 1; 		// When selected, the auto increment counter will skip over the LSB data bytes. (8 bits)
-	ctrl_reg1.LNOISE = 1; 		//
+	ctrl_reg1.LNOISE = 0; 		//
 	mma8451_write_reg(CTRL_REG1_ADDRESS, ctrl_reg1.data);
 
 	ctrl_reg1.ACTIVE = 1; 		// En 0 es stanby, en 1 es active.
