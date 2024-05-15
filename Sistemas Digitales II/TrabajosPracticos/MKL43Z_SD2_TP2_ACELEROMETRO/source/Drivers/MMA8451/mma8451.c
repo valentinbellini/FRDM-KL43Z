@@ -46,7 +46,7 @@
 
 /*==================[macros and definitions]=================================*/
 
-#define MMA8451_I2C_ADDRESS     (0x1d)	// Direccón del acelerómetro (se la debo indicar al I2C)
+#define MMA8451_I2C_ADDRESS     (0x1d)	// Direccón del acelerómetro
 
 typedef struct {
     int16_t X;
@@ -186,18 +186,17 @@ void mma8451_freefall_config(void){
 	mma8451_write_reg(FF_MT_CFG_ADDRESS,FF_MT_CFG_reg.data);
 
 	/* Format Scale (2g, 4g u 8g) */
-	data_cfg.FormatScale = FS_2G;
+	data_cfg.FormatScale = FS_4G;
 	data_cfg.HPF_out = 0;
 	mma8451_write_reg(XYZ_DATA_CFG_ADDRESS, data_cfg.data);
 
-
-	/* Threshold Setting Value for the resulting acceleration < 0.2g */
-	FF_MT_THS_reg.THS = 0x07; // Note: The step count is 15.6mg/count - 0.2g/15.6mg = 12.82 counts (Round to 12 or counts)
-	FF_MT_THS_reg.DBCNTM = 1;
+	/* Threshold Setting Value for the resulting acceleration < 0.15g */
+	FF_MT_THS_reg.THS = 0x05; // Note: The step count is 31.25mg/count (LNOISE=1) - 0.15g/31.25mg = 4.8 counts (Round to 5)
+	FF_MT_THS_reg.DBCNTM = 1; // Reinicia el counter cuando se deja de dar la condición de freefall (En 0 lo decrementa)
 	mma8451_write_reg(FF_MT_THS_ADDRESS,FF_MT_THS_reg.data);
 
 	/* Set debounce counter to eliminate false positive readings for 200Hz sample rate with a requirement of 120 ms timer. */
-	FF_MT_COUNT_reg.data = 0x18; // Note: 120 ms/5 ms (steps) = 24 counts (0x18)
+	FF_MT_COUNT_reg.data = 0x1A; 	// Note: 130 ms/5 ms (steps) = 26 counts (0x1A) --> 8.5 cm
 	mma8451_write_reg(FF_MT_COUNT_ADRESS,FF_MT_COUNT_reg.data);
 
 	/* Enable Motion/Freefall Interrupt Function in the System (CTRL_REG4) */
@@ -211,11 +210,13 @@ void mma8451_freefall_config(void){
 	mma8451_write_reg(CTRL_REG5_ADDRESS, ctrl_reg5.data);
 
 	/* Put the device in Active Mode, 200 Hz, Fast-Read mode */
-	ctrl_reg1.ACTIVE = 1; // en 0 es stanby, 1 es active.
-	ctrl_reg1.DR = DR_200hz; // Dr 010, 200HZ 5ms Hz output data rate
+	ctrl_reg1.DR = DR_200hz; 		// Dr 010, 800HZ 1.25ms Hz output data rate
 	ctrl_reg1.ASLP_RATE = 0B00;
-	ctrl_reg1.F_READ = 1;	// Fast-Read mode (8 bits) --> Menor resolución pero mayor velocidad
-	ctrl_reg1.LNOISE = 0;
+	ctrl_reg1.F_READ = 1;			// Fast-Read mode (8 bits)
+	ctrl_reg1.LNOISE = 1;			//  1: The maximum threshold will be limited to 4 g regardless of the full-scale range
+	mma8451_write_reg(CTRL_REG1_ADDRESS, ctrl_reg1.data);
+
+	ctrl_reg1.ACTIVE = 1; 			// Back to active mode
 	mma8451_write_reg(CTRL_REG1_ADDRESS, ctrl_reg1.data);
 
 	config_port_int1();
@@ -255,11 +256,13 @@ void mma8451_dataReady_config(void){
 	mma8451_write_reg(XYZ_DATA_CFG_ADDRESS, data_cfg.data);
 
 	/* Put the device in Active Mode, 200 Hz, Fast-Read mode */
-	ctrl_reg1.ACTIVE = 1; 		// En 0 es stanby, en 1 es active.
 	ctrl_reg1.DR = DR_200hz; 	// Dr 010, 200HZ 5ms Hz output data rate
 	ctrl_reg1.ASLP_RATE = 0B00;
 	ctrl_reg1.F_READ = 1; 		// When selected, the auto increment counter will skip over the LSB data bytes. (8 bits)
-	ctrl_reg1.LNOISE = 0; 		//
+	ctrl_reg1.LNOISE = 1; 		//
+	mma8451_write_reg(CTRL_REG1_ADDRESS, ctrl_reg1.data);
+
+	ctrl_reg1.ACTIVE = 1; 		// En 0 es stanby, en 1 es active.
 	mma8451_write_reg(CTRL_REG1_ADDRESS, ctrl_reg1.data);
 
 	config_port_int1();
@@ -365,87 +368,3 @@ void PORTC_PORTD_IRQHandler(void){
 }
 
 /*==================[end of file]============================================*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-uint16_t getResolutionInCountsXG(void){
-	XYZ_DATA_CFG_t data_cfg;
-	CTRL_REG1_t ctrl_reg1;
-	uint16_t countsxg = 0;
-	data_cfg.data = mma8451_read_reg(XYZ_DATA_CFG_ADDRESS);
-	ctrl_reg1.data = mma8451_read_reg(CTRL_REG1_ADDRESS);
-	bool modoConv = ctrl_reg1.F_READ; // 1: 8 bits ; 0:14 bits ?
-	switch(data_cfg.FormatScale){
-		case FS_2G:
-			if(modoConv) countsxg = 64; // 64 counts/g --> 15.6 mg/LSB
-			else countsxg = 4096;		// 4096 count/g --> 0.25 mg/LSB
-		break;
-		case FS_4G:
-			if(modoConv) countsxg = 32; // 32 counts/g --> 31.25 mg/LSB
-			else countsxg = 2048;		// 2048 count/g --> 0.5 mg/LSB
-		break;
-		case FS_8G:
-			if(modoConv) countsxg = 16; // 16 counts/g --> 62.5 mg/LSB
-			else countsxg = 1024;		// 4096 count/g --> 1 mg/LSB
-		break;
-	}
-	return countsxg;
-}
-
-void setThreshold(int mg_threshold){
-	FF_MT_THS_t FF_MT_THS_reg;
-	uint16_t resolutionxg = getResolutionInCountsXG();
-	int counts_in_threshold = (int) (mg_threshold + resolutionxg / 2) / resolutionxg;
-	FF_MT_THS_reg.data = counts_in_threshold;
-	mma8451_write_reg(FF_MT_THS_ADDRESS,FF_MT_THS_reg.data);
-}
-
-void setDebounceCounter(int debounceCountermS){
-	CTRL_REG1_t ctrl_reg1;
-	FF_MT_COUNT_t FF_MT_COUNT_reg;
-	int debounceCount = 0;
-	ctrl_reg1.DR = mma8451_read_reg(FF_MT_COUNT_ADRESS);
-	switch(ctrl_reg1.DR){
-		case DR_800hz:
-			debounceCount = debounceCountermS/1.25;
-		break;
-		case DR_400hz:
-			debounceCount = debounceCountermS/2.5;
-		break;
-		case DR_200hz:
-			debounceCount = debounceCountermS/5;
-		break;
-		case DR_100hz:
-			debounceCount = debounceCountermS/10;
-		break;
-		case DR_50hz:
-			debounceCount = debounceCountermS/20;
-		break;
-		case DR_12p5hz:
-			debounceCount = debounceCountermS/80;
-		break;
-		case DR_6p25hz:
-			debounceCount = debounceCountermS/160;
-		break;
-		case DR_1p56hz:
-			debounceCount = debounceCountermS/640;
-		break;
-		FF_MT_COUNT_reg.data = debounceCount;
-		mma8451_write_reg(FF_MT_COUNT_ADRESS,FF_MT_COUNT_reg.data);
-	}
-
-}
-
-

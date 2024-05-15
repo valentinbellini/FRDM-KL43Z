@@ -5,7 +5,7 @@
  * Generated linker script file for MKL43Z256xxx4
  * Created from memory.ldt by FMCreateLinkMemory
  * Using Freemarker v2.3.30
- * MCUXpresso IDE v11.9.0 [Build 2144] [2024-01-05] on 14 may. 2024 18:01:21
+ * MCUXpresso IDE v11.9.0 [Build 2144] [2024-01-05] on 15 may. 2024 11:25:26
  */
 
 MEMORY
