@@ -126,7 +126,7 @@ extern void mef(){
 				/* Let's take a look if we have a new max value */
 				if(NewAccValue >= MaxAccValue) MaxAccValue = NewAccValue;
 
-				/* Here we could implement any method to get out when the fall is finished */
+				/* Here we implement a method to get out the state when the fall is finished */
 				if (NewAccValue < limit_high && NewAccValue > limit_low){
 					cuenta++;
 				} else {
@@ -134,7 +134,7 @@ extern void mef(){
 				}
 			}
 
-			/* Here we could implement any method to get out when the fall is finished */
+			/* Here we implement a method to get out the state when the fall is finished */
 			if(cuenta >= 5){
 				// Transition to next state so:
 				state = SHOW_DISPLAY;				// Set Next State
@@ -148,10 +148,10 @@ extern void mef(){
 
 				char max_acc_str[16];	// Variable to save the max aceleration value into a string to print.
 				oled_clearScreen(OLED_COLOR_BLACK);
-				sprintf(max_acc_str, "Max Acc: %d.%d g",MaxAccValue/100,MaxAccValue-(MaxAccValue/100)*100);
 				oled_fillRect(8, 16, 56+64, 16+32, OLED_COLOR_WHITE);
 				oled_fillRect(8+4, 16+4, 56+64-4, 16+32-4, OLED_COLOR_BLACK);
-				oled_putString(20, 29, (uint8_t *)max_acc_str , OLED_COLOR_WHITE, OLED_COLOR_BLACK);
+				sprintf(max_acc_str, "Max Acc: %d.%d g",MaxAccValue/100,MaxAccValue-(MaxAccValue/100)*100); // Similar a un string copy
+				oled_putString(20, 29, (uint8_t *)max_acc_str , OLED_COLOR_WHITE, OLED_COLOR_BLACK);		// Se imprime en pantalla el "string"
 
 			}
 
@@ -161,6 +161,7 @@ extern void mef(){
 				LR_TOGGLE;
 				timBlink = T_BLINK;
 			}
+			/* Print left time in Display */
 			char char_time[16];
 			sprintf(char_time, "%d.%03d S", timSec / 1000, timSec % 1000);
 			oled_putString(46, 2, (uint8_t *)char_time , OLED_COLOR_WHITE, OLED_COLOR_BLACK);

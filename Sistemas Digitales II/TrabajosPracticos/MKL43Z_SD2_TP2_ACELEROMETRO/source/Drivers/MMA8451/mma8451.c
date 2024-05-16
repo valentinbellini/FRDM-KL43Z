@@ -191,12 +191,12 @@ void mma8451_freefall_config(void){
 	mma8451_write_reg(XYZ_DATA_CFG_ADDRESS, data_cfg.data);
 
 	/* Threshold Setting Value for the resulting acceleration < 0.15g */
-	FF_MT_THS_reg.THS = 0x05; // Note: The step count is 31.25mg/count (LNOISE=1) - 0.15g/31.25mg = 4.8 counts (Round to 5)
+	FF_MT_THS_reg.THS = 0x04; // Note: The step count is 31.25mg/count (LNOISE=1) - 0.15g/31.25mg = 4.8 counts (Round to 5)
 	FF_MT_THS_reg.DBCNTM = 1; // Reinicia el counter cuando se deja de dar la condición de freefall (En 0 lo decrementa)
 	mma8451_write_reg(FF_MT_THS_ADDRESS,FF_MT_THS_reg.data);
 
 	/* Set debounce counter to eliminate false positive readings for 200Hz sample rate with a requirement of 120 ms timer. */
-	FF_MT_COUNT_reg.data = 0x1A; 	// Note: 130 ms/5 ms (steps) = 26 counts (0x1A) --> 8.5 cm
+	FF_MT_COUNT_reg.data = 0x1B; 	// Note: 135 ms/5 ms (steps) = 27 counts (0x1B) --> 8.5 cm
 	mma8451_write_reg(FF_MT_COUNT_ADRESS,FF_MT_COUNT_reg.data);
 
 	/* Enable Motion/Freefall Interrupt Function in the System (CTRL_REG4) */
@@ -210,7 +210,8 @@ void mma8451_freefall_config(void){
 	mma8451_write_reg(CTRL_REG5_ADDRESS, ctrl_reg5.data);
 
 	/* Put the device in Active Mode, 200 Hz, Fast-Read mode */
-	ctrl_reg1.DR = DR_200hz; 		// Dr 010, 800HZ 1.25ms Hz output data rate
+	//ctrl_reg1.DR = DR_200hz; 		// Dr 010, 800HZ 1.25ms Hz output data rate
+	ctrl_reg1.DR = DR_200hz;
 	ctrl_reg1.ASLP_RATE = 0B00;
 	ctrl_reg1.F_READ = 1;			// Fast-Read mode (8 bits)
 	ctrl_reg1.LNOISE = 1;			//  1: The maximum threshold will be limited to 4 g regardless of the full-scale range
