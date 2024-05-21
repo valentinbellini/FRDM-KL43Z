@@ -1,0 +1,13 @@
+C:\Users\guido\Documents\MCUXpressoIDE_11.6.1_8255\workspace\Docencia SD2\SD2_ssd1306\drivers/fsl_clock.h:438:20:CLOCK_EnableClock	24	static
+C:\Users\guido\Documents\MCUXpressoIDE_11.6.1_8255\workspace\Docencia SD2\SD2_ssd1306\drivers/fsl_port.h:243:20:PORT_SetPinConfig	32	static
+C:\Users\guido\Documents\MCUXpressoIDE_11.6.1_8255\workspace\Docencia SD2\SD2_ssd1306\drivers/fsl_gpio.h:162:20:GPIO_PinWrite	32	static
+C:\Users\guido\Documents\MCUXpressoIDE_11.6.1_8255\workspace\Docencia SD2\SD2_ssd1306\drivers/fsl_gpio.h:182:20:GPIO_PortSet	16	static
+C:\Users\guido\Documents\MCUXpressoIDE_11.6.1_8255\workspace\Docencia SD2\SD2_ssd1306\drivers/fsl_gpio.h:193:20:GPIO_PortClear	16	static
+C:\Users\guido\Documents\MCUXpressoIDE_11.6.1_8255\workspace\Docencia SD2\SD2_ssd1306\drivers/fsl_gpio.h:204:20:GPIO_PortToggle	16	static
+C:\Users\guido\Documents\MCUXpressoIDE_11.6.1_8255\workspace\Docencia SD2\SD2_ssd1306\drivers/fsl_gpio.h:223:24:GPIO_PinRead	16	static
+../source/SD2_board.c:79:6:board_init	40	static
+../source/SD2_board.c:164:6:board_setLed	16	static
+../source/SD2_board.c:185:6:board_setOledPin	16	static
+../source/SD2_board.c:190:6:board_getSw	16	static
+../source/SD2_board.c:195:6:board_configSPI0	40	static
+../source/SD2_board.c:239:6:board_SPISend	32	static
