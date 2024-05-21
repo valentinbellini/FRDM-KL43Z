@@ -3,10 +3,8 @@ Para los proyectos en este repositorio se utilizarán las placas de desarrollo d
 
 ## Contenido
 
-- [SD2_board_KL43](/SD2_board_KL43/SD2_KL43Z_board.c): Contiene código con definiciones y funciones para el manejo de LEDS y Switches para la placa de desarrollo FRDM-KL43Z4. Tambien se definen algunas macros y estructuras de datos internas que describen los pines utilizados.
 
-- [SD2_Components](/SD2_Components/key.c): contiene algunos componentes reutilizables para diferentes proyectos tales como `key.c` que se utiliza para manejar el pulsado de los switches.
+- [SD2_Components](/SD2_Components/key.c): Contiene componentes reutilizables para el manejo de la placa de desarrollo y sus periféricos. Entre ellos encontramos componentes para el manejo de los pulsadores, led, comunicación I2C, SPI, UART, uso del clock en diferentes modo de consumo, controlador SSD1306, Acelerómetro mma8451...
 
-- [Trabajos prácticos](/TrabajosPracticos/README.md): Trabajos prácticos de sistemas digitales II. 
+- [Trabajos prácticos](/TrabajosPracticos/README.md): Trabajos prácticos de Sistemas Digitales II. 
 
-- [Ejercicios](/Ejercicios/README.md): Contiene una lista de proyectos realizados para dicha placa de desarrollo. Algunos son soluciones, otros son simplemente codigo realizado para ver algun tema de registros o manejo de instrucciones en particular. 
