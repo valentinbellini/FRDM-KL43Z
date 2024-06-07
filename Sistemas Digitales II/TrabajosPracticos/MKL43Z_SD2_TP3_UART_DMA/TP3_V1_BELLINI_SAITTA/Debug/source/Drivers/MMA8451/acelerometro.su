@@ -1,0 +1,14 @@
+C:\Users\valen\Documents\MCUXpressoIDE_11.9.0_2144\workspace\TP3_V1_BELLINI_SAITTA\CMSIS/core_cm0plus.h:741:22:__NVIC_EnableIRQ	16	static
+C:\Users\valen\Documents\MCUXpressoIDE_11.9.0_2144\workspace\TP3_V1_BELLINI_SAITTA\CMSIS/core_cm0plus.h:850:22:__NVIC_SetPriority	24	static
+C:\Users\valen\Documents\MCUXpressoIDE_11.9.0_2144\workspace\TP3_V1_BELLINI_SAITTA\drivers/fsl_clock.h:438:20:CLOCK_EnableClock	24	static
+C:\Users\valen\Documents\MCUXpressoIDE_11.9.0_2144\workspace\TP3_V1_BELLINI_SAITTA\drivers/fsl_port.h:243:20:PORT_SetPinConfig	32	static
+C:\Users\valen\Documents\MCUXpressoIDE_11.9.0_2144\workspace\TP3_V1_BELLINI_SAITTA\drivers/fsl_port.h:416:20:PORT_SetPinInterruptConfig	24	static
+../source/Drivers/MMA8451/acelerometro.c:47:13:I2C_configPins	16	static
+../source/Drivers/MMA8451/acelerometro.c:80:13:config_port_int2	16	static
+../source/Drivers/MMA8451/acelerometro.c:111:13:escribir_registro	40	static
+../source/Drivers/MMA8451/acelerometro.c:126:16:leer_registro	56	static
+../source/Drivers/MMA8451/acelerometro.c:143:13:modoStandby	16	static
+../source/Drivers/MMA8451/acelerometro.c:161:13:acelerometro_init	96	static
+../source/Drivers/MMA8451/acelerometro.c:261:20:fast_data_read	64	static
+../source/Drivers/MMA8451/acelerometro.c:293:21:acelerometro_getDatos	24	static
+../source/Drivers/MMA8451/acelerometro.c:304:13:acelerometro_ISR	24	static

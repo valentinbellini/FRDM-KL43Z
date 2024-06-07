@@ -1,0 +1,15 @@
+../source/Drivers/MMA8451/mma8451.c:135:13:mma8451_write_reg	48	static
+../source/Drivers/MMA8451/mma8451.c:100:16:mma8451_read_reg	40	static
+../source/Drivers/MMA8451/mma8451.c:67:13:config_port_int1	16	static
+../source/Drivers/MMA8451/mma8451.c:157:6:mma8451_freefall_config	8	static
+../source/Drivers/MMA8451/mma8451.c:229:6:mma8451_dataReady_config	8	static
+../source/Drivers/MMA8451/mma8451.c:265:6:mma8451_clearInterruptions_config	8	static
+../source/Drivers/MMA8451/mma8451.c:283:6:mma8451_getFreefallInterruptStatus	0	static
+../source/Drivers/MMA8451/mma8451.c:291:6:mma8451_getDataReadyInterruptStatus	0	static
+../source/Drivers/MMA8451/mma8451.c:300:9:mma8451_getAcX	0	static
+../source/Drivers/MMA8451/mma8451.c:303:9:mma8451_getAcY	0	static
+../source/Drivers/MMA8451/mma8451.c:306:9:mma8451_getAcZ	0	static
+../source/Drivers/MMA8451/mma8451.c:310:6:readAccsFromRegisters	40	static
+../source/Drivers/MMA8451/mma8451.c:329:6:PORTC_PORTD_IRQHandler	8	static
+../source/Drivers/MMA8451/mma8451.c:369:6:mma8451_setDataRate	16	static
+../source/Drivers/MMA8451/mma8451.c:394:6:mma8451_init	8	static

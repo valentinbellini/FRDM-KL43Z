@@ -1,0 +1,7 @@
+C:\Users\valen\Documents\MCUXpressoIDE_11.9.0_2144\workspace\TP2_V1\drivers/fsl_clock.h:629:20:CLOCK_SetSimSafeDivs	8	static
+C:\Users\valen\Documents\MCUXpressoIDE_11.9.0_2144\workspace\TP2_V1\drivers/fsl_smc.h:275:33:SMC_GetPowerModeState	16	static
+../source/power_mode_switch.c:30:6:APP_SetClockRunFromVlpr	32	static
+../source/power_mode_switch.c:50:6:APP_SetClockVlpr	32	static
+../source/power_mode_switch.c:71:6:APP_ShowPowerMode	16	static
+../source/power_mode_switch.c:91:6:APP_CheckPowerMode	24	static
+../source/power_mode_switch.c:145:6:APP_PowerModeSwitch	32	static

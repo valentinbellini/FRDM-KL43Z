@@ -1,0 +1,5 @@
+../source/Drivers/PowerMode/power_mode_switch.c:30:6:APP_SetClockRunFromVlpr	24	static
+../source/Drivers/PowerMode/power_mode_switch.c:50:6:APP_SetClockVlpr	24	static
+../source/Drivers/PowerMode/power_mode_switch.c:71:6:APP_ShowPowerMode	8	static
+../source/Drivers/PowerMode/power_mode_switch.c:91:6:APP_CheckPowerMode	8	static
+../source/Drivers/PowerMode/power_mode_switch.c:145:6:APP_PowerModeSwitch	24	static

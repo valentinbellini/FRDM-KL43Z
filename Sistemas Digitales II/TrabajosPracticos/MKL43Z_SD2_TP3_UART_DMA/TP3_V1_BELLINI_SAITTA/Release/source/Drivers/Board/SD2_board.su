@@ -1,0 +1,7 @@
+../source/Drivers/Board/SD2_board.c:66:6:board_init	24	static
+../source/Drivers/Board/SD2_board.c:127:6:adc_init	0	static
+../source/Drivers/Board/SD2_board.c:143:6:redPWM_init	8	static
+../source/Drivers/Board/SD2_board.c:171:6:greenPWM_init	0	static
+../source/Drivers/Board/SD2_board.c:199:6:board_setLed	0	static
+../source/Drivers/Board/SD2_board.c:220:6:board_getSw	0	static
+../source/Drivers/Board/SD2_board.c:225:6:board_getLed	0	static

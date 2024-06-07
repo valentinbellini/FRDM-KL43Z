@@ -1,0 +1,3 @@
+../source/App/trama_process.c:28:13:accionLed	16	static
+../source/App/trama_process.c:41:13:accionSwitch	16	static
+../source/App/trama_process.c:58:6:tramaProcess	88	static

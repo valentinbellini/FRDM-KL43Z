@@ -1,0 +1,2 @@
+../source/Drivers/I2C/SD2_I2C.c:66:13:i2c_release_bus_delay	0	static
+../source/Drivers/I2C/SD2_I2C.c:164:6:SD2_I2C_init	40	static

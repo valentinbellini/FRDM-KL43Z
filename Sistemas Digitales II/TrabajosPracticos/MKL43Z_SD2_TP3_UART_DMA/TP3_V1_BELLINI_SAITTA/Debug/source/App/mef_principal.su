@@ -1,0 +1,3 @@
+../source/App/mef_principal.c:40:6:mef_principal_init	16	static
+../source/App/mef_principal.c:47:6:mef_principal	16	static
+../source/App/mef_principal.c:96:6:mef_principal_task1ms	8	static

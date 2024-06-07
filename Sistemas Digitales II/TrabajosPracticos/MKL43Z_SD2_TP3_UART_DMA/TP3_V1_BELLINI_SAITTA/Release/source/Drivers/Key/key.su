@@ -1,0 +1,4 @@
+../source/Drivers/Key/key.c:61:6:key_init	0	static
+../source/Drivers/Key/key.c:72:6:key_getPressEv	0	static
+../source/Drivers/Key/key.c:85:6:key_periodicTask1ms	16	static
+../source/Drivers/Key/key.c:116:13:key_clearFlags	0	static
