@@ -26,11 +26,11 @@ void init_clocks_and_power_mode(){
 	uint32_t freq = 0;
 	smc_power_state_t currentPowerState;
 
-	PRINTF("\r\n####################  TRABAJO PRACTICO 2 - SD2 - Bellini, Saitta ####################\n\r\n");
+	PRINTF("\r\n####################  TRABAJO PRACTICO 3 - SD2 - BELLINI Y SAITTA ####################\n\r");
 
 	currentPowerState = SMC_GetPowerModeState(SMC);
 	APP_ShowPowerMode(currentPowerState);
-	PRINTF("    Clock luego del Reset\n");
+	PRINTF("\n    Clock luego del Reset\n");
 	freq = CLOCK_GetFreq(kCLOCK_CoreSysClk);
 	PRINTF("    Core Clock = %dMHz \r\r", freq/1000000);
 
@@ -41,7 +41,7 @@ void init_clocks_and_power_mode(){
     /* Se habilita la posibilidad de operar con todos los modos de bajo consumo */
     SMC_SetPowerModeProtection(SMC, kSMC_AllowPowerModeAll);
     freq = CLOCK_GetFreq(kCLOCK_CoreSysClk);
-    PRINTF("    Core Clock = %dMHz \r\r", freq/1000000);
+    PRINTF("    Core Clock = %dMHz \r", freq/1000000);
 
     PRINTF("\r\n#################### ========================= ####################\n\r\n");
 }
@@ -54,7 +54,7 @@ int main(void) {
     /* Inicialización FSL debug console. */
     BOARD_InitDebugConsole();
 
-    /* Inicialización de funciones de la placa */
+    /* Inicialización de GPIOS (LED, SW, OLED) */
     board_init();
 
     /* Inicialización de SPI y display OLED */
@@ -69,12 +69,13 @@ int main(void) {
     /* Inicialización MEF de pulsadores*/
     key_init();
 
-    // Se inicializa UART0 con ring buffer
+    /* Se inicializa UART0 y DMA */
     uart_ringBuffer_init();
 
-    /* Se configura interrupción de systick */
+    /* Se configura interrupción de systick cada 1 ms */
     SysTick_Config(SystemCoreClock / 1000U);
 
+    /* INIT de la APP */
     mef_principal_init();
 
     while(1) {

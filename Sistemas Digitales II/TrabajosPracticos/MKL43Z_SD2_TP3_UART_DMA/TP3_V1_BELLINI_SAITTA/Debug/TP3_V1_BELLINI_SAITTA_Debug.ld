@@ -5,7 +5,7 @@
  * Generated linker script file for MKL43Z256xxx4
  * Created from linkscript.ldt by FMCreateLinkLibraries
  * Using Freemarker v2.3.30
- * MCUXpresso IDE v11.9.0 [Build 2144] [2024-01-05] on 7 jun. 2024 21:39:31
+ * MCUXpresso IDE v11.9.0 [Build 2144] [2024-01-05] on 8 jun. 2024 09:05:35
  */
 
 INCLUDE "TP3_V1_BELLINI_SAITTA_Debug_library.ld"

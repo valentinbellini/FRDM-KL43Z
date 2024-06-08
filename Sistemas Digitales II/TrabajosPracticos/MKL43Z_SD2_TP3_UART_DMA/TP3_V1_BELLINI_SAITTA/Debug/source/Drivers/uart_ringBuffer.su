@@ -5,9 +5,9 @@ C:\Users\valen\Documents\MCUXpressoIDE_11.9.0_2144\workspace\TP3_V1_BELLINI_SAIT
 C:\Users\valen\Documents\MCUXpressoIDE_11.9.0_2144\workspace\TP3_V1_BELLINI_SAITTA\drivers/fsl_port.h:346:20:PORT_SetPinMux	24	static
 C:\Users\valen\Documents\MCUXpressoIDE_11.9.0_2144\workspace\TP3_V1_BELLINI_SAITTA\drivers/fsl_dmamux.h:75:20:DMAMUX_EnableChannel	16	static
 C:\Users\valen\Documents\MCUXpressoIDE_11.9.0_2144\workspace\TP3_V1_BELLINI_SAITTA\drivers/fsl_dmamux.h:105:20:DMAMUX_SetSource	24	static
-../source/Drivers/uart_ringBuffer.c:72:13:LPUART_UserCallback	24	static
-../source/Drivers/uart_ringBuffer.c:81:6:uart_ringBuffer_init	32	static
-../source/Drivers/uart_ringBuffer.c:150:9:uart_ringBuffer_recDatos	24	static
-../source/Drivers/uart_ringBuffer.c:175:9:uart_ringBuffer_envDatos	24	static
-../source/Drivers/uart_ringBuffer.c:207:9:uart0_drv_envDatos	24	static
-../source/Drivers/uart_ringBuffer.c:236:6:LPUART0_IRQHandler	24	static
+../source/Drivers/uart_ringBuffer.c:73:13:LPUART_UserCallback	24	static
+../source/Drivers/uart_ringBuffer.c:82:6:checkUartErrors	16	static
+../source/Drivers/uart_ringBuffer.c:99:6:uart_ringBuffer_init	32	static
+../source/Drivers/uart_ringBuffer.c:169:9:uart_ringBuffer_recDatos	24	static
+../source/Drivers/uart_ringBuffer.c:194:9:uart0_drv_envDatos	24	static
+../source/Drivers/uart_ringBuffer.c:225:6:LPUART0_IRQHandler	24	static

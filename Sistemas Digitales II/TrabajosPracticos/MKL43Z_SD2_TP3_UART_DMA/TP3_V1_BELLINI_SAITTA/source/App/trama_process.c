@@ -5,50 +5,53 @@
  *      Author: Usuario
  */
 /*==================[inclusions]=============================================*/
+#include <stdio.h>
+#include <stdbool.h>
+
 #include "App/trama_process.h"
 #include "Drivers/Board/SD2_board.h"
 #include "Drivers/SSD1306/oled.h"
 #include "Drivers/MMA8451/mma8451.h"
 #include "Drivers/uart_ringBuffer.h"
-#include <stdio.h>
 #include "App/mef_trama_rec.h"
 
 #include "fsl_debug_console.h"
 
 /*==================[macros and definitions]=================================*/
-
+#define _BUFFER_SIZE		32
 /*==================[internal data declaration]==============================*/
-
+static bool wrongTrama = false;
 /*==================[internal functions declaration]=========================*/
-
+void setErrorAndLog(const char *errorMessage) {
+    wrongTrama = true;
+    PRINTF("Error: %s\n",errorMessage);
+    //logError(errorMessage);
+}
 /*==================[external data definition]===============================*/
 
 /*==================[internal functions definition]==========================*/
 
-static void accionLed(uint8_t charIdLed, board_ledMsg_enum ledMsg)
-{
-	switch (charIdLed)
-	{
+static void handleLedAction(uint8_t charIdLed, board_ledMsg_enum ledMsg){
+	switch (charIdLed){
 		case '1':
 			board_setLed(BOARD_LED_ID_ROJO, ledMsg);
 			break;
-
 		case '2':
 			board_setLed(BOARD_LED_ID_VERDE, ledMsg);
 			break;
+		default:
+			setErrorAndLog("Trama Incorrecta. Led Invalido");
+			break;
 	}
 }
-static bool accionSwitch(uint8_t charIdSwitch)
-{
-	switch (charIdSwitch)
-	{
+static bool isSwitchPressed(uint8_t charIdSwitch){
+	switch (charIdSwitch){
 		case '1':
 			return board_getSw(BOARD_SW_ID_1);
-			break;
-
 		case '3':
 			return board_getSw(BOARD_SW_ID_3);
-			break;
+		default:
+			setErrorAndLog("Trama incorrecta. Switch Invalido.");
 	}
 	return false;
 }
@@ -58,69 +61,62 @@ static bool accionSwitch(uint8_t charIdSwitch)
 void tramaProcess(char *buf, int length)
 {
 	PRINTF("Input buffer: %s\n", buf);
-	uint8_t buffer[32];
-	bool pulsador_presionado;
+	uint8_t buffer[_BUFFER_SIZE];
+	bool swPressed;
 	buffer[0]='\0';
-	switch (buf[0])
-	{
+	wrongTrama = false; /* La trama empieza bien si se llama al procesador */
 
-	case '0'://Caso de los leds
-		switch (buf[2])
-		{
-			case 'A':
-				accionLed(buf[1], BOARD_LED_MSG_OFF);
-				break;
-			case 'E':
-				accionLed(buf[1], BOARD_LED_MSG_ON);
-				break;
-			case 'T':
-				accionLed(buf[1], BOARD_LED_MSG_TOGGLE);
-				break;
-		}
-		//Se da formato al string a transmitir y se almacena en el arrelgo de char buffer
-
-		sprintf((char*)buffer, ":%c%c0%c%c\n",NUM_GRUPO_A, NUM_GRUPO_B,buf[1], buf[2]);
-		break;
-
-    case '1'://Caso de los switchs
-
-    	pulsador_presionado = accionSwitch(buf[1]);
-    	if (pulsador_presionado)
-    	{
-            //Se da formato al string a transmitir y se almacena en el arrelgo de char buffer
-            sprintf((char*)buffer, ":%c%c1%cP\n",NUM_GRUPO_A, NUM_GRUPO_B, buf[1]);
-    	}
-    	else
-    	{
-            //Se da formato al string a transmitir y se almacena en el arrelgo de char buffer
-            sprintf((char*)buffer, ":%c%c1%cN\n", NUM_GRUPO_A, NUM_GRUPO_B,buf[1]);
-    	}
-        break;
-
-	case '2'://Caso de los acelerometro
-
-		if (buf[1]=='1')
-		{
-			/* Se configura interrupciones por DataReady y se espera que esté lista la conversión en No-Operation */
-			mma8451_dataReady_config();
-			while(!mma8451_getDataReadyInterruptStatus()){
-				//__NOP();
+	switch (buf[0]){
+		//Caso de los leds
+		case '0':
+			switch (buf[2]){
+				case 'A':
+					handleLedAction(buf[1], BOARD_LED_MSG_OFF);
+					break;
+				case 'E':
+					handleLedAction(buf[1], BOARD_LED_MSG_ON);
+					break;
+				case 'T':
+					handleLedAction(buf[1], BOARD_LED_MSG_TOGGLE);
+					break;
+				default:
+					setErrorAndLog("Trama incorrecta. Control de LED invalido.");
+                    break;
 			}
-			int16_t x = mma8451_getAcX();
-			int16_t y = mma8451_getAcY();
-			int16_t z = mma8451_getAcZ();
-			snprintf((char*)buffer, sizeof(buffer), ":%c%c21%+04d%+04d%+04d\n", NUM_GRUPO_A, NUM_GRUPO_B, x, y, z);
-			mma8451_clearInterruptions_config();
-		}
-		break;
-	default:
-		break;
+			//Se da formato al string a transmitir y se almacena en el arrelgo de char buffer
+			snprintf((char*)buffer, sizeof(buffer), ":%c%c0%c%c\n", NUM_GRUPO_A, NUM_GRUPO_B, buf[1], buf[2]);
+			break;
+
+		//Caso de los switchs
+		case '1':
+			swPressed = isSwitchPressed(buf[1]);
+			snprintf((char*)buffer, sizeof(buffer), ":%c%c1%c%c\n", NUM_GRUPO_A, NUM_GRUPO_B, buf[1], (swPressed ? 'P' : 'N'));
+			break;
+
+		//Caso de los acelerometro
+		case '2':
+			if (buf[1]=='1'){
+				/* Se configura interrupciones por DataReady y se espera que esté lista la conversión en No-Operation */
+				mma8451_dataReady_config();
+				while(!mma8451_getDataReadyInterruptStatus()){
+					__NOP();
+				}
+				int16_t x = mma8451_getAcX();
+				int16_t y = mma8451_getAcY();
+				int16_t z = mma8451_getAcZ();
+				snprintf((char*)buffer, sizeof(buffer), ":%c%c21%+04d%+04d%+04d\n", NUM_GRUPO_A, NUM_GRUPO_B, x, y, z);
+				mma8451_clearInterruptions_config();
+			} else {
+                setErrorAndLog("Trama incorrecta para lectura de acelerómetro");
+            }
+            break;
+		default:
+			setErrorAndLog("Trama incorrecta. buf[0] no encuentra coincidencias.");
+			break;
 	}
 	PRINTF("Output buffer: %s\n", buffer);
-	//uart_ringBuffer_envDatos(buffer, sizeof(buffer));
-	uart0_drv_envDatos(buffer, strlen((char*)buffer));
 	//Envia datos por UART0 mediante DMA
-	//transceptor_envDatosDMA(buffer, strlen((char*)buffer));
+	uart0_drv_envDatos(buffer, strlen((char*)buffer));
 }
 /*==================[end of file]============================================*/
 

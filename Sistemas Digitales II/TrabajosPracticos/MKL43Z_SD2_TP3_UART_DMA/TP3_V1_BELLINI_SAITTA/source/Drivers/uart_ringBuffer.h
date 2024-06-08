@@ -61,15 +61,6 @@ void uart_ringBuffer_init(void);
  **/
 int32_t uart_ringBuffer_recDatos(uint8_t *pBuf, int32_t size);
 
-/** \brief envía datos por puerto serie accediendo al RB
- **
- ** \param[inout] pBuf buffer a donde estan los datos a enviar
- ** \param[in] size tamaño del buffer
- ** \return cantidad de bytes enviados
- **/
-int32_t uart_ringBuffer_envDatos(uint8_t *pBuf, int32_t size);
-
-
 int32_t uart0_drv_envDatos(uint8_t *pBuf, int32_t size);
 /*==================[cplusplus]==============================================*/
 #ifdef __cplusplus

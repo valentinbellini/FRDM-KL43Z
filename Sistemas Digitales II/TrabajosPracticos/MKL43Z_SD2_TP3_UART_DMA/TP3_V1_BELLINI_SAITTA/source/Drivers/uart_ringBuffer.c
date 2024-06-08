@@ -49,19 +49,20 @@
 #include "fsl_dmamux.h"
 #include "MKL43Z4.h"
 #include "pin_mux.h"
+#include "fsl_debug_console.h"
+
 
 /*==================[macros and definitions]=================================*/
-#define LPUART_TX_DMA_CHANNEL 0U
-#define TX_BUFFER_DMA_SIZE  32
+#define TR_UART					LPUART0
+#define LPUART_TX_DMA_CHANNEL 	0U
+#define TX_BUFFER_DMA_SIZE  	32
 
 /*==================[internal data declaration]==============================*/
-static void* pRingBufferRx;
-static void* pRingBufferTx;
-
-static uint8_t txBuffer_dma[TX_BUFFER_DMA_SIZE];
-static lpuart_dma_handle_t LPUARTDmaHandle;
-static dma_handle_t LPUARTTxDmaHandle;
-volatile bool txOnGoing = false;
+static uint8_t txBuffer_dma[TX_BUFFER_DMA_SIZE]; /* Buffer para almacenar datos que se enviarán por DMA. */
+static lpuart_dma_handle_t LPUARTDmaHandle; /* Estructura de manejo para la Tx y Rx de datos UART utilizando DMA. */
+static dma_handle_t LPUARTTxDmaHandle; /* Estructura de manejo específica para las transfer DMA de transmisión UART. */
+static void* pRingBufferRx; /* Puntero al buffer circular utilizado para almacenar datos recibidos. */
+volatile bool txOnGoing = false; /* Bandera que indica si una operación de transmisión está en curso. */
 
 /*==================[internal functions declaration]=========================*/
 
@@ -76,10 +77,28 @@ static void LPUART_UserCallback(LPUART_Type *base, lpuart_dma_handle_t *handle, 
         txOnGoing = false;
     }
 }
+
+/** \brief Lee las status flags de UART y chequea de donde viene el error. **/
+void checkUartErrors(void) {
+    uint32_t status = LPUART_GetStatusFlags(TR_UART);
+    if (status & kLPUART_RxOverrunFlag) {
+        LPUART_ClearStatusFlags(TR_UART, kLPUART_RxOverrunFlag);
+        PRINTF("UART Rx Overrun Error\n");
+    }
+    if (status & kLPUART_FramingErrorFlag) {
+        LPUART_ClearStatusFlags(TR_UART, kLPUART_FramingErrorFlag);
+        PRINTF("UART Framing Error\n");
+    }
+    if (status & kLPUART_ParityErrorFlag) {
+        LPUART_ClearStatusFlags(TR_UART, kLPUART_ParityErrorFlag);
+        PRINTF("UART Parity Error\n");
+    }
+}
 /*==================[external functions definition]==========================*/
 
-void uart_ringBuffer_init(void)
-{
+void uart_ringBuffer_init(void){
+
+
 	lpuart_config_t config;
 
     pRingBufferRx = ringBuffer_init(16);
@@ -105,7 +124,7 @@ void uart_ringBuffer_init(void)
 	 */
 	LPUART_GetDefaultConfig(&config);
 
-	config.baudRate_Bps = 115200;
+	config.baudRate_Bps = 9600;//115200;
 	config.parityMode = kLPUART_ParityDisabled;
 	config.stopBitCount = kLPUART_OneStopBit;
 	config.enableTx = true;
@@ -114,9 +133,9 @@ void uart_ringBuffer_init(void)
 	LPUART_Init(LPUART0, &config, CLOCK_GetFreq(kCLOCK_CoreSysClk));
 
 	/* Habilitación de interrupciones */
-	LPUART_EnableInterrupts(LPUART0, kLPUART_RxDataRegFullInterruptEnable);
-	//LPUART_EnableInterrupts(LPUART0, kLPUART_TxDataRegEmptyInterruptEnable);
-	LPUART_EnableInterrupts(LPUART0, kLPUART_TransmissionCompleteInterruptEnable);
+	LPUART_EnableInterrupts(TR_UART, kLPUART_RxDataRegFullInterruptEnable);
+	LPUART_EnableInterrupts(TR_UART, kLPUART_TransmissionCompleteInterruptEnable);
+	LPUART_EnableInterrupts(TR_UART, kLPUART_RxOverrunInterruptEnable);
 	EnableIRQ(LPUART0_IRQn);
 
 	/* CONFIGURACIÓN DMA (sólo para TX) */
@@ -166,38 +185,6 @@ int32_t uart_ringBuffer_recDatos(uint8_t *pBuf, int32_t size)
     return ret;
 }
 
-/** \brief envía datos por puerto serie accediendo al RB
- **
- ** \param[inout] pBuf buffer a donde estan los datos a enviar
- ** \param[in] size tamaño del buffer
- ** \return cantidad de bytes enviados
- **/
-int32_t uart_ringBuffer_envDatos(uint8_t *pBuf, int32_t size)
-{
-    int32_t ret = 0;
-
-    /* entra sección de código crítico */
-    //NVIC_DisableIRQ(LPUART0_IRQn);
-    __disable_irq();   // Habilita todas las interrupciones
-
-    /* si el buffer estaba vacío hay que habilitar la int TX */
-    if (ringBuffer_isEmpty(pRingBufferTx))
-    	LPUART_EnableInterrupts(LPUART0, kLPUART_TxDataRegEmptyInterruptEnable);
-
-    while (!ringBuffer_isFull(pRingBufferTx) && ret < size)
-    {
-        ringBuffer_putData(pRingBufferTx, pBuf[ret]);
-        ret++;
-    }
-
-    /* sale de sección de código crítico */
-    //NVIC_EnableIRQ(LPUART0_IRQn);
-    __enable_irq();   // Habilita todas las interrupciones
-
-    return ret;
-}
-
-
 /** \brief envía datos por puerto serie accediendo a memoria RAM
  **
  ** \param[inout] pBuf buffer a donde estan los datos a enviar
@@ -208,7 +195,9 @@ int32_t uart0_drv_envDatos(uint8_t *pBuf, int32_t size)
 {
     lpuart_transfer_t xfer;
 
-    if (txOnGoing)
+    // Modificamos la condición para que la función pueda aceptar
+    // size = 0. En ese caso la fución no hace nada y devuelve 0.
+    if (txOnGoing || size == 0 )
     {
         size = 0;
     }
@@ -237,6 +226,7 @@ void LPUART0_IRQHandler(void)
 {
 	uint8_t data;
 
+	/* Interrupción de RX */
     if ( (kLPUART_RxDataRegFullFlag)            & LPUART_GetStatusFlags(LPUART0) &&
          (kLPUART_RxDataRegFullInterruptEnable) & LPUART_GetEnabledInterrupts(LPUART0) )
 	{
@@ -248,28 +238,28 @@ void LPUART0_IRQHandler(void)
 
 	}
 
-//	if ( (kLPUART_TxDataRegEmptyFlag)            & LPUART_GetStatusFlags(LPUART0) &&
-//         (kLPUART_TxDataRegEmptyInterruptEnable) & LPUART_GetEnabledInterrupts(LPUART0) )
-//	{
-//		if (ringBuffer_getData(pRingBufferTx, &data))
-//		{
-//			/* envía dato extraído del RB al puerto serie */
-//			LPUART_WriteByte(LPUART0, data);
-//		}
-//		else
-//		{
-//			/* si el RB está vacío deshabilita interrupción TX */
-//			LPUART_DisableInterrupts(LPUART0, kLPUART_TxDataRegEmptyInterruptEnable);
-//		}
-//	}
-
+    /* Interrupción de TX */
 	if ( (kLPUART_TransmissionCompleteFlag)            & LPUART_GetStatusFlags(LPUART0) &&
 	         (kLPUART_TransmissionCompleteInterruptEnable) & LPUART_GetEnabledInterrupts(LPUART0) )
 	{
+		// Desahabilita interrupciones de transmisión. Se vuelven a
+		// habilitar en transceptor_envDatosDMA()
 		LPUART_DisableInterrupts(LPUART0, kLPUART_TransmissionCompleteInterruptEnable);
 		LPUART_ClearStatusFlags(LPUART0, kLPUART_TransmissionCompleteFlag);
 
 	}
+
+	/* Interrupción de OverRun */
+	if ((kLPUART_RxOverrunFlag) 					   & LPUART_GetStatusFlags(TR_UART) &&
+		(kLPUART_RxOverrunInterruptEnable)			   & LPUART_GetEnabledInterrupts(TR_UART))
+	{
+		// Se limpia la bandera de OverRun. La interfaz de UART se detinen
+		// mientras esta bandera esta setea, aunque no esté habilitada
+		// la interrupción de OverRun. Por eso hay que limpiarla manualmente.
+		LPUART_ClearStatusFlags(TR_UART, kLPUART_RxOverrunFlag);
+	}
+
+	checkUartErrors();
 }
 
 
