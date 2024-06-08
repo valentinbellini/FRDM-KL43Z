@@ -4,13 +4,16 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
-../source/Drivers/Transceiver/transceiver_uart_rs485.c 
+../source/Drivers/Transceiver/transceiver_uart_rs485.c \
+../source/Drivers/Transceiver/uart_ringBuffer.c 
 
 C_DEPS += \
-./source/Drivers/Transceiver/transceiver_uart_rs485.d 
+./source/Drivers/Transceiver/transceiver_uart_rs485.d \
+./source/Drivers/Transceiver/uart_ringBuffer.d 
 
 OBJS += \
-./source/Drivers/Transceiver/transceiver_uart_rs485.o 
+./source/Drivers/Transceiver/transceiver_uart_rs485.o \
+./source/Drivers/Transceiver/uart_ringBuffer.o 
 
 
 # Each subdirectory must supply rules for building sources it contributes
@@ -25,7 +28,7 @@ source/Drivers/Transceiver/%.o: ../source/Drivers/Transceiver/%.c source/Drivers
 clean: clean-source-2f-Drivers-2f-Transceiver
 
 clean-source-2f-Drivers-2f-Transceiver:
-	-$(RM) ./source/Drivers/Transceiver/transceiver_uart_rs485.d ./source/Drivers/Transceiver/transceiver_uart_rs485.o
+	-$(RM) ./source/Drivers/Transceiver/transceiver_uart_rs485.d ./source/Drivers/Transceiver/transceiver_uart_rs485.o ./source/Drivers/Transceiver/uart_ringBuffer.d ./source/Drivers/Transceiver/uart_ringBuffer.o
 
 .PHONY: clean-source-2f-Drivers-2f-Transceiver
 

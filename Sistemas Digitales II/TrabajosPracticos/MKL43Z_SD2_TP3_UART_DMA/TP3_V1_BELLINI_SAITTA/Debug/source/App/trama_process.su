@@ -1,4 +1,5 @@
-../source/App/trama_process.c:25:6:setErrorAndLog	16	static
-../source/App/trama_process.c:34:13:handleLedAction	16	static
-../source/App/trama_process.c:47:13:isSwitchPressed	16	static
-../source/App/trama_process.c:61:6:tramaProcess	88	static
+../source/App/trama_process.c:26:6:setErrorAndLog	16	static
+../source/App/trama_process.c:31:6:logError	24	static
+../source/App/trama_process.c:52:13:handleLedAction	16	static
+../source/App/trama_process.c:65:13:isSwitchPressed	16	static
+../source/App/trama_process.c:78:6:tramaProcess	88	static

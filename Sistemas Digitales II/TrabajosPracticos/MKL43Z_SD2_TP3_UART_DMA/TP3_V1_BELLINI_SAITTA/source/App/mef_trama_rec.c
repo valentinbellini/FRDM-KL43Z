@@ -10,8 +10,7 @@
 #include <Drivers/Transceiver/transceiver_uart_rs485.h>
 #include "App/mef_trama_rec.h"
 #include "App/trama_process.h"
-#include "Drivers/uart_ringBuffer.h"
-//#include "uart_ringBuffer.h"
+#include "Drivers/Transceiver/uart_ringBuffer.h"
 
 /*==================[macros and definitions]=================================*/
 #define _BUFFER_SIZE		32

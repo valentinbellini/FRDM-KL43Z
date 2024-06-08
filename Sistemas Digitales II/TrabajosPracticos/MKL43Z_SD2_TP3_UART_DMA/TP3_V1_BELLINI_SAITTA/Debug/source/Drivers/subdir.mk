@@ -4,16 +4,13 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
-../source/Drivers/time.c \
-../source/Drivers/uart_ringBuffer.c 
+../source/Drivers/time.c 
 
 C_DEPS += \
-./source/Drivers/time.d \
-./source/Drivers/uart_ringBuffer.d 
+./source/Drivers/time.d 
 
 OBJS += \
-./source/Drivers/time.o \
-./source/Drivers/uart_ringBuffer.o 
+./source/Drivers/time.o 
 
 
 # Each subdirectory must supply rules for building sources it contributes
@@ -28,7 +25,7 @@ source/Drivers/%.o: ../source/Drivers/%.c source/Drivers/subdir.mk
 clean: clean-source-2f-Drivers
 
 clean-source-2f-Drivers:
-	-$(RM) ./source/Drivers/time.d ./source/Drivers/time.o ./source/Drivers/uart_ringBuffer.d ./source/Drivers/uart_ringBuffer.o
+	-$(RM) ./source/Drivers/time.d ./source/Drivers/time.o
 
 .PHONY: clean-source-2f-Drivers
 

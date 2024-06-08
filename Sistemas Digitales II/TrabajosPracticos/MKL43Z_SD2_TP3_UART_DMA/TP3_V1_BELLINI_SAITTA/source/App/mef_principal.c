@@ -14,7 +14,7 @@
 
 #include "App/mef_trama_rec.h"
 #include "App/mef_principal.h"
-#include "Drivers/uart_ringBuffer.h"
+#include "Drivers/Transceiver/uart_ringBuffer.h"
 #include "Drivers/Board/SD2_board.h"
 #include "Drivers/Key/key.h"
 #include "Drivers/MMA8451/mma8451.h"
@@ -23,7 +23,7 @@
 
 /*=====================================[macros and typedef]=====================================*/
 #define IS_DATA_MMA8451_READY		mma8451_getDataReadyInterruptStatus()	// return bool
-#define _UART_TRANSMISSION_DELAY	500 //ms
+#define _UART_TRANSMISSION_DELAY	150 //ms
 
 int16_t x = 0;
 int16_t y = 0;
@@ -59,7 +59,7 @@ void mef_principal(){
 				estado = Est_3D;
 				oled_clearScreen(OLED_COLOR_BLACK);
 				oled_putString(30, 29, (uint8_t*)"Estado 3D" , OLED_COLOR_WHITE, OLED_COLOR_BLACK);
-				mma8451_dataReady_config();
+				mma8451_dataReady_config(); /* Se habilitan interrupciones por dataReady */
 			}
 			break;
 
@@ -71,21 +71,19 @@ void mef_principal(){
 			}
 			if(timer <= 0) // Para no sobrecargar el puerto UART, Ejecutamos cada un tiempo mayor a 100ms.
 			{
-				PRINTF("Eje X: %d - ",x);
-				PRINTF("Eje Y: %d - ",y);
+				PRINTF("Eje X: %d | ",x);
+				PRINTF("Eje Y: %d | ",y);
 				PRINTF("Eje Z: %d\n",z);
 				timer = _UART_TRANSMISSION_DELAY;
 
-				snprintf((char*)buffer_modo_3d, sizeof(buffer_modo_3d), ":%c%c21%+04d%+04d%+04d\n", NUM_GRUPO_A, NUM_GRUPO_B, x, y, z);
-				//sprintf((char*)buffer_modo_3d, "%d %d %d\n", medicion_acel.ejex, medicion_acel.ejey, medicion_acel.ejez);
-				//transceptor_envDatosDMA(buffer_modo_3d, strlen((char*)buffer_modo_3d));
+				//snprintf((char*)buffer_modo_3d, sizeof(buffer_modo_3d), ":%c%c21%+04d%+04d%+04d\n", NUM_GRUPO_A, NUM_GRUPO_B, x, y, z);
+				snprintf((char*)buffer_modo_3d, sizeof(buffer_modo_3d), "%d %d %d\n", x, y, z);
 				uart0_drv_envDatos(buffer_modo_3d, strlen((char*)buffer_modo_3d));
 			}
 
 			/* Transición a ESTADO MASTER */
 			if(key_getPressEv(BOARD_SW_ID_1)) {
-				//uart0_drv_envDatos(buffer_modo_3d, strlen((char*)buffer_modo_3d));
-				mma8451_clearInterruptions_config();
+				mma8451_clearInterruptions_config(); /* Se deja de interrumpir por interrupciones */
 				estado = Est_Master;
 				oled_clearScreen(OLED_COLOR_BLACK);
 				oled_putString(30, 29, (uint8_t*)"Estado Master" , OLED_COLOR_WHITE, OLED_COLOR_BLACK);

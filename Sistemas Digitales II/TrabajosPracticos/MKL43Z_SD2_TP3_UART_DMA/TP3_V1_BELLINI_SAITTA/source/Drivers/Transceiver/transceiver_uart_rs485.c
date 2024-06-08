@@ -34,12 +34,12 @@
 //#define TR_EN_GPIO	        GPIOB
 //#define TR_EN_PIN	        0
 //
-////#define RS485_DE_PORT       PORTC
-////#define RS485_DE_GPIO       GPIOC
-////#define RS485_DE_PIN        1
-////#define RS485_RE_PORT       PORTC
-////#define RS485_RE_GPIO       GPIOC
-////#define RS485_RE_PIN        2
+//#define RS485_DE_PORT       PORTC
+//#define RS485_DE_GPIO       GPIOC
+//#define RS485_DE_PIN        1
+//#define RS485_RE_PORT       PORTC
+//#define RS485_RE_GPIO       GPIOC
+//#define RS485_RE_PIN        2
 //
 ///*==================[internal data declaration]==============================*/
 //static uint8_t txBuffer_dma[TX_BUFFER_DMA_SIZE];

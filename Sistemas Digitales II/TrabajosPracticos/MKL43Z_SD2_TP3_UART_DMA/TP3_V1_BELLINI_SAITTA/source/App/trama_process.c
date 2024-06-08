@@ -12,13 +12,14 @@
 #include "Drivers/Board/SD2_board.h"
 #include "Drivers/SSD1306/oled.h"
 #include "Drivers/MMA8451/mma8451.h"
-#include "Drivers/uart_ringBuffer.h"
+#include "Drivers/Transceiver/uart_ringBuffer.h"
 #include "App/mef_trama_rec.h"
 
 #include "fsl_debug_console.h"
 
 /*==================[macros and definitions]=================================*/
-#define _BUFFER_SIZE		32
+#define _ERROR_LOG_FILE 		"error.log"
+#define _BUFFER_SIZE			32
 /*==================[internal data declaration]==============================*/
 static bool wrongTrama = false;
 /*==================[internal functions declaration]=========================*/
@@ -27,10 +28,27 @@ void setErrorAndLog(const char *errorMessage) {
     PRINTF("Error: %s\n",errorMessage);
     //logError(errorMessage);
 }
+void logError(const char *errorMessage) {
+    FILE *errorLogFile = fopen(_ERROR_LOG_FILE, "a"); /* apertura en modo apéndice */
+
+    if (errorLogFile != NULL) {
+        fprintf(errorLogFile, "%s\n", errorMessage);
+        fclose(errorLogFile);
+    } else {
+        // Intenta crear el archivo de registro de errores
+        errorLogFile = fopen(_ERROR_LOG_FILE, "w"); /* apertura en modo escritura */
+        if (errorLogFile != NULL) {
+            fprintf(errorLogFile, "%s\n", errorMessage);
+            fclose(errorLogFile);
+        } else {
+            PRINTF("No se pudo abrir ni crear el archivo de registro de errores\n");
+        }
+    }
+}
+
 /*==================[external data definition]===============================*/
 
 /*==================[internal functions definition]==========================*/
-
 static void handleLedAction(uint8_t charIdLed, board_ledMsg_enum ledMsg){
 	switch (charIdLed){
 		case '1':
@@ -57,7 +75,6 @@ static bool isSwitchPressed(uint8_t charIdSwitch){
 }
 
 /*==================[external functions definition]==========================*/
-
 void tramaProcess(char *buf, int length)
 {
 	PRINTF("Input buffer: %s\n", buf);
@@ -118,6 +135,7 @@ void tramaProcess(char *buf, int length)
 	//Envia datos por UART0 mediante DMA
 	uart0_drv_envDatos(buffer, strlen((char*)buffer));
 }
+
 /*==================[end of file]============================================*/
 
 
