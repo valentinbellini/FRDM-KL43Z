@@ -97,25 +97,28 @@ void tramaProcess(char *buf, int length)
     	}
         break;
 
-        case '2'://Caso de los acelerometro
+	case '2'://Caso de los acelerometro
 
-            if (buf[1]=='1')
-            {
-            	/* Se configura interrupciones por DataReady y se espera que esté lista la conversión en No-Operation */
-				mma8451_dataReady_config();
-				while(!mma8451_getDataReadyInterruptStatus()){
-					//__NOP();
-				}
-				int16_t x = mma8451_getAcX();
-				int16_t y = mma8451_getAcY();
-				int16_t z = mma8451_getAcZ();
-				snprintf((char*)buffer, sizeof(buffer), ":%c%c21%+04d%+04d%+04d\n", NUM_GRUPO_A, NUM_GRUPO_B, x, y, z);
-				mma8451_clearInterruptions_config();
-            }
-            break;
+		if (buf[1]=='1')
+		{
+			/* Se configura interrupciones por DataReady y se espera que esté lista la conversión en No-Operation */
+			mma8451_dataReady_config();
+			while(!mma8451_getDataReadyInterruptStatus()){
+				//__NOP();
+			}
+			int16_t x = mma8451_getAcX();
+			int16_t y = mma8451_getAcY();
+			int16_t z = mma8451_getAcZ();
+			snprintf((char*)buffer, sizeof(buffer), ":%c%c21%+04d%+04d%+04d\n", NUM_GRUPO_A, NUM_GRUPO_B, x, y, z);
+			mma8451_clearInterruptions_config();
+		}
+		break;
+	default:
+		break;
 	}
 	PRINTF("Output buffer: %s\n", buffer);
-	uart_ringBuffer_envDatos(buffer, sizeof(buffer));
+	//uart_ringBuffer_envDatos(buffer, sizeof(buffer));
+	uart0_drv_envDatos(buffer, strlen((char*)buffer));
 	//Envia datos por UART0 mediante DMA
 	//transceptor_envDatosDMA(buffer, strlen((char*)buffer));
 }

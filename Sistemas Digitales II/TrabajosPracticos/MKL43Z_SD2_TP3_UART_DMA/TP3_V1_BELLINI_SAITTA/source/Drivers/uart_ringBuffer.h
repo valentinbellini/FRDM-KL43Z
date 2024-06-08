@@ -69,6 +69,8 @@ int32_t uart_ringBuffer_recDatos(uint8_t *pBuf, int32_t size);
  **/
 int32_t uart_ringBuffer_envDatos(uint8_t *pBuf, int32_t size);
 
+
+int32_t uart0_drv_envDatos(uint8_t *pBuf, int32_t size);
 /*==================[cplusplus]==============================================*/
 #ifdef __cplusplus
 }

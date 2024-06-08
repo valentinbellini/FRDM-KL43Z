@@ -33,24 +33,49 @@
  */
 
 /*==================[inclusions]=============================================*/
+// Standard C Included Files
+#include <string.h>
+#include <stdio.h>
+#include <stdbool.h>
+
+// Project Included Files
 #include "Drivers/Board/SD2_board.h"
+#include "Drivers/uart_ringBuffer.h"
 #include "fsl_lpuart.h"
 #include "fsl_port.h"
 #include "board.h"
 #include "ringBuffer.h"
+#include "fsl_lpuart_dma.h"
+#include "fsl_dmamux.h"
+#include "MKL43Z4.h"
+#include "pin_mux.h"
 
 /*==================[macros and definitions]=================================*/
+#define LPUART_TX_DMA_CHANNEL 0U
+#define TX_BUFFER_DMA_SIZE  32
 
 /*==================[internal data declaration]==============================*/
 static void* pRingBufferRx;
 static void* pRingBufferTx;
+
+static uint8_t txBuffer_dma[TX_BUFFER_DMA_SIZE];
+static lpuart_dma_handle_t LPUARTDmaHandle;
+static dma_handle_t LPUARTTxDmaHandle;
+volatile bool txOnGoing = false;
 
 /*==================[internal functions declaration]=========================*/
 
 /*==================[external data definition]===============================*/
 
 /*==================[internal functions definition]==========================*/
-
+/* UART user callback */
+static void LPUART_UserCallback(LPUART_Type *base, lpuart_dma_handle_t *handle, status_t status, void *userData)
+{
+    if (kStatus_LPUART_TxIdle == status)
+    {
+        txOnGoing = false;
+    }
+}
 /*==================[external functions definition]==========================*/
 
 void uart_ringBuffer_init(void)
@@ -58,13 +83,11 @@ void uart_ringBuffer_init(void)
 	lpuart_config_t config;
 
     pRingBufferRx = ringBuffer_init(16);
-    pRingBufferTx = ringBuffer_init(16);
 
     CLOCK_SetLpuart0Clock(0x1U); //IRC48M clock
 
 	/* PORTA1 (pin 35) is configured as LPUART0_RX */
 	PORT_SetPinMux(PORTA, 1U, kPORT_MuxAlt2);
-
 	/* PORTA2 (pin 36) is configured as LPUART0_TX */
 	PORT_SetPinMux(PORTA, 2U, kPORT_MuxAlt2);
 
@@ -92,8 +115,30 @@ void uart_ringBuffer_init(void)
 
 	/* Habilitación de interrupciones */
 	LPUART_EnableInterrupts(LPUART0, kLPUART_RxDataRegFullInterruptEnable);
-	LPUART_EnableInterrupts(LPUART0, kLPUART_TxDataRegEmptyInterruptEnable);
+	//LPUART_EnableInterrupts(LPUART0, kLPUART_TxDataRegEmptyInterruptEnable);
+	LPUART_EnableInterrupts(LPUART0, kLPUART_TransmissionCompleteInterruptEnable);
 	EnableIRQ(LPUART0_IRQn);
+
+	/* CONFIGURACIÓN DMA (sólo para TX) */
+	/* Init DMAMUX */
+	DMAMUX_Init(DMAMUX0);
+
+	/* Set channel for LPUART  */
+	DMAMUX_SetSource(DMAMUX0, LPUART_TX_DMA_CHANNEL, kDmaRequestMux0LPUART0Tx);
+	DMAMUX_EnableChannel(DMAMUX0, LPUART_TX_DMA_CHANNEL);
+
+	/* Init the DMA module */
+	DMA_Init(DMA0);
+	DMA_CreateHandle(&LPUARTTxDmaHandle, DMA0, LPUART_TX_DMA_CHANNEL);
+
+	/* Create LPUART DMA handle. */
+	LPUART_TransferCreateHandleDMA(
+			LPUART0,
+			&LPUARTDmaHandle,
+			LPUART_UserCallback,
+			NULL,
+			&LPUARTTxDmaHandle,
+			NULL);
 }
 
 /** \brief recibe datos por puerto serie accediendo al RB
@@ -107,7 +152,7 @@ int32_t uart_ringBuffer_recDatos(uint8_t *pBuf, int32_t size)
     int32_t ret = 0;
 
     /* entra sección de código crítico */
-    NVIC_DisableIRQ(LPUART0_IRQn);
+    __disable_irq();  // Deshabilita todas las interrupciones
 
     while (!ringBuffer_isEmpty(pRingBufferRx) && ret < size)
     {
@@ -116,7 +161,7 @@ int32_t uart_ringBuffer_recDatos(uint8_t *pBuf, int32_t size)
     }
 
     /* sale de sección de código crítico */
-    NVIC_EnableIRQ(LPUART0_IRQn);
+    __enable_irq();   // Habilita todas las interrupciones
 
     return ret;
 }
@@ -132,7 +177,8 @@ int32_t uart_ringBuffer_envDatos(uint8_t *pBuf, int32_t size)
     int32_t ret = 0;
 
     /* entra sección de código crítico */
-    NVIC_DisableIRQ(LPUART0_IRQn);
+    //NVIC_DisableIRQ(LPUART0_IRQn);
+    __disable_irq();   // Habilita todas las interrupciones
 
     /* si el buffer estaba vacío hay que habilitar la int TX */
     if (ringBuffer_isEmpty(pRingBufferTx))
@@ -145,11 +191,47 @@ int32_t uart_ringBuffer_envDatos(uint8_t *pBuf, int32_t size)
     }
 
     /* sale de sección de código crítico */
-    NVIC_EnableIRQ(LPUART0_IRQn);
+    //NVIC_EnableIRQ(LPUART0_IRQn);
+    __enable_irq();   // Habilita todas las interrupciones
 
     return ret;
 }
 
+
+/** \brief envía datos por puerto serie accediendo a memoria RAM
+ **
+ ** \param[inout] pBuf buffer a donde estan los datos a enviar
+ ** \param[in] size tamaño del buffer
+ ** \return cantidad de bytes enviados
+ **/
+int32_t uart0_drv_envDatos(uint8_t *pBuf, int32_t size)
+{
+    lpuart_transfer_t xfer;
+
+    if (txOnGoing)
+    {
+        size = 0;
+    }
+    else
+    {
+        /* limita size */
+        if (size > TX_BUFFER_DMA_SIZE)
+            size = TX_BUFFER_DMA_SIZE;
+
+        // Hace copia del buffer a transmitir en otro arreglo
+        memcpy(txBuffer_dma, pBuf, size);
+
+        xfer.data = txBuffer_dma;
+        xfer.dataSize = size;
+
+        txOnGoing = true;
+        LPUART_TransferSendDMA(LPUART0, &LPUARTDmaHandle, &xfer);
+
+        LPUART_EnableInterrupts(LPUART0, kLPUART_TransmissionCompleteInterruptEnable);
+    }
+
+    return size;
+}
 
 void LPUART0_IRQHandler(void)
 {
@@ -166,19 +248,27 @@ void LPUART0_IRQHandler(void)
 
 	}
 
-	if ( (kLPUART_TxDataRegEmptyFlag)            & LPUART_GetStatusFlags(LPUART0) &&
-         (kLPUART_TxDataRegEmptyInterruptEnable) & LPUART_GetEnabledInterrupts(LPUART0) )
+//	if ( (kLPUART_TxDataRegEmptyFlag)            & LPUART_GetStatusFlags(LPUART0) &&
+//         (kLPUART_TxDataRegEmptyInterruptEnable) & LPUART_GetEnabledInterrupts(LPUART0) )
+//	{
+//		if (ringBuffer_getData(pRingBufferTx, &data))
+//		{
+//			/* envía dato extraído del RB al puerto serie */
+//			LPUART_WriteByte(LPUART0, data);
+//		}
+//		else
+//		{
+//			/* si el RB está vacío deshabilita interrupción TX */
+//			LPUART_DisableInterrupts(LPUART0, kLPUART_TxDataRegEmptyInterruptEnable);
+//		}
+//	}
+
+	if ( (kLPUART_TransmissionCompleteFlag)            & LPUART_GetStatusFlags(LPUART0) &&
+	         (kLPUART_TransmissionCompleteInterruptEnable) & LPUART_GetEnabledInterrupts(LPUART0) )
 	{
-		if (ringBuffer_getData(pRingBufferTx, &data))
-		{
-			/* envía dato extraído del RB al puerto serie */
-			LPUART_WriteByte(LPUART0, data);
-		}
-		else
-		{
-			/* si el RB está vacío deshabilita interrupción TX */
-			LPUART_DisableInterrupts(LPUART0, kLPUART_TxDataRegEmptyInterruptEnable);
-		}
+		LPUART_DisableInterrupts(LPUART0, kLPUART_TransmissionCompleteInterruptEnable);
+		LPUART_ClearStatusFlags(LPUART0, kLPUART_TransmissionCompleteFlag);
+
 	}
 }
 
