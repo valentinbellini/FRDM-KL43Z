@@ -1,0 +1,13 @@
+../source/Drivers/SSD1306/oled.c:104:1:writeCommand	16	static
+../source/Drivers/SSD1306/oled.c:266:6:oled_init	8	static
+../source/Drivers/SSD1306/oled.c:293:6:oled_setContrast	8	static
+../source/Drivers/SSD1306/oled.c:309:6:oled_putPixel	32	static
+../source/Drivers/SSD1306/oled.c:236:13:vLine	24	static
+../source/Drivers/SSD1306/oled.c:206:13:hLine	24	static
+../source/Drivers/SSD1306/oled.c:370:6:oled_line	48	static
+../source/Drivers/SSD1306/oled.c:473:6:oled_circle	80	static
+../source/Drivers/SSD1306/oled.c:611:6:oled_rect	32	static
+../source/Drivers/SSD1306/oled.c:632:6:oled_fillRect	32	static
+../source/Drivers/SSD1306/oled.c:679:6:oled_clearScreen	168	static
+../source/Drivers/SSD1306/oled.c:696:9:oled_putChar	48	static
+../source/Drivers/SSD1306/oled.c:736:6:oled_putString	40	static

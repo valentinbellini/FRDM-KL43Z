@@ -1,0 +1,4 @@
+../source/App/trama_process.c:26:6:setErrorAndLog	8	static
+../source/App/trama_process.c:52:13:handleLedAction	8	static
+../source/App/trama_process.c:31:6:logError	16	static
+../source/App/trama_process.c:78:6:tramaProcess	64	static

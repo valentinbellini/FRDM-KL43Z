@@ -508,7 +508,7 @@
 								<option id="com.crt.advproject.gcc.specs.1469595299" name="Specs" superClass="com.crt.advproject.gcc.specs" useByScannerDiscovery="false"/>
 								<option id="com.crt.advproject.gcc.config.904749232" name="Obsolete (Config)" superClass="com.crt.advproject.gcc.config" useByScannerDiscovery="false"/>
 								<option id="com.crt.advproject.gcc.store.690873600" name="Obsolete (Store)" superClass="com.crt.advproject.gcc.store" useByScannerDiscovery="false"/>
-								<option id="com.crt.advproject.gcc.exe.release.option.optimization.level.709801516" superClass="com.crt.advproject.gcc.exe.release.option.optimization.level" useByScannerDiscovery="true"/>
+								<option id="com.crt.advproject.gcc.exe.release.option.optimization.level.709801516" name="Optimization Level" superClass="com.crt.advproject.gcc.exe.release.option.optimization.level" useByScannerDiscovery="true"/>
 								<inputType id="com.crt.advproject.compiler.input.903984713" superClass="com.crt.advproject.compiler.input"/>
 							</tool>
 							<tool id="com.crt.advproject.gas.exe.release.41633699" name="MCU Assembler" superClass="com.crt.advproject.gas.exe.release">
@@ -724,7 +724,14 @@
 &lt;/infoList&gt;&#13;
 &lt;/TargetConfig&gt;</projectStorage>
 	</storageModule>
-	<storageModule moduleId="refreshScope"/>
+	<storageModule moduleId="refreshScope" versionNumber="2">
+		<configuration configurationName="Debug">
+			<resource resourceType="PROJECT" workspacePath="/TP3_V1_BELLINI_SAITTA"/>
+		</configuration>
+		<configuration configurationName="Release">
+			<resource resourceType="PROJECT" workspacePath="/TP3_V1_BELLINI_SAITTA"/>
+		</configuration>
+	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets"/>
 	<storageModule moduleId="openCmsis"/>
 </cproject>

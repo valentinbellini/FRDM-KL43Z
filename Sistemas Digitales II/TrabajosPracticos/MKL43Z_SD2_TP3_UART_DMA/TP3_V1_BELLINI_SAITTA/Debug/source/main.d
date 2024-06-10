@@ -26,9 +26,9 @@ source/main.o source/main.d: ../source/main.c \
  ../source/Drivers/Key/key.h \
  C:\Users\valen\Documents\MCUXpressoIDE_11.9.0_2144\workspace\TP3_V1_BELLINI_SAITTA\source/Drivers/Board/SD2_board.h \
  ../source/Drivers/I2C/SD2_I2C.h ../source/Drivers/SSD1306/oled.h \
- ../source/Drivers/Transceiver/uart_ringBuffer.h \
  ../source/Drivers/MMA8451/mma8451.h \
  C:\Users\valen\Documents\MCUXpressoIDE_11.9.0_2144\workspace\TP3_V1_BELLINI_SAITTA\source/Drivers/MMA8451/mma8451_registers.h \
+ C:\Users\valen\Documents\MCUXpressoIDE_11.9.0_2144\workspace\TP3_V1_BELLINI_SAITTA\source/Drivers/Transceiver/transceiver_RS485_UART.h \
  C:\Users\valen\Documents\MCUXpressoIDE_11.9.0_2144\workspace\TP3_V1_BELLINI_SAITTA\source/App/mef_principal.h
 C:\Users\valen\Documents\MCUXpressoIDE_11.9.0_2144\workspace\TP3_V1_BELLINI_SAITTA\board/board.h:
 C:\Users\valen\Documents\MCUXpressoIDE_11.9.0_2144\workspace\TP3_V1_BELLINI_SAITTA\board/clock_config.h:
@@ -58,7 +58,7 @@ C:\Users\valen\Documents\MCUXpressoIDE_11.9.0_2144\workspace\TP3_V1_BELLINI_SAIT
 C:\Users\valen\Documents\MCUXpressoIDE_11.9.0_2144\workspace\TP3_V1_BELLINI_SAITTA\source/Drivers/Board/SD2_board.h:
 ../source/Drivers/I2C/SD2_I2C.h:
 ../source/Drivers/SSD1306/oled.h:
-../source/Drivers/Transceiver/uart_ringBuffer.h:
 ../source/Drivers/MMA8451/mma8451.h:
 C:\Users\valen\Documents\MCUXpressoIDE_11.9.0_2144\workspace\TP3_V1_BELLINI_SAITTA\source/Drivers/MMA8451/mma8451_registers.h:
+C:\Users\valen\Documents\MCUXpressoIDE_11.9.0_2144\workspace\TP3_V1_BELLINI_SAITTA\source/Drivers/Transceiver/transceiver_RS485_UART.h:
 C:\Users\valen\Documents\MCUXpressoIDE_11.9.0_2144\workspace\TP3_V1_BELLINI_SAITTA\source/App/mef_principal.h:

@@ -1,0 +1,9 @@
+../drivers/fsl_lpuart_dma.c:111:13:LPUART_TransferSendDMACallback	8	static
+../drivers/fsl_lpuart_dma.c:139:13:LPUART_TransferReceiveDMACallback	8	static
+../drivers/fsl_lpuart_dma.c:171:6:LPUART_TransferCreateHandleDMA	32	static
+../drivers/fsl_lpuart_dma.c:237:10:LPUART_TransferSendDMA	48	static
+../drivers/fsl_lpuart_dma.c:289:10:LPUART_TransferReceiveDMA	48	static
+../drivers/fsl_lpuart_dma.c:336:6:LPUART_TransferAbortSendDMA	8	static
+../drivers/fsl_lpuart_dma.c:362:6:LPUART_TransferAbortReceiveDMA	8	static
+../drivers/fsl_lpuart_dma.c:393:10:LPUART_TransferGetSendCountDMA	0	static
+../drivers/fsl_lpuart_dma.c:421:10:LPUART_TransferGetReceiveCountDMA	0	static

@@ -1,5 +1,5 @@
 C:\Users\valen\Documents\MCUXpressoIDE_11.9.0_2144\workspace\TP3_V1_BELLINI_SAITTA\CMSIS/core_cm0plus.h:741:22:__NVIC_EnableIRQ	16	static
-C:\Users\valen\Documents\MCUXpressoIDE_11.9.0_2144\workspace\TP3_V1_BELLINI_SAITTA\drivers/fsl_clock.h:470:20:CLOCK_SetLpuart0Clock	16	static
+C:\Users\valen\Documents\MCUXpressoIDE_11.9.0_2144\workspace\TP3_V1_BELLINI_SAITTA\drivers/fsl_clock.h:438:20:CLOCK_EnableClock	24	static
 C:\Users\valen\Documents\MCUXpressoIDE_11.9.0_2144\workspace\TP3_V1_BELLINI_SAITTA\drivers/fsl_common.h:484:28:EnableIRQ	16	static
 C:\Users\valen\Documents\MCUXpressoIDE_11.9.0_2144\workspace\TP3_V1_BELLINI_SAITTA\drivers/fsl_lpuart.h:606:23:LPUART_ReadByte	16	static
 C:\Users\valen\Documents\MCUXpressoIDE_11.9.0_2144\workspace\TP3_V1_BELLINI_SAITTA\drivers/fsl_port.h:243:20:PORT_SetPinConfig	32	static
@@ -7,11 +7,11 @@ C:\Users\valen\Documents\MCUXpressoIDE_11.9.0_2144\workspace\TP3_V1_BELLINI_SAIT
 C:\Users\valen\Documents\MCUXpressoIDE_11.9.0_2144\workspace\TP3_V1_BELLINI_SAITTA\drivers/fsl_gpio.h:162:20:GPIO_PinWrite	32	static
 C:\Users\valen\Documents\MCUXpressoIDE_11.9.0_2144\workspace\TP3_V1_BELLINI_SAITTA\drivers/fsl_dmamux.h:75:20:DMAMUX_EnableChannel	16	static
 C:\Users\valen\Documents\MCUXpressoIDE_11.9.0_2144\workspace\TP3_V1_BELLINI_SAITTA\drivers/fsl_dmamux.h:105:20:DMAMUX_SetSource	24	static
-../source/Drivers/Transceiver/uart_ringBuffer.c:95:13:LPUART_UserCallback	24	static
-../source/Drivers/Transceiver/uart_ringBuffer.c:104:6:transceiver_habilitarTx	8	static
-../source/Drivers/Transceiver/uart_ringBuffer.c:108:6:transceiver_habilitarRx	8	static
-../source/Drivers/Transceiver/uart_ringBuffer.c:115:6:checkUartErrors	16	static
-../source/Drivers/Transceiver/uart_ringBuffer.c:132:6:uart_ringBuffer_init	48	static
-../source/Drivers/Transceiver/uart_ringBuffer.c:234:9:uart_ringBuffer_recDatos	24	static
-../source/Drivers/Transceiver/uart_ringBuffer.c:262:9:uart0_drv_envDatos	24	static
-../source/Drivers/Transceiver/uart_ringBuffer.c:299:6:LPUART0_IRQHandler	24	static
+../source/Drivers/Transceiver/uart_ringBuffer.c:86:13:LPUART_UserCallback	24	static
+../source/Drivers/Transceiver/uart_ringBuffer.c:95:6:transceiver_habilitarTx	8	static
+../source/Drivers/Transceiver/uart_ringBuffer.c:99:6:transceiver_habilitarRx	8	static
+../source/Drivers/Transceiver/uart_ringBuffer.c:106:6:checkUartErrors	16	static
+../source/Drivers/Transceiver/uart_ringBuffer.c:123:6:uart_ringBuffer_init	48	static
+../source/Drivers/Transceiver/uart_ringBuffer.c:229:9:uart_ringBuffer_recDatos	24	static
+../source/Drivers/Transceiver/uart_ringBuffer.c:257:9:uart1_drv_envDatos	24	static
+../source/Drivers/Transceiver/uart_ringBuffer.c:294:6:LPUART1_IRQHandler	24	static

@@ -1,0 +1,5 @@
+../source/Drivers/time.c:60:6:PIT_IRQHandler	0	static
+../source/Drivers/time.c:70:6:time_init	24	static
+../source/Drivers/time.c:98:6:time_restart	0	static
+../source/Drivers/time.c:108:10:time_elapsed_us	16	static
+../source/Drivers/time.c:129:6:time_overflow	0	static

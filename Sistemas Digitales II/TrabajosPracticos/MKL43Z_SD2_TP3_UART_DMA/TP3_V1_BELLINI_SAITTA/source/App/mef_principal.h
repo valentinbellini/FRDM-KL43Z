@@ -1,8 +1,7 @@
-/*
- * mef_principal.h
- *
- *  Created on: 30.05.2023
- *      Author: valen
+/**
+ * @file    mef_principal.h
+ * @brief   main MEF
+ * @autor	Valentin Bellini & Iván Saitta
  */
 
 #ifndef MEF_PRINCIPAL_H_

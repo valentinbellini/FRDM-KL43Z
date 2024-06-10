@@ -26,6 +26,9 @@ source/Drivers/I2C \
 source/Drivers/Key \
 source/Drivers/MMA8451 \
 source/Drivers/PowerMode \
+source/Drivers/SSD1306 \
+source/Drivers/Transceiver \
+source/Drivers \
 source \
 startup \
 utilities \

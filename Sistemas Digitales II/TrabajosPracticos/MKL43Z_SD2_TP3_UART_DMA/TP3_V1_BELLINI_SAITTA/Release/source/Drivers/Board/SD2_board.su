@@ -1,7 +1,7 @@
-../source/Drivers/Board/SD2_board.c:66:6:board_init	24	static
-../source/Drivers/Board/SD2_board.c:127:6:adc_init	0	static
-../source/Drivers/Board/SD2_board.c:143:6:redPWM_init	8	static
-../source/Drivers/Board/SD2_board.c:171:6:greenPWM_init	0	static
-../source/Drivers/Board/SD2_board.c:199:6:board_setLed	0	static
-../source/Drivers/Board/SD2_board.c:220:6:board_getSw	0	static
-../source/Drivers/Board/SD2_board.c:225:6:board_getLed	0	static
+../source/Drivers/Board/SD2_board.c:83:6:board_init	40	static
+../source/Drivers/Board/SD2_board.c:169:6:board_setLed	0	static
+../source/Drivers/Board/SD2_board.c:190:6:board_getSw	0	static
+../source/Drivers/Board/SD2_board.c:195:6:board_getLed	0	static
+../source/Drivers/Board/SD2_board.c:200:6:board_setOledPin	0	static
+../source/Drivers/Board/SD2_board.c:205:6:board_configSPI0	24	static
+../source/Drivers/Board/SD2_board.c:249:6:board_SPI0Send	24	static

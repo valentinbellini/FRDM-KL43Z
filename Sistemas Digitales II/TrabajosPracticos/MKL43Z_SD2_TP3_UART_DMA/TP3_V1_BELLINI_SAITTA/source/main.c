@@ -4,8 +4,7 @@
  * @autor	Valentin Bellini & Iván Saitta
  */
 
-/*==================[inclusiones]==========================*/
-
+/*==================[inclusions]=============================================*/
 #include <stdio.h>
 #include "board.h"
 #include "fsl_debug_console.h"
@@ -18,10 +17,11 @@
 #include "Drivers/Key/key.h"
 #include "Drivers/I2C/SD2_I2C.h"
 #include "Drivers/SSD1306/oled.h"
-#include "Drivers/Transceiver/uart_ringBuffer.h"
 #include "Drivers/MMA8451/mma8451.h"
+#include <Drivers/Transceiver/transceiver_RS485_UART.h>
 #include <App/mef_principal.h>
 
+/*==================[internal functions definition]==========================*/
 void init_clocks_and_power_mode(){
 	uint32_t freq = 0;
 	smc_power_state_t currentPowerState;
@@ -46,6 +46,7 @@ void init_clocks_and_power_mode(){
     PRINTF("\r\n#################### ========================= ####################\n\r\n");
 }
 
+
 int main(void) {
 
 	/* Inicialización de clocks a máxima frecuencia y micro en modo RUN a 48MHz */
@@ -69,8 +70,8 @@ int main(void) {
     /* Inicialización MEF de pulsadores*/
     key_init();
 
-    /* Se inicializa UART0 y DMA */
-    uart_ringBuffer_init();
+    /* Se inicializa UART1 y DMA */
+    transceiver_init();
 
     /* Se configura interrupción de systick cada 1 ms */
     SysTick_Config(SystemCoreClock / 1000U);
@@ -88,5 +89,6 @@ int main(void) {
 void SysTick_Handler(void){
     key_periodicTask1ms();
     mef_principal_task1ms();
+
 }
 

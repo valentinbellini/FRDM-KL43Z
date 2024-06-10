@@ -1,3 +1,9 @@
+/**
+ * @file    trama_process.h
+ * @brief   Lógica para procesamiento de trama y accionamiento.
+ * @autor	Valentin Bellini & Iván Saitta
+ */
+
 #ifndef TRAMA_PROCESS_H
 #define TRAMA_PROCESS_H
 

@@ -1,0 +1,7 @@
+../source/Drivers/Transceiver/transceiver_RS485_UART.c:77:13:LPUART_UserCallback	0	static
+../source/Drivers/Transceiver/transceiver_RS485_UART.c:86:6:transceiver_habilitarTx	0	static
+../source/Drivers/Transceiver/transceiver_RS485_UART.c:91:6:transceiver_habilitarRx	0	static
+../source/Drivers/Transceiver/transceiver_RS485_UART.c:146:6:transceiver_init	48	static
+../source/Drivers/Transceiver/transceiver_RS485_UART.c:225:9:uart_ringBuffer_recDatos	24	static
+../source/Drivers/Transceiver/transceiver_RS485_UART.c:253:9:uart_drv_envDatos_DMA	32	static
+../source/Drivers/Transceiver/transceiver_RS485_UART.c:334:7:LPUART0_IRQHandler	16	static

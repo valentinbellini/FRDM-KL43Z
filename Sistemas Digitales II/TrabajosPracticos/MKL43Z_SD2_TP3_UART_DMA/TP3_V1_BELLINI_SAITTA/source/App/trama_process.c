@@ -1,10 +1,11 @@
-/*
- * procTrama.c
- *
- *  Created on: 30 may. 2023
- *      Author: Usuario
+/**
+ * @file    trama_process.c
+ * @brief   Lógica para procesamiento de trama y accionamiento.
+ * @autor	Valentin Bellini & Iván Saitta
  */
+
 /*==================[inclusions]=============================================*/
+#include <Drivers/Transceiver/transceiver_RS485_UART.h>
 #include <stdio.h>
 #include <stdbool.h>
 
@@ -12,7 +13,6 @@
 #include "Drivers/Board/SD2_board.h"
 #include "Drivers/SSD1306/oled.h"
 #include "Drivers/MMA8451/mma8451.h"
-#include "Drivers/Transceiver/uart_ringBuffer.h"
 #include "App/mef_trama_rec.h"
 
 #include "fsl_debug_console.h"
@@ -84,7 +84,7 @@ void tramaProcess(char *buf, int length)
 	wrongTrama = false; /* La trama empieza bien si se llama al procesador */
 
 	switch (buf[0]){
-		//Caso de los leds
+		// Caso de los leds
 		case '0':
 			switch (buf[2]){
 				case 'A':
@@ -100,19 +100,19 @@ void tramaProcess(char *buf, int length)
 					setErrorAndLog("Trama incorrecta. Control de LED invalido.");
                     break;
 			}
-			//Se da formato al string a transmitir y se almacena en el arrelgo de char buffer
+			/* Se da formato al string a transmitir y se almacena en el buffer */
 			snprintf((char*)buffer, sizeof(buffer), ":%c%c0%c%c\n", NUM_GRUPO_A, NUM_GRUPO_B, buf[1], buf[2]);
 			break;
 
-		//Caso de los switchs
+		// Caso de los switchs
 		case '1':
-			swPressed = isSwitchPressed(buf[1]);
+			swPressed = isSwitchPressed(buf[1]); /* return bool true if sw is pressed */
 			snprintf((char*)buffer, sizeof(buffer), ":%c%c1%c%c\n", NUM_GRUPO_A, NUM_GRUPO_B, buf[1], (swPressed ? 'P' : 'N'));
 			break;
 
-		//Caso de los acelerometro
+		// Caso de los acelerometro
 		case '2':
-			if (buf[1]=='1'){
+			if (buf[1] == '1'){
 				/* Se configura interrupciones por DataReady y se espera que esté lista la conversión en No-Operation */
 				mma8451_dataReady_config();
 				while(!mma8451_getDataReadyInterruptStatus()){
@@ -131,170 +131,13 @@ void tramaProcess(char *buf, int length)
 			setErrorAndLog("Trama incorrecta. buf[0] no encuentra coincidencias.");
 			break;
 	}
+
+
 	PRINTF("Output buffer: %s\n", buffer);
-	//Envia datos por UART0 mediante DMA
-	uart0_drv_envDatos(buffer, strlen((char*)buffer));
+
+	/* Envia datos por UART mediante DMA */
+	uart_drv_envDatos_DMA(buffer, strlen((char*)buffer));
 }
 
 /*==================[end of file]============================================*/
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-///*
-// * procTrama.c
-// *
-// *  Created on: 06/06/2024
-// *  Author: Valen
-// */
-///*==================[inclusions]=============================================*/
-//#include <Drivers/Transceiver/transceiver_uart_rs485.h>
-//#include <stdio.h>
-//#include <stdbool.h>
-//
-//#include "App/trama_process.h"
-//#include "Drivers/Board/SD2_board.h"
-//#include "Drivers/MMA8451/mma8451.h"
-//#include "App/mef_trama_rec.h"
-//
-///*==================[macros and definitions]=================================*/
-//#define _ERROR_LOG_FILE 		"error.log"
-//
-///*==================[internal data declaration]==============================*/
-//static bool wrongTrama = false;
-//
-///*==================[internal functions definition]==========================*/
-//static board_ledMsg_enum convertToBoardLedMsg(char c) {
-//    switch (c) {
-//        case 'A':
-//            return BOARD_LED_MSG_OFF;
-//        case 'E':
-//            return BOARD_LED_MSG_ON;
-//        case 'T':
-//            return BOARD_LED_MSG_TOGGLE;
-//        default:
-//            // En caso de que se pase un carácter no válido, regresamos un valor por defecto
-//            return BOARD_LED_MSG_OFF;
-//    }
-//}
-//void setErrorAndLog(const char *errorMessage) {
-//    wrongTrama = true;
-//    PRINTF("Error: Trama incorrecta\n");
-//    //logError(errorMessage);
-//}
-//static void handleLedAction(char IdLed, char ledMsgChar){
-//	board_ledMsg_enum ledMsg = convertToBoardLedMsg(ledMsgChar);
-//
-//	switch (IdLed){
-//		case '1':
-//			board_setLed(BOARD_LED_ID_ROJO, ledMsg);
-//			break;
-//		case '2':
-//			board_setLed(BOARD_LED_ID_VERDE, ledMsg);
-//			break;
-//		default:
-//			setErrorAndLog("Trama Incorrecta. Led Invalido");
-//			break;
-//	}
-//}
-//static bool isSwitchPressed(char IdSwitch)
-//{
-//	switch (IdSwitch){
-//		case '1':
-//			return board_getSw(BOARD_SW_ID_1);
-//		case '3':
-//			return board_getSw(BOARD_SW_ID_3);
-//		default:
-//			setErrorAndLog("Trama incorrecta. Switch Invalido.");
-//	}
-//	return false;
-//}
-//void logError(const char *errorMessage) {
-//    FILE *errorLogFile = fopen(_ERROR_LOG_FILE, "a"); /* apertura en modo apéndice */
-//
-//    if (errorLogFile != NULL) {
-//        fprintf(errorLogFile, "%s\n", errorMessage);
-//        fclose(errorLogFile);
-//    } else {
-//        // Intenta crear el archivo de registro de errores
-//        errorLogFile = fopen(_ERROR_LOG_FILE, "w"); /* apertura en modo escritura */
-//        if (errorLogFile != NULL) {
-//            fprintf(errorLogFile, "%s\n", errorMessage);
-//            fclose(errorLogFile);
-//        } else {
-//            PRINTF("No se pudo abrir ni crear el archivo de registro de errores\n");
-//        }
-//    }
-//}
-//
-///*==================[external functions definition]==========================*/
-//void tramaProcess(char *buf, int length) {
-//    bool swPressed;
-//    uint8_t buffer[BUFFER_SIZE];
-//    buffer[0] = '\0';
-//
-//    switch (buf[0]) {
-//        case '0': // Caso de los leds
-//            switch (buf[2]) {
-//                case 'A':
-//                case 'E':
-//                case 'T':
-//                    handleLedAction(buf[1],buf[2]);
-//                    /* formatea una cadena de caracteres y la coloca en el búfer teniendo en cuenta desbordamiento. */
-//                    snprintf((char*)buffer, sizeof(buffer), ":%c%c0%c%c\n", NUM_GRUPO_A, NUM_GRUPO_B, buf[1], buf[2]);
-//                    break;
-//                default:
-//                    setErrorAndLog("Trama incorrecta. Control de LED invalido.");
-//                    break;
-//            }
-//            break;
-//
-//        case '1': // Caso de los switchs
-//            swPressed = isSwitchPressed(buf[1]);
-//            snprintf((char*)buffer, sizeof(buffer), ":%c%c1%c%c\n", NUM_GRUPO_A, NUM_GRUPO_B, buf[1], (swPressed ? 'P' : 'N'));
-//            break;
-//
-//        case '2': // Caso de los acelerómetro
-//            if (buf[1] == '1') {
-//            	/* Se configura interrupciones por DataReady y se espera que esté lista la conversión en No-Operation */
-//                mma8451_dataReady_config();
-//                while(!isInterruptionByDR){
-//                	__NOP();
-//                }
-//                int16_t x = mma8451_getAcX();
-//                int16_t y = mma8451_getAcY();
-//                int16_t z = mma8451_getAcZ();
-//                snprintf((char*)buffer, sizeof(buffer), ":%c%c21%+04d%+04d%+04d\n", NUM_GRUPO_A, NUM_GRUPO_B, x, y, z);
-//            } else {
-//                setErrorAndLog("Trama incorrecta para lectura de acelerómetro");
-//            }
-//            break;
-//
-//        default:
-//            setErrorAndLog("Trama Incorrecta. buf[0] no encuentra coincidencias.");
-//            break;
-//    }
-//
-//    if (wrongTrama) {
-//    	/* Si la trama no cumple con lo esperado, devuelve todas F */
-//        memset(buffer, 'F', sizeof(buffer));
-//    }
-//
-//    // Envía datos por UART0 mediante DMA
-//    transceiver_envDatosDMA(buffer, strlen((char*)buffer));
-//}
-///*==================[end of file]============================================*/
-//
