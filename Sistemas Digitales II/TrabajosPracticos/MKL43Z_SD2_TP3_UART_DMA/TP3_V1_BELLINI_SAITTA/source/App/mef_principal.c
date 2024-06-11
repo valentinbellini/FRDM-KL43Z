@@ -62,7 +62,11 @@ void mef_principal(){
 
 		/*---Estado Master-------------------------------------------*/
 		case Est_Master:
-			mefRecTrama_task();
+			if (board_rs485_isDataAvailable()){
+				mefRecTrama_task();
+			}
+			//mefRecTrama_task();
+
 			/* Transición a ESTADO 3D */
 			if(key_getPressEv(BOARD_SW_ID_1)){
 				estado_mef_principal = Est_3D;

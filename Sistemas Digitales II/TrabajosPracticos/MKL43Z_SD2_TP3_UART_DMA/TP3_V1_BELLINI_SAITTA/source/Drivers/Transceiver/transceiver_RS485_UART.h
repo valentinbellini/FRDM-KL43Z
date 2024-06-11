@@ -10,6 +10,16 @@
 /*==================[inclusions]=============================================*/
 #include "stdint.h"
 #include "stdbool.h"
+#include <string.h>
+#include "fsl_lpuart.h"
+#include "fsl_port.h"
+#include "board.h"
+#include "fsl_lpuart_dma.h"
+#include "fsl_dmamux.h"
+#include "MKL43Z4.h"
+#include "pin_mux.h"
+#include "fsl_debug_console.h"
+
 
 /*==================[cplusplus]==============================================*/
 #ifdef __cplusplus
@@ -25,6 +35,8 @@ extern "C" {
 /*==================[external functions definition]==========================*/
 
 void transceiver_init(void);
+
+bool board_rs485_isDataAvailable(void);
 
 /** \brief recibe datos por puerto serie accediendo al RB
  **
