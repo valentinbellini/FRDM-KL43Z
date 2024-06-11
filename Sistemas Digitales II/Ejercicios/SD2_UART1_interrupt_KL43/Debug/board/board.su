@@ -1,0 +1,2 @@
+C:\Users\guido\Documents\MCUXpressoIDE_11.6.1_8255\workspace\Docencia SD2\SD2_UART1_interrupt_KL43\drivers/fsl_clock.h:470:20:CLOCK_SetLpuart0Clock	16	static
+../board/board.c:25:6:BOARD_InitDebugConsole	16	static

@@ -1,3 +1,0 @@
-../source/mefLed.c:32:13:mefLed_init	8	static
-../source/mefLed.c:37:13:mefLed	8	static
-../source/mefLed.c:74:13:mefLed_task1ms	8	static

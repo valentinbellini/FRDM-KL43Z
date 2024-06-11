@@ -1,0 +1,14 @@
+C:\Users\guido\Documents\MCUXpressoIDE_11.6.1_8255\workspace\Docencia SD2\SD2_UART1_interrupt_KL43\CMSIS/core_cm0plus.h:741:22:__NVIC_EnableIRQ	16	static
+C:\Users\guido\Documents\MCUXpressoIDE_11.6.1_8255\workspace\Docencia SD2\SD2_UART1_interrupt_KL43\drivers/fsl_gpio.h:182:20:GPIO_PortSet	16	static
+C:\Users\guido\Documents\MCUXpressoIDE_11.6.1_8255\workspace\Docencia SD2\SD2_UART1_interrupt_KL43\drivers/fsl_gpio.h:193:20:GPIO_PortClear	16	static
+C:\Users\guido\Documents\MCUXpressoIDE_11.6.1_8255\workspace\Docencia SD2\SD2_UART1_interrupt_KL43\drivers/fsl_lpuart.h:592:20:LPUART_WriteByte	16	static
+C:\Users\guido\Documents\MCUXpressoIDE_11.6.1_8255\workspace\Docencia SD2\SD2_UART1_interrupt_KL43\drivers/fsl_lpuart.h:606:23:LPUART_ReadByte	16	static
+C:\Users\guido\Documents\MCUXpressoIDE_11.6.1_8255\workspace\Docencia SD2\SD2_UART1_interrupt_KL43\drivers/fsl_port.h:243:20:PORT_SetPinConfig	32	static
+C:\Users\guido\Documents\MCUXpressoIDE_11.6.1_8255\workspace\Docencia SD2\SD2_UART1_interrupt_KL43\drivers/fsl_port.h:346:20:PORT_SetPinMux	24	static
+../source/SD2_board_rs485.c:65:13:rs485_RE	16	static
+../source/SD2_board_rs485.c:73:13:rs485_DE	16	static
+../source/SD2_board_rs485.c:82:6:board_rs485_init	32	static
+../source/SD2_board_rs485.c:145:6:board_rs485_sendByte	16	static
+../source/SD2_board_rs485.c:157:6:board_rs485_isDataAvailable	8	static
+../source/SD2_board_rs485.c:162:9:board_rs485_readByte	8	static
+../source/SD2_board_rs485.c:168:6:LPUART1_IRQHandler	8	static

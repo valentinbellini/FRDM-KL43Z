@@ -1,0 +1,10 @@
+core_cm0plus.h:741:22:__NVIC_EnableIRQ	16	static
+fsl_clock.h:470:20:CLOCK_SetLpuart0Clock	16	static
+fsl_common.h:484:28:EnableIRQ	16	static
+fsl_port.h:346:20:PORT_SetPinMux	24	static
+fsl_dmamux.h:75:20:DMAMUX_EnableChannel	16	static
+fsl_dmamux.h:105:20:DMAMUX_SetSource	24	static
+uart0_drv.c:70:13:LPUART_UserCallback	24	static
+uart0_drv.c:80:6:uart0_drv_init	32	static
+uart0_drv.c:140:9:uart0_drv_envDatos	24	static
+uart0_drv.c:170:6:LPUART0_IRQHandler	8	static

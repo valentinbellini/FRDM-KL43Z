@@ -1,0 +1,4 @@
+C:\Users\guido\Documents\MCUXpressoIDE_11.6.1_8255\workspace\Docencia SD2\SD2_UART1_interrupt_KL43\CMSIS/core_cm0plus.h:850:22:__NVIC_SetPriority	24	static
+C:\Users\guido\Documents\MCUXpressoIDE_11.6.1_8255\workspace\Docencia SD2\SD2_UART1_interrupt_KL43\CMSIS/core_cm0plus.h:1056:26:SysTick_Config	16	static
+../source/ejemploRS485.c:65:5:main	24	static
+../source/ejemploRS485.c:109:6:SysTick_Handler	8	static

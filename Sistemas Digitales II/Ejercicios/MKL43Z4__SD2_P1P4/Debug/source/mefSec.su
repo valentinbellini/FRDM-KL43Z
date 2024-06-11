@@ -1,3 +1,0 @@
-../source/mefSec.c:60:13:mefSec_init	8	static
-../source/mefSec.c:66:13:mefSec	8	static
-../source/mefSec.c:102:13:mefSec_task1ms	8	static
