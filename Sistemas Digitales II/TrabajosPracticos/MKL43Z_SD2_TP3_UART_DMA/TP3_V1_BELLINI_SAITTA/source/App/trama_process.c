@@ -5,47 +5,27 @@
  */
 
 /*==================[inclusions]=============================================*/
-#include <Drivers/Transceiver/transceiver_RS485_UART.h>
+#include "debug.h"
 #include <stdio.h>
 #include <stdbool.h>
+#include "fsl_debug_console.h"
 
 #include "App/trama_process.h"
+#include <Drivers/Transceiver/transceiver_RS485_UART.h>
 #include "Drivers/Board/SD2_board.h"
 #include "Drivers/SSD1306/oled.h"
 #include "Drivers/MMA8451/mma8451.h"
 #include "App/mef_trama_rec.h"
 
-#include "fsl_debug_console.h"
-
 /*==================[macros and definitions]=================================*/
-#define _ERROR_LOG_FILE 		"error.log"
+
 #define _BUFFER_SIZE			32
 /*==================[internal data declaration]==============================*/
 static bool wrongTrama = false;
 /*==================[internal functions declaration]=========================*/
-void setErrorAndLog(const char *errorMessage) {
-    wrongTrama = true;
-    PRINTF("Error: %s\n",errorMessage);
-    //logError(errorMessage);
-}
-void logError(const char *errorMessage) {
-    FILE *errorLogFile = fopen(_ERROR_LOG_FILE, "a"); /* apertura en modo apéndice */
-
-    if (errorLogFile != NULL) {
-        fprintf(errorLogFile, "%s\n", errorMessage);
-        fclose(errorLogFile);
-    } else {
-        // Intenta crear el archivo de registro de errores
-        errorLogFile = fopen(_ERROR_LOG_FILE, "w"); /* apertura en modo escritura */
-        if (errorLogFile != NULL) {
-            fprintf(errorLogFile, "%s\n", errorMessage);
-            fclose(errorLogFile);
-        } else {
-            PRINTF("No se pudo abrir ni crear el archivo de registro de errores\n");
-        }
-    }
-}
-
+static void handleLedAction(uint8_t charIdLed, board_ledMsg_enum ledMsg);
+static bool isSwitchPressed(uint8_t charIdSwitch);
+void setErrorAndLog(const char *errorMessage);
 /*==================[external data definition]===============================*/
 
 /*==================[internal functions definition]==========================*/
@@ -73,11 +53,18 @@ static bool isSwitchPressed(uint8_t charIdSwitch){
 	}
 	return false;
 }
+void setErrorAndLog(const char *errorMessage) {
+    wrongTrama = true;
+    //DEBUG_PRINT("Error: %s\n",errorMessage);
+    LOG_ERROR(errorMessage);
+}
 
 /*==================[external functions definition]==========================*/
 void tramaProcess(char *buf, int length)
 {
-	PRINTF("Input buffer: %s\n", buf);
+	ASSERT(length >= 3); // Para asegurar que buf[0], buf[1] y buf[2] existen
+	DEBUG_PRINT("Input buffer: %s\n", buf);
+
 	uint8_t buffer[_BUFFER_SIZE];
 	bool swPressed;
 	buffer[0]='\0';
@@ -132,8 +119,7 @@ void tramaProcess(char *buf, int length)
 			break;
 	}
 
-
-	PRINTF("Output buffer: %s\n", buffer);
+	DEBUG_PRINT("Output buffer: %s\n", buffer);
 
 	/* Envia datos por UART mediante DMA */
 	uart_drv_envDatos_DMA(buffer, strlen((char*)buffer));

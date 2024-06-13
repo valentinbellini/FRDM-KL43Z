@@ -4,6 +4,31 @@
  * @autor	Valentin Bellini & Iván Saitta
  */
 
+/*  =========== [PORT MAPPING] ====================================== *//*
+    This application is using the following PORT/PINS:
+
+    PORTA   4   BOARD_SW1
+
+    PORTC   0   RST - OLED
+    PORTC   3   BOARD_SW3
+    PORTC   4   SPI1_SS
+    PORTC   5   SPI1_SCK
+    PORTC   6   SPI1_MOSI
+    PORTC   7   DATA/CMD - OLED
+
+    PORTD   1   INT2 - MMA8451
+    PORTD   5   BOARD_LED_VERDE
+
+	PORTE	0	UART1_TX
+	PORTE	1	UART1_RX
+    PORTE   24  I2C0_SCL
+    PORTE   25  I2C0_SDA
+    PORTE	29	UART1_ControlLine_RE
+    PORTE	30	UART1_ControlLine_DE
+    PORTE   31  BOARD_LED_ROJO
+
+*/
+
 /*==================[inclusions]=============================================*/
 #include <stdio.h>
 #include "board.h"
@@ -26,24 +51,24 @@ void init_clocks_and_power_mode(){
 	uint32_t freq = 0;
 	smc_power_state_t currentPowerState;
 
-	PRINTF("\r\n####################  TRABAJO PRACTICO 3 - SD2 - BELLINI Y SAITTA ####################\n\r");
+	DEBUG_PRINT("\r\n####################  TRABAJO PRACTICO 3 - SD2 - BELLINI Y SAITTA ####################\n\r");
 
 	currentPowerState = SMC_GetPowerModeState(SMC);
 	APP_ShowPowerMode(currentPowerState);
-	PRINTF("\n    Clock luego del Reset\n");
+	DEBUG_PRINT("\n    Clock luego del Reset\n");
 	freq = CLOCK_GetFreq(kCLOCK_CoreSysClk);
-	PRINTF("    Core Clock = %dMHz \r\r", freq/1000000);
+	DEBUG_PRINT("    Core Clock = %dMHz \r\r", freq/1000000);
 
 
-	PRINTF("    Configurando Clocks a máxima frecuencia...\n");
+	DEBUG_PRINT("    Configurando Clocks a máxima frecuencia...\n");
 	/* Se configuran los clocks a máxima frecuencia */
     BOARD_InitBootClocks();
     /* Se habilita la posibilidad de operar con todos los modos de bajo consumo */
     SMC_SetPowerModeProtection(SMC, kSMC_AllowPowerModeAll);
     freq = CLOCK_GetFreq(kCLOCK_CoreSysClk);
-    PRINTF("    Core Clock = %dMHz \r", freq/1000000);
+    DEBUG_PRINT("    Core Clock = %dMHz \r", freq/1000000);
 
-    PRINTF("\r\n#################### ========================= ####################\n\r\n");
+    DEBUG_PRINT("\r\n#################### ========================= ####################\n\r\n");
 }
 
 
@@ -55,23 +80,22 @@ int main(void) {
     /* Inicialización FSL debug console. */
     BOARD_InitDebugConsole();
 
-    /* Inicialización de GPIOS (LED, SW, OLED) */
+    /* Inicialización de GPIOS (LED, SW, OLED, RS485) */
     board_init();
 
     /* Inicialización de SPI y display OLED */
     board_configSPI0();
     oled_init();
     oled_setContrast(16);
-	oled_clearScreen(OLED_COLOR_BLACK);
 
-    /* Inicialización del I2C */
+    /* Inicialización del I2C: release bus - config pins - master init*/
     SD2_I2C_init();
 
-    /* Inicialización MEF de pulsadores*/
+    /* Inicialización MEF de switches*/
     key_init();
 
-    /* Se inicializa UART1 y DMA */
-    transceiver_init();
+    /* Se inicializa UART1, DMA y RingBufferRx */
+    transceiver_uart_rs485_init();
 
     /* Se configura interrupción de systick cada 1 ms */
     SysTick_Config(SystemCoreClock / 1000U);
@@ -89,6 +113,5 @@ int main(void) {
 void SysTick_Handler(void){
     key_periodicTask1ms();
     mef_principal_task1ms();
-
 }
 
