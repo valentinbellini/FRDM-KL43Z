@@ -42,6 +42,7 @@
 #include "fsl_spi.h"
 
 /*==================[macros and definitions]=================================*/
+/*------------------ SPI CONFIGS --------------------------------------------*/
 #define SPI0_MASTER              	SPI0
 #define SPI0_MASTER_SOURCE_CLOCK 	kCLOCK_BusClk
 #define SPI0_MASTER_CLK_FREQ     	CLOCK_GetFreq(kCLOCK_BusClk)
@@ -70,6 +71,12 @@ static const board_gpioInfo_type board_gpioOled[] =
     {PORTC, GPIOC, 7},      /* DATA/CMD */
 
 };
+/* Transceiver UART/RS485. Control Lines de UART. */
+static const board_gpioInfo_type board_gpioUART_ControlLine[] =
+{
+    {PORTE, GPIOE, 29},    /* RE */
+    {PORTE, GPIOE, 30},    /* DE */
+};
 
 /*==================[internal functions declaration]=========================*/
 
@@ -78,28 +85,15 @@ static const board_gpioInfo_type board_gpioOled[] =
 /*==================[external data definition]===============================*/
 
 /*==================[internal functions definition]==========================*/
-
-/*==================[external functions definition]==========================*/
-void board_init(void)
-{
+static void board_gpio_led_init(void){
 	int32_t i;
 	gpio_pin_config_t gpio_led_config =
 	{
 		.outputLogic = 1,
 		.pinDirection = kGPIO_DigitalOutput,
 	};
-	gpio_pin_config_t gpio_sw_config = {
-		.pinDirection = kGPIO_DigitalInput,
-		.outputLogic = 0U
-	};
-	gpio_pin_config_t gpio_oled_config =
-	{
-		.outputLogic = 0,
-		.pinDirection = kGPIO_DigitalOutput,
-	};
-
 	const port_pin_config_t port_led_config = {
-			/* Internal pull-up/down resistor is disabled */
+		/* Internal pull-up/down resistor is disabled */
 		.pullSelect = kPORT_PullDisable,
 		/* Slow slew rate is configured */
 		.slewRate = kPORT_SlowSlewRate,
@@ -110,7 +104,19 @@ void board_init(void)
 		/* Pin is configured as PTC3 */
 		.mux = kPORT_MuxAsGpio,
 	};
-
+	/* inicialización de leds */
+	for (i = 0 ; i < BOARD_LED_ID_TOTAL ; i++)
+	{
+		PORT_SetPinConfig(board_gpioLeds[i].port, board_gpioLeds[i].pin, &port_led_config);
+		GPIO_PinInit(board_gpioLeds[i].gpio, board_gpioLeds[i].pin, &gpio_led_config);
+	}
+}
+static void board_gpio_switch_init(void){
+	int32_t i;
+	gpio_pin_config_t gpio_sw_config = {
+		.pinDirection = kGPIO_DigitalInput,
+		.outputLogic = 0U
+	};
 	const port_pin_config_t port_sw_config = {
 		/* Internal pull-up resistor is enabled */
 		.pullSelect = kPORT_PullUp,
@@ -124,6 +130,49 @@ void board_init(void)
 		.mux = kPORT_MuxAsGpio,
 	};
 
+	/* Desactivación de NMI en SW1 */
+	PORTA->PCR[4] &= ~(7 << 8);
+
+	/* inicialización de SWs */
+	for (i = 0 ; i < BOARD_SW_ID_TOTAL ; i++)
+	{
+		PORT_SetPinConfig(board_gpioSw[i].port, board_gpioSw[i].pin, &port_sw_config);
+		GPIO_PinInit(board_gpioSw[i].gpio, board_gpioSw[i].pin, &gpio_sw_config);
+	}
+}
+static void board_gpio_rs485_init(void){
+	int32_t i;
+	const gpio_pin_config_t gpio_rs485_config = {
+			.outputLogic = 1,
+			.pinDirection = kGPIO_DigitalOutput,
+	};
+	const port_pin_config_t port_rs485_config = {
+		/* Internal pull-up/down resistor is disabled */
+		.pullSelect = kPORT_PullDisable,
+		/* Slow slew rate is configured */
+		.slewRate = kPORT_SlowSlewRate,
+		/* Passive filter is disabled */
+		.passiveFilterEnable = kPORT_PassiveFilterDisable,
+		/* Low drive strength is configured */
+		.driveStrength = kPORT_LowDriveStrength,
+		/* Pin is configured as PTC3 */
+		.mux = kPORT_MuxAsGpio,
+	};
+	/* Inicialización de los pines de controles para manejar el transceiver UART/RS485 */
+	for (i = 0 ; i < RS485_TOTAL ; i++){
+		PORT_SetPinConfig(board_gpioUART_ControlLine[i].port, board_gpioUART_ControlLine[i].pin, &port_rs485_config);
+		GPIO_PinInit(board_gpioUART_ControlLine[i].gpio, board_gpioUART_ControlLine[i].pin, &gpio_rs485_config);
+		GPIO_PortClear(board_gpioUART_ControlLine[i].gpio, 1<<board_gpioUART_ControlLine[i].pin); /* Empiezan ambos para recibir */
+	}
+
+}
+static void board_gpio_oled_init(void){
+	int32_t i;
+	gpio_pin_config_t gpio_oled_config =
+	{
+		.outputLogic = 0,
+		.pinDirection = kGPIO_DigitalOutput,
+	};
 	const port_pin_config_t port_oled_config = {
 		/* Internal pull-up/down resistor is disabled */
 		.pullSelect = kPORT_PullDisable,
@@ -136,35 +185,27 @@ void board_init(void)
 		/* Pin is configured as GPIO */
 		.mux = kPORT_MuxAsGpio,
 	};
-
-	CLOCK_EnableClock(kCLOCK_PortA);
-	CLOCK_EnableClock(kCLOCK_PortC);
-	CLOCK_EnableClock(kCLOCK_PortD);
-	CLOCK_EnableClock(kCLOCK_PortE);
-
-	/* inicialización de leds */
-	for (i = 0 ; i < BOARD_LED_ID_TOTAL ; i++)
-	{
-		PORT_SetPinConfig(board_gpioLeds[i].port, board_gpioLeds[i].pin, &port_led_config);
-		GPIO_PinInit(board_gpioLeds[i].gpio, board_gpioLeds[i].pin, &gpio_led_config);
-	}
-
-	PORTA->PCR[4] &= ~(7 << 8); //Desactivación de NMI en SW1
-
-	/* inicialización de SWs */
-	for (i = 0 ; i < BOARD_SW_ID_TOTAL ; i++)
-	{
-		PORT_SetPinConfig(board_gpioSw[i].port, board_gpioSw[i].pin, &port_sw_config);
-		GPIO_PinInit(board_gpioSw[i].gpio, board_gpioSw[i].pin, &gpio_sw_config);
-	}
-
 	/*Inicialización de los pines GPIO necesarios para manejar el display OLED*/
 	for (i = 0 ; i < OLED_TOTAL ; i++){
 		PORT_SetPinConfig(board_gpioOled[i].port, board_gpioOled[i].pin, &port_oled_config);
 		GPIO_PinInit(board_gpioOled[i].gpio, board_gpioOled[i].pin, &gpio_oled_config);
 	}
 }
+/*==================[external functions definition]==========================*/
+void board_init(void)
+{
+	/* Clocks enables */
+	CLOCK_EnableClock(kCLOCK_PortA);
+	CLOCK_EnableClock(kCLOCK_PortC);
+	CLOCK_EnableClock(kCLOCK_PortD);
+	CLOCK_EnableClock(kCLOCK_PortE);
 
+	board_gpio_led_init();		/* Board LEDS init */
+	board_gpio_switch_init();	/* Board Switches init */
+	board_gpio_oled_init(),		/* external OLED SSD1306 GPIO init */
+	board_gpio_rs485_init(); 	/* external conversor uart/rs485 control lines init (DE y RE) */
+
+}
 
 void board_setLed(board_ledId_enum id, board_ledMsg_enum msg)
 {
@@ -185,6 +226,13 @@ void board_setLed(board_ledId_enum id, board_ledMsg_enum msg)
         default:
             break;
     }
+}
+
+void board_setRS485_controlLine(board_RS485_ControlLines_enum id, bool est){
+	if (est)
+		GPIO_PortSet(board_gpioUART_ControlLine[id].gpio, 1<<board_gpioUART_ControlLine[id].pin);
+	else
+		GPIO_PortClear(board_gpioUART_ControlLine[id].gpio, 1<<board_gpioUART_ControlLine[id].pin);
 }
 
 bool board_getSw(board_swId_enum id)
@@ -255,6 +303,7 @@ void board_SPI0Send(uint8_t* buf, size_t len){
 
 	SPI_MasterTransferBlocking(SPI0_MASTER, &xfer);
 }
+
 
 /* ----------------------------------------------------------------------------------------------------- */
 

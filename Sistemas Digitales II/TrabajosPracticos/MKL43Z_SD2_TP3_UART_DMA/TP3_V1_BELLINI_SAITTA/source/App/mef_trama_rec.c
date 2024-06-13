@@ -13,7 +13,6 @@
 #define _BUFFER_SIZE		32		/* Buffer Size de RX */
 #define CHAR_LF				0x0A
 
-
 typedef enum{
 	MEF_EST_ESPERANDO_INICIO = 0,
 	MEF_EST_ESPERANDO_GRUPO_1,
@@ -36,7 +35,7 @@ void mefRecTrama_task(void){
 	uint8_t byteRec;			/* Variable donde se guarda el byte recibido */
 	static uint8_t indexRec;	/* Indice del buffer */
 
-	flagRec = uart_ringBuffer_recDatos(&byteRec, sizeof(byteRec));
+	flagRec = uart_ringBuffer_recDatos(&byteRec, sizeof(byteRec)); /* Recibe dato por UART */
 
 	switch (estado){
 

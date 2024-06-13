@@ -10,6 +10,7 @@ RM := rm -rf
 -include sources.mk
 -include utilities/subdir.mk
 -include startup/subdir.mk
+-include source/test/subdir.mk
 -include source/Drivers/Transceiver/subdir.mk
 -include source/Drivers/SSD1306/subdir.mk
 -include source/Drivers/PowerMode/subdir.mk
@@ -17,7 +18,6 @@ RM := rm -rf
 -include source/Drivers/Key/subdir.mk
 -include source/Drivers/I2C/subdir.mk
 -include source/Drivers/Board/subdir.mk
--include source/Drivers/subdir.mk
 -include source/App/subdir.mk
 -include source/subdir.mk
 -include drivers/subdir.mk
