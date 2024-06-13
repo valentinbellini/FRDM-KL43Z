@@ -71,12 +71,7 @@ static const board_gpioInfo_type board_gpioOled[] =
     {PORTC, GPIOC, 7},      /* DATA/CMD */
 
 };
-/* Transceiver UART/RS485. Control Lines de UART. */
-static const board_gpioInfo_type board_gpioUART_ControlLine[] =
-{
-    {PORTE, GPIOE, 29},    /* RE */
-    {PORTE, GPIOE, 30},    /* DE */
-};
+
 
 /*==================[internal functions declaration]=========================*/
 
@@ -140,32 +135,6 @@ static void board_gpio_switch_init(void){
 		GPIO_PinInit(board_gpioSw[i].gpio, board_gpioSw[i].pin, &gpio_sw_config);
 	}
 }
-static void board_gpio_rs485_init(void){
-	int32_t i;
-	const gpio_pin_config_t gpio_rs485_config = {
-			.outputLogic = 1,
-			.pinDirection = kGPIO_DigitalOutput,
-	};
-	const port_pin_config_t port_rs485_config = {
-		/* Internal pull-up/down resistor is disabled */
-		.pullSelect = kPORT_PullDisable,
-		/* Slow slew rate is configured */
-		.slewRate = kPORT_SlowSlewRate,
-		/* Passive filter is disabled */
-		.passiveFilterEnable = kPORT_PassiveFilterDisable,
-		/* Low drive strength is configured */
-		.driveStrength = kPORT_LowDriveStrength,
-		/* Pin is configured as PTC3 */
-		.mux = kPORT_MuxAsGpio,
-	};
-	/* Inicialización de los pines de controles para manejar el transceiver UART/RS485 */
-	for (i = 0 ; i < RS485_TOTAL ; i++){
-		PORT_SetPinConfig(board_gpioUART_ControlLine[i].port, board_gpioUART_ControlLine[i].pin, &port_rs485_config);
-		GPIO_PinInit(board_gpioUART_ControlLine[i].gpio, board_gpioUART_ControlLine[i].pin, &gpio_rs485_config);
-		GPIO_PortClear(board_gpioUART_ControlLine[i].gpio, 1<<board_gpioUART_ControlLine[i].pin); /* Empiezan ambos para recibir */
-	}
-
-}
 static void board_gpio_oled_init(void){
 	int32_t i;
 	gpio_pin_config_t gpio_oled_config =
@@ -202,8 +171,7 @@ void board_init(void)
 
 	board_gpio_led_init();		/* Board LEDS init */
 	board_gpio_switch_init();	/* Board Switches init */
-	board_gpio_oled_init(),		/* external OLED SSD1306 GPIO init */
-	board_gpio_rs485_init(); 	/* external conversor uart/rs485 control lines init (DE y RE) */
+	board_gpio_oled_init();		/* external OLED SSD1306 GPIO init */
 
 }
 
@@ -228,12 +196,12 @@ void board_setLed(board_ledId_enum id, board_ledMsg_enum msg)
     }
 }
 
-void board_setRS485_controlLine(board_RS485_ControlLines_enum id, bool est){
-	if (est)
-		GPIO_PortSet(board_gpioUART_ControlLine[id].gpio, 1<<board_gpioUART_ControlLine[id].pin);
-	else
-		GPIO_PortClear(board_gpioUART_ControlLine[id].gpio, 1<<board_gpioUART_ControlLine[id].pin);
-}
+//void board_setRS485_controlLine(board_RS485_ControlLines_enum id, bool est){
+//	if (est)
+//		GPIO_PortSet(board_gpioUART_ControlLine[id].gpio, 1<<board_gpioUART_ControlLine[id].pin);
+//	else
+//		GPIO_PortClear(board_gpioUART_ControlLine[id].gpio, 1<<board_gpioUART_ControlLine[id].pin);
+//}
 
 bool board_getSw(board_swId_enum id)
 {

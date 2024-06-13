@@ -29,7 +29,6 @@ source/Drivers/PowerMode \
 source/Drivers/SSD1306 \
 source/Drivers/Transceiver \
 source \
-source/test \
 startup \
 utilities \
 

@@ -95,7 +95,7 @@ int main(void) {
     key_init();
 
     /* Se inicializa UART1, DMA y RingBufferRx */
-    transceiver_uart_rs485_init();
+    transceiver_init();
 
     /* Se configura interrupción de systick cada 1 ms */
     SysTick_Config(SystemCoreClock / 1000U);

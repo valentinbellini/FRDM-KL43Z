@@ -34,7 +34,7 @@ extern "C" {
 
 /*==================[external functions definition]==========================*/
 
-void transceiver_uart_rs485_init(void);
+void transceiver_init(void);
 
 bool board_rs485_isDataAvailable(void);
 

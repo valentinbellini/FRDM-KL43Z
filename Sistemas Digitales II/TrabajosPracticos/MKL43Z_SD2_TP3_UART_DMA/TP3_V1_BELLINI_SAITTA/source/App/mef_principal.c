@@ -17,7 +17,7 @@
 
 /*==================[macros and definitions]=================================*/
 #define IS_DATA_MMA8451_READY		mma8451_getDataReadyInterruptStatus()	/* return bool true if dataready for reading */
-#define _UART_TRANSMISSION_DELAY	150 //ms
+#define UART_TRANSMISSION_DELAY		150 //ms
 
 typedef struct {
     int16_t x;
@@ -39,7 +39,7 @@ static aceleracion_t mma8451_acel_reading;
 /*==================[external functions definition]==========================*/
 void mef_principal_init(){
 	estado_mef_principal = Est_Master;
-	timer = _UART_TRANSMISSION_DELAY;
+	timer = UART_TRANSMISSION_DELAY;
 	oled_clearScreen(OLED_COLOR_BLACK);
 	oled_putString(30, 29, (uint8_t*)"Estado Master" , OLED_COLOR_WHITE, OLED_COLOR_BLACK);
 }
@@ -55,7 +55,6 @@ void mef_principal(){
 			if (board_rs485_isDataAvailable()){ /* Redundancia para chequeo de dato disponible */
 				mefRecTrama_task();
 			}
-			//mefRecTrama_task();
 
 			/* Transición a ESTADO 3D */
 			if(key_getPressEv(BOARD_SW_ID_1)){
@@ -82,7 +81,7 @@ void mef_principal(){
 					DEBUG_PRINT("Eje Z: %d\n", mma8451_acel_reading.z);
 				#endif
 
-				timer = _UART_TRANSMISSION_DELAY;
+				timer = UART_TRANSMISSION_DELAY;
 
 				/* Se formatea el buffer y se envia por uart via DMA: */
 				snprintf((char*)buffer_modo_3d, sizeof(buffer_modo_3d), "%d %d %d\n",  mma8451_acel_reading.x, mma8451_acel_reading.y, mma8451_acel_reading.z);

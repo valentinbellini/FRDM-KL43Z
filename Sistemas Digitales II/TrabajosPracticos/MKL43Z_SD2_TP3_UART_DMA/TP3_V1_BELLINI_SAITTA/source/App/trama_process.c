@@ -62,7 +62,7 @@ void setErrorAndLog(const char *errorMessage) {
 /*==================[external functions definition]==========================*/
 void tramaProcess(char *buf, int length)
 {
-	ASSERT(length >= 3); // Para asegurar que buf[0], buf[1] y buf[2] existen
+	//ASSERT(length >= 3); // Para asegurar que buf[0], buf[1] y buf[2] existen
 	DEBUG_PRINT("Input buffer: %s\n", buf);
 
 	uint8_t buffer[_BUFFER_SIZE];
