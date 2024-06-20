@@ -5,12 +5,14 @@
  */
 
 /*==================[inclusions]=============================================*/
+
 #include <Drivers/Transceiver/transceiver_RS485_UART.h>
 #include "App/mef_trama_rec.h"
 #include "App/trama_process.h"
 
 /*==================[macros and definitions]=================================*/
-#define _BUFFER_SIZE		32		/* Buffer Size de RX */
+
+#define BUFFER_SIZE			32		/* Buffer Size de RX */
 #define CHAR_LF				0x0A
 
 typedef enum{
@@ -20,9 +22,9 @@ typedef enum{
 	MEF_EST_RECIBIENDO_TRAMA,
 }mefRecTrama_estado_enum;
 
-
 /*==================[internal data declaration]==============================*/
-static char bufferRec[_BUFFER_SIZE];
+
+static char bufferRec[BUFFER_SIZE];
 
 /*==================[external functions definition]==========================*/
 
@@ -40,12 +42,14 @@ void mefRecTrama_task(void){
 	switch (estado){
 
 		case MEF_EST_ESPERANDO_INICIO:
+
 			if (flagRec != 0 && byteRec == ':'){
 				estado = MEF_EST_ESPERANDO_GRUPO_1;
 			}
 			break;
 
 		case MEF_EST_ESPERANDO_GRUPO_1:
+
 			if (flagRec != 0 && byteRec == NUM_GRUPO_A){
 				estado = MEF_EST_ESPERANDO_GRUPO_2;
 			}
@@ -58,6 +62,7 @@ void mefRecTrama_task(void){
 			break;
 
 		case MEF_EST_ESPERANDO_GRUPO_2:
+
 			if (flagRec != 0 && byteRec == NUM_GRUPO_B){
 				estado = MEF_EST_RECIBIENDO_TRAMA;
 				indexRec = 0;
@@ -74,11 +79,11 @@ void mefRecTrama_task(void){
 			/*
 			 * En este estado ya se ha verificado que la trama es correcta y debe ser procesada.
 			 * Se procesa el buffer con los siguientes caracteres que sean datos.
-			 * Por último, cuando llega el CHAR_LF, se llama a una función para procesar la trama
+			 * Por último, cuando llega el CHAR_LF, se llama a una función para procesar la trama.
 			 * */
 
 			if (flagRec != 0 && byteRec != CHAR_LF){ /* Si ocurre esto -> El byte recibido es parte del dato */
-				if (indexRec < _BUFFER_SIZE){
+				if (indexRec < BUFFER_SIZE){
 					bufferRec[indexRec] = byteRec;
 					indexRec++;
 				}
@@ -94,7 +99,7 @@ void mefRecTrama_task(void){
 				estado = MEF_EST_ESPERANDO_INICIO;
 			}
 
-			if (indexRec >= _BUFFER_SIZE){
+			if (indexRec >= BUFFER_SIZE){
 				estado = MEF_EST_ESPERANDO_INICIO;
 			}
 

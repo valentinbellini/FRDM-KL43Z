@@ -72,6 +72,12 @@ static const board_gpioInfo_type board_gpioOled[] =
 
 };
 
+/* ----------- Controls Lines for UART + RS485 ---------------------------------------*/
+static const board_gpioInfo_type board_gpioRS485_ControlLine[] =
+{
+    {PORTE, GPIOE, 29},    /* RE */
+    {PORTE, GPIOE, 30},    /* DE */
+};
 
 /*==================[internal functions declaration]=========================*/
 
@@ -80,6 +86,7 @@ static const board_gpioInfo_type board_gpioOled[] =
 /*==================[external data definition]===============================*/
 
 /*==================[internal functions definition]==========================*/
+
 static void board_gpio_led_init(void){
 	int32_t i;
 	gpio_pin_config_t gpio_led_config =
@@ -160,7 +167,36 @@ static void board_gpio_oled_init(void){
 		GPIO_PinInit(board_gpioOled[i].gpio, board_gpioOled[i].pin, &gpio_oled_config);
 	}
 }
+static void board_gpio_RS485_init(void){
+	int32_t i;
+	const gpio_pin_config_t gpio_rs485_config = {
+		.outputLogic = 1,
+		.pinDirection = kGPIO_DigitalOutput,
+	};
+	const port_pin_config_t port_config = {
+		/* Internal pull-up/down resistor is disabled */
+		.pullSelect = kPORT_PullDisable,
+		/* Slow slew rate is configured */
+		.slewRate = kPORT_SlowSlewRate,
+		/* Passive filter is disabled */
+		.passiveFilterEnable = kPORT_PassiveFilterDisable,
+		/* Low drive strength is configured */
+		.driveStrength = kPORT_LowDriveStrength,
+		/* Pin is configured as PTC3 */
+		.mux = kPORT_MuxAsGpio,
+	};
+	/* inicialización de pines de control (RE y DE)*/
+	for (i = 0 ; i < 2 ; i++)
+	{
+		PORT_SetPinConfig(board_gpioRS485_ControlLine[i].port, board_gpioRS485_ControlLine[i].pin, &port_config);
+		GPIO_PinInit(board_gpioRS485_ControlLine[i].gpio, board_gpioRS485_ControlLine[i].pin, &gpio_rs485_config);
+	}
+	rs485_RE(false);
+	rs485_DE(false);
+}
+
 /*==================[external functions definition]==========================*/
+
 void board_init(void)
 {
 	/* Clocks enables */
@@ -172,7 +208,7 @@ void board_init(void)
 	board_gpio_led_init();		/* Board LEDS init */
 	board_gpio_switch_init();	/* Board Switches init */
 	board_gpio_oled_init();		/* external OLED SSD1306 GPIO init */
-
+	board_gpio_RS485_init();	/* RS485 Control lines GPIO init */
 }
 
 void board_setLed(board_ledId_enum id, board_ledMsg_enum msg)
@@ -195,13 +231,6 @@ void board_setLed(board_ledId_enum id, board_ledMsg_enum msg)
             break;
     }
 }
-
-//void board_setRS485_controlLine(board_RS485_ControlLines_enum id, bool est){
-//	if (est)
-//		GPIO_PortSet(board_gpioUART_ControlLine[id].gpio, 1<<board_gpioUART_ControlLine[id].pin);
-//	else
-//		GPIO_PortClear(board_gpioUART_ControlLine[id].gpio, 1<<board_gpioUART_ControlLine[id].pin);
-//}
 
 bool board_getSw(board_swId_enum id)
 {
@@ -272,9 +301,32 @@ void board_SPI0Send(uint8_t* buf, size_t len){
 	SPI_MasterTransferBlocking(SPI0_MASTER, &xfer);
 }
 
+/*  Pin RE (Receiver Enable): Este pin se utiliza para controlar la recepción
+	de datos desde el bus RS485 hacia el módulo conversor RS485 a TTL.
+	- RE=0, habilitado y el módulo puede recibir datos desde el bus RS485.
+	- RE=1, deshabilitado y el módulo no puede recibir datos desde el bus RS485
 
-/* ----------------------------------------------------------------------------------------------------- */
+ */
+void rs485_RE(bool est)
+{
+    if (est)
+    	GPIO_PortSet(board_gpioRS485_ControlLine[0].gpio, 1<<board_gpioRS485_ControlLine[0].pin);
+    else
+    	GPIO_PortClear(board_gpioRS485_ControlLine[0].gpio, 1<<board_gpioRS485_ControlLine[0].pin);
+}
 
+/*  Pin DE (Driver Enable): Este pin es utilizado para controlar la
+	transmisión de datos desde el módulo conversor RS485 a TTL hacia el bus RS485.
+	- DE=0, deshabilitado y no se transmiten datos hacia el bus RS485.
+	- DE=1, habilitado y los datos se transmiten hacia el bus RS485.
 
+ */
+void rs485_DE(bool est)
+{
+    if (est)
+    	GPIO_PortSet(board_gpioRS485_ControlLine[1].gpio, 1<<board_gpioRS485_ControlLine[1].pin);
+    else
+    	GPIO_PortClear(board_gpioRS485_ControlLine[1].gpio, 1<<board_gpioRS485_ControlLine[1].pin);
+}
 
 /*==================[end of file]============================================*/

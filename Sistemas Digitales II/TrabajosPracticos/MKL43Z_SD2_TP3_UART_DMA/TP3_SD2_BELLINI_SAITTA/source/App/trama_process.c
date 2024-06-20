@@ -5,6 +5,7 @@
  */
 
 /*==================[inclusions]=============================================*/
+
 #include "debug.h"
 #include <stdio.h>
 #include <stdbool.h>
@@ -19,16 +20,22 @@
 
 /*==================[macros and definitions]=================================*/
 
-#define _BUFFER_SIZE			32
+#define BUFFER_SIZE			32
+
 /*==================[internal data declaration]==============================*/
+
 static bool wrongTrama = false;
+
 /*==================[internal functions declaration]=========================*/
+
 static void handleLedAction(uint8_t charIdLed, board_ledMsg_enum ledMsg);
 static bool isSwitchPressed(uint8_t charIdSwitch);
 void setErrorAndLog(const char *errorMessage);
+
 /*==================[external data definition]===============================*/
 
 /*==================[internal functions definition]==========================*/
+
 static void handleLedAction(uint8_t charIdLed, board_ledMsg_enum ledMsg){
 	switch (charIdLed){
 		case '1':
@@ -56,16 +63,17 @@ static bool isSwitchPressed(uint8_t charIdSwitch){
 void setErrorAndLog(const char *errorMessage) {
     wrongTrama = true;
     //DEBUG_PRINT("Error: %s\n",errorMessage);
-    LOG_ERROR(errorMessage);
+    //LOG_ERROR(errorMessage);
 }
 
 /*==================[external functions definition]==========================*/
+
 void tramaProcess(char *buf, int length)
 {
-	//ASSERT(length >= 3); // Para asegurar que buf[0], buf[1] y buf[2] existen
+	// ASSERT(length >= 3); // Para asegurar que buf[0], buf[1] y buf[2] existen */
 	DEBUG_PRINT("Input buffer: %s\n", buf);
 
-	uint8_t buffer[_BUFFER_SIZE];
+	uint8_t buffer[BUFFER_SIZE];
 	bool swPressed;
 	buffer[0]='\0';
 	wrongTrama = false; /* La trama empieza bien si se llama al procesador */
@@ -73,6 +81,7 @@ void tramaProcess(char *buf, int length)
 	switch (buf[0]){
 		// Caso de los leds
 		case '0':
+
 			switch (buf[2]){
 				case 'A':
 					handleLedAction(buf[1], BOARD_LED_MSG_OFF);
@@ -87,18 +96,21 @@ void tramaProcess(char *buf, int length)
 					setErrorAndLog("Trama incorrecta. Control de LED invalido.");
                     break;
 			}
+
 			/* Se da formato al string a transmitir y se almacena en el buffer */
 			snprintf((char*)buffer, sizeof(buffer), ":%c%c0%c%c\n", NUM_GRUPO_A, NUM_GRUPO_B, buf[1], buf[2]);
 			break;
 
 		// Caso de los switchs
 		case '1':
+
 			swPressed = isSwitchPressed(buf[1]); /* return bool true if sw is pressed */
 			snprintf((char*)buffer, sizeof(buffer), ":%c%c1%c%c\n", NUM_GRUPO_A, NUM_GRUPO_B, buf[1], (swPressed ? 'P' : 'N'));
 			break;
 
 		// Caso de los acelerometro
 		case '2':
+
 			if (buf[1] == '1'){
 				/* Se configura interrupciones por DataReady y se espera que esté lista la conversión en No-Operation */
 				mma8451_dataReady_config();

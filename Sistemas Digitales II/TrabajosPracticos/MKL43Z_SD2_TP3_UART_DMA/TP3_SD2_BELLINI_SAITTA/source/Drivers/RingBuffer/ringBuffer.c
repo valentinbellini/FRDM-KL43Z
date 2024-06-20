@@ -33,7 +33,7 @@
  */
 
 /*==================[inclusions]=============================================*/
-#include <ringBuffer.h>
+#include <Drivers/RingBuffer/ringBuffer.h>
 #include "stdlib.h"
 
 /*==================[macros and definitions]=================================*/

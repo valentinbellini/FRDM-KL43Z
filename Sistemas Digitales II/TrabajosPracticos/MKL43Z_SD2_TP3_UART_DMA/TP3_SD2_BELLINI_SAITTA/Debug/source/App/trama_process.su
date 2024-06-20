@@ -1,2 +1,2 @@
-../source/App/trama_process.c:56:6:setErrorAndLog	24	static
-../source/App/trama_process.c:63:6:tramaProcess	64	static
+../source/App/trama_process.c:63:6:setErrorAndLog	0	static
+../source/App/trama_process.c:71:6:tramaProcess	64	static

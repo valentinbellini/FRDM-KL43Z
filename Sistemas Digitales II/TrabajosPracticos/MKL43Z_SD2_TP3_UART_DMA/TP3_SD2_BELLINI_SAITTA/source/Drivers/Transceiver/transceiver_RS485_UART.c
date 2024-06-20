@@ -9,7 +9,7 @@
 /* Project Included Files */
 #include <Drivers/Transceiver/transceiver_RS485_UART.h>
 #include "Drivers/Board/SD2_board.h"
-#include "ringBuffer.h"
+#include "Drivers/RingBuffer/ringBuffer.h"
 #include "debug.h"
 
 /*==================[macros and definitions]=================================*/
@@ -33,18 +33,12 @@ static dma_handle_t LPUARTTxDmaHandle; /* Handle for managing UART Tx DMA transf
 static void* pRingBufferRx; /* Pointer to the ring buffer for storing received data. */
 volatile bool txOnGoing = false; /* Flag indicating if a transmission is in progress. */
 
-/* ----------- Controls Lines for UART1 + RS485 ---------------------------------------*/
-static const board_gpioInfo_type board_gpioUART_ControlLine[] =
-{
-    {PORTE, GPIOE, 29},    /* RE */
-    {PORTE, GPIOE, 30},    /* DE */
-};
 
 static bool dataAvailable;
 
 /*==================[internal functions declaration]=========================*/
+
 static void LPUART_UserCallback(LPUART_Type *base, lpuart_dma_handle_t *handle, status_t status, void *userData);
-static void init_transceiver_GPIO(void); /* Init control lines for UART1 + RS485 */
 static void checkUartErrors(void);
 
 /*==================[internal functions definition]==========================*/
@@ -56,52 +50,6 @@ static void LPUART_UserCallback(LPUART_Type *base, lpuart_dma_handle_t *handle, 
     {
         txOnGoing = false;
     }
-}
-
-static void rs485_RE(bool est)
-{
-    if (est)
-    	GPIO_PortSet(board_gpioUART_ControlLine[0].gpio, 1<<board_gpioUART_ControlLine[0].pin);
-    else
-    	GPIO_PortClear(board_gpioUART_ControlLine[0].gpio, 1<<board_gpioUART_ControlLine[0].pin);
-}
-
-static void rs485_DE(bool est)
-{
-    if (est)
-    	GPIO_PortSet(board_gpioUART_ControlLine[1].gpio, 1<<board_gpioUART_ControlLine[1].pin);
-    else
-    	GPIO_PortClear(board_gpioUART_ControlLine[1].gpio, 1<<board_gpioUART_ControlLine[1].pin);
-}
-
-/* Initialize GPIO for transceiver control lines */
-void init_transceiver_GPIO(void){
-	/* ====================== [CONFIGURACION DE Y RE] ============================================ */
-	int32_t i;
-	const gpio_pin_config_t gpio_rs485_config = {
-		.outputLogic = 1,
-		.pinDirection = kGPIO_DigitalOutput,
-	};
-	const port_pin_config_t port_config = {
-		/* Internal pull-up/down resistor is disabled */
-		.pullSelect = kPORT_PullDisable,
-		/* Slow slew rate is configured */
-		.slewRate = kPORT_SlowSlewRate,
-		/* Passive filter is disabled */
-		.passiveFilterEnable = kPORT_PassiveFilterDisable,
-		/* Low drive strength is configured */
-		.driveStrength = kPORT_LowDriveStrength,
-		/* Pin is configured as PTC3 */
-		.mux = kPORT_MuxAsGpio,
-	};
-	/* inicialización de pines de control (RE y DE)*/
-	for (i = 0 ; i < 2 ; i++)
-	{
-		PORT_SetPinConfig(board_gpioUART_ControlLine[i].port, board_gpioUART_ControlLine[i].pin, &port_config);
-		GPIO_PinInit(board_gpioUART_ControlLine[i].gpio, board_gpioUART_ControlLine[i].pin, &gpio_rs485_config);
-	}
-	rs485_RE(false);
-	rs485_DE(false);
 }
 
 /** \brief Lee las status flags de UART y chequea de donde viene el error. **/
@@ -142,7 +90,6 @@ void transceiver_init(void){
 	CLOCK_SetLpuart1Clock(0x1U);
 	PORT_SetPinMux(PORTE, 1U, kPORT_MuxAlt3);	/* RX: PORTE PIN 1 --- pag 116 ref*/
 	PORT_SetPinMux(PORTE, 0U, kPORT_MuxAlt3);	/* TX: PORTE PIN 0 */
-	init_transceiver_GPIO();
 
 	/* DEFAULT CONFIG:
 	 *	 lpuartConfig->baudRate_Bps = 115200U;
@@ -246,12 +193,10 @@ int32_t uart_drv_envDatos_DMA(uint8_t *pBuf, int32_t size)
     else
     {
         /* limita size */
-        if (size > TX_BUFFER_DMA_SIZE)
-            size = TX_BUFFER_DMA_SIZE;
+        if (size > TX_BUFFER_DMA_SIZE) size = TX_BUFFER_DMA_SIZE;
 
-        /* Habilitar la transmisión antes de enviar los datos */
-        rs485_RE(true);
-		rs485_DE(true);
+        rs485_RE(true); /* RE = 1: Deshabilitado y el módulo no puede recibir datos desde el bus RS485 */
+		rs485_DE(true); /* Habilitar la transmisión hacia el bus RS485 antes de enviar los datos */
 
         /* Copio los datos a una variable para no depender del buffer original */
 		memcpy(txBuffer_dma, pBuf, size);
@@ -281,12 +226,14 @@ void LPUART1_IRQHandler(void){
 	uint8_t data; /* variable para guardar dato de lectura de Rx */
 
 	/* ============= [Interrupción de RX] =================================================== */
+
 	if ( (kLPUART_RxDataRegFullFlag) & LPUART_GetStatusFlags(TR_UART) &&
 		 (kLPUART_RxDataRegFullInterruptEnable) & LPUART_GetEnabledInterrupts(TR_UART) )
 	{
 		/* obtiene dato recibido por puerto serie */
 		data = LPUART_ReadByte(TR_UART);
 		dataAvailable = true;
+
 		/* pone dato en ring buffer */
 		ringBuffer_putData(pRingBufferRx, data);
 
@@ -294,16 +241,18 @@ void LPUART1_IRQHandler(void){
 	}
 
 	/* ============= [Interrupción de TX] =================================================== */
+
 	if ( (kLPUART_TransmissionCompleteFlag) & LPUART_GetStatusFlags(TR_UART) &&
 		 (kLPUART_TransmissionCompleteInterruptEnable) & LPUART_GetEnabledInterrupts(TR_UART) )
 	{
-		/* Desahabilita interrupciones de transmisión. Se vuelven a habilitar en el envio de datos por dma. */
+		/* Desahabilita interrupción de transmisión completa.
+		 * Se vuelve a habilitar en el envio de datos por DMA. */
 		LPUART_DisableInterrupts(TR_UART, kLPUART_TransmissionCompleteInterruptEnable);
 		LPUART_ClearStatusFlags(TR_UART, kLPUART_TransmissionCompleteFlag);
 
 		/* Habilito recepción para esperar el dato de vuelta */
-		rs485_RE(false);
-		rs485_DE(false);
+		rs485_RE(false); /* Driver Enable en 0: deshabilitado y no se transmiten datos hacia el bus RS485 */
+		rs485_DE(false); /* Receiver Enable en 0: habilitado y puede recibir datos desde el busRS485 */
 	}
 
 	/* Chequeo de errores en UART leyendo banderas */

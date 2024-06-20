@@ -16,6 +16,7 @@
 
 
 /*==================[macros and definitions]=================================*/
+
 #define IS_DATA_MMA8451_READY		mma8451_getDataReadyInterruptStatus()	/* return bool true if dataready for reading */
 #define UART_TRANSMISSION_DELAY		150 //ms
 
@@ -32,11 +33,13 @@ typedef enum{
 }mef_principal_estado_enum;
 
 /*==================[internal data declaration]==============================*/
+
 static mef_principal_estado_enum estado_mef_principal;
 static volatile int timer;
 static aceleracion_t mma8451_acel_reading;
 
 /*==================[external functions definition]==========================*/
+
 void mef_principal_init(){
 	estado_mef_principal = Est_Master;
 	timer = UART_TRANSMISSION_DELAY;
@@ -46,12 +49,11 @@ void mef_principal_init(){
 
 void mef_principal(){
 
-	uint8_t buffer_modo_3d[32];
-
 	switch(estado_mef_principal){
 
-		/*---Estado Master-------------------------------------------*/
+		/*------ Estado Master -------------------------------------------*/
 		case Est_Master:
+
 			if (board_rs485_isDataAvailable()){ /* Redundancia para chequeo de dato disponible */
 				mefRecTrama_task();
 			}
@@ -65,8 +67,9 @@ void mef_principal(){
 			}
 			break;
 
-		/*---Estado 3D-------------------------------------------*/
+		/*------ Estado 3D -------------------------------------------*/
 		case Est_3D:
+			uint8_t buffer_modo_3d[32];
 			if(IS_DATA_MMA8451_READY){ /* Si la conversión finalizo --> guardamos los datos localmente */
 				mma8451_acel_reading.x = mma8451_getAcX();
 				mma8451_acel_reading.y = mma8451_getAcY();
@@ -74,12 +77,10 @@ void mef_principal(){
 			}
 			if(timer <= 0) // Para no sobrecargar el puerto UART, Ejecutamos cada un tiempo mayor a 100ms.
 			{
-				#ifdef DEBUG
-					/* Impresión en consola para verificar */
-					DEBUG_PRINT("Eje X: %d | ", mma8451_acel_reading.x);
-					DEBUG_PRINT("Eje Y: %d | ", mma8451_acel_reading.y);
-					DEBUG_PRINT("Eje Z: %d\n", mma8451_acel_reading.z);
-				#endif
+				/* Impresión en consola para verificar (Solo el modo DEBUG)	 */
+				DEBUG_PRINT("Eje X: %d | ", mma8451_acel_reading.x);
+				DEBUG_PRINT("Eje Y: %d | ", mma8451_acel_reading.y);
+				DEBUG_PRINT("Eje Z: %d\n", mma8451_acel_reading.z);
 
 				timer = UART_TRANSMISSION_DELAY;
 

@@ -46,7 +46,7 @@
 #include <Drivers/Transceiver/transceiver_RS485_UART.h>
 #include <App/mef_principal.h>
 
-/*==================[internal functions definition]==========================*/
+/*==================[ internal functions definition ]==========================*/
 void init_clocks_and_power_mode(){
 	uint32_t freq = 0;
 	smc_power_state_t currentPowerState;
@@ -71,8 +71,8 @@ void init_clocks_and_power_mode(){
     DEBUG_PRINT("\r\n#################### ========================= ####################\n\r\n");
 }
 
-
-int main(void) {
+/*==================[ MAIN ]==========================*/
+int main(void){
 
 	/* Inicialización de clocks a máxima frecuencia y micro en modo RUN a 48MHz */
 	init_clocks_and_power_mode();

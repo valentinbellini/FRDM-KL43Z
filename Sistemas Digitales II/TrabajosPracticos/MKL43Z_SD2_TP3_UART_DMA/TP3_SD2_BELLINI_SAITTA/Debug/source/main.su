@@ -1,3 +1,3 @@
 ../source/main.c:50:6:init_clocks_and_power_mode	8	static
-../source/main.c:75:5:main	8	static
-../source/main.c:113:6:SysTick_Handler	8	static
+../source/main.c:74:5:main	8	static
+../source/main.c:112:6:SysTick_Handler	8	static

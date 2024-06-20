@@ -74,6 +74,13 @@ typedef enum
 	OLED_TOTAL
 }board_oledPin_enum;
 
+typedef enum
+{
+	RS485_RE_PIN = 0,
+    RS485_DE_PIN,
+	RS485_TOTAL
+}board_rs485Pin_enum;
+
 typedef struct
 {
     PORT_Type *port;
@@ -125,6 +132,9 @@ void board_SPI0Send(uint8_t* buf, size_t len);
  **/
 void board_setOledPin(board_oledPin_enum oledPin, uint8_t state);
 
+/* Control Lines RS485: RE y DE */
+void rs485_DE(bool est);
+void rs485_RE(bool est);
 
 
 /*==================[cplusplus]==============================================*/
