@@ -1,0 +1,11 @@
+/lib/
+src/captive_portal/wifi_config.h
+# Ignorar archivos de compilación y carpetas temporales
+*.bin
+*.elf
+*.hex
+*.log
+*.tmp
+.vscode/
+.platformio/
+
