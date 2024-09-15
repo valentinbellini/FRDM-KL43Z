@@ -4,39 +4,69 @@
 // Instancia del display
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
+void ssd1306_setupDisplay() {
+  display.clearDisplay();  // Limpiar el display
+  display.setCursor(0, 0); // Establecer el cursor
+  display.setTextSize(1);  // Tamaño del texto
+  display.setTextColor(WHITE); // Color del texto
+}
+
 void ssd1306_init() {
   if(!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) { // Dirección I2C
     Serial.println(F("Error al iniciar el display SSD1306"));
     for(;;); // Detener el programa si falla el display
   }
-  display.clearDisplay();
-  display.setTextSize(1);
-  display.setTextColor(WHITE);
+  ssd1306_setupDisplay();
+  display.println("Welcome to ESP32");
+  display.println("Conectar a ESP32_AP");
   display.display();
 }
 
 void ssd1306_showIP(IPAddress ip) {
-  display.clearDisplay();            // Limpiar el display antes de mostrar la IP
-  display.setCursor(0, 0);           // Establecer el cursor en la posición inicial
-  display.setTextSize(1);            // Tamaño del texto
-  display.setTextColor(WHITE);       // Color del texto
+  ssd1306_setupDisplay();
   
   // Convertir la dirección IP en cadena de texto
-  String ipStr = "IP: " + ip.toString();
+  String ipStr = ip.toString();
 
   // Mostrar la dirección IP en el display
+  display.println("IP Address:");
   display.println(ipStr);
   display.display();                 // Actualizar el display con el contenido
 }
 
 void ssd1306_easyPrint(String str){
-  display.clearDisplay();            // Limpiar el display antes de mostrar la IP
-  display.setCursor(0, 0);           // Establecer el cursor en la posición inicial
-  display.setTextSize(1);            // Tamaño del texto
-  display.setTextColor(WHITE);       // Color del texto
+  ssd1306_setupDisplay();
+
   display.println(str);
   display.display();                 // Actualizar el display con el contenido
 }
 
+void ssd1306_printIPandString(IPAddress ip, String str){
+  ssd1306_setupDisplay();
+  String ipStr = ip.toString();
+  display.println(str);
+  display.println(ipStr);
+  display.display();   
+}
 
 
+void ssd1306_ShowSetUpAP(IPAddress ip){
+  ssd1306_setupDisplay();
+  String ipStr = ip.toString();
+  display.println("Bienvenido!");
+  display.println("Para conectar ESP32 A WiFi");
+  display.println("1. Conectarse a ESP32_AP");
+  display.println("2. Abrir el explorador en:");
+  display.println("http://"+ipStr);
+  display.println("3. Completar los datos");
+}
+
+void ssd1306_ShowSTAConnected(IPAddress ip, String str){
+  ssd1306_setupDisplay();
+  String ipStr = ip.toString();
+  display.println("Conexión Exitosa");
+  display.println("[ESP32] IP Address asignada:");
+  display.println(ipStr);
+  display.println("BTC Address:");
+  display.println(str);
+}
