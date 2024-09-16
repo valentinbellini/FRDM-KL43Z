@@ -22,6 +22,7 @@ void ssd1306_easyPrint(String str); // Imprime en pantalla el String enviado
 void ssd1306_ShowSetUpAP(IPAddress ip);
 void ssd1306_ShowSTAConnected(IPAddress ip, String str);
 
+void displayTokenPrice(String token, float price);
 
 
 #endif

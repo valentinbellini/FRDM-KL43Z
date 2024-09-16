@@ -3,19 +3,32 @@
 #include "wifi_manager.h"
 #include "html.h"
 #include "ssd1306.h"
-
+#include <Ticker.h>
+#include "crypto.h"
 
 // =================================== [ MACROS AND TYPEDEF ] =================================== //
+
 #define SERIAL_BAUDRATE 115200
 
+/* Estados MEF */
 enum Estado { AP_MODE, 
               STA_MODE, 
               CONECTADO };
               
 Estado estadoActual = AP_MODE;
-String extraData = "";  // Almacena el dato extra recibido del formulario
+
+/* Almacena el dato extra recibido del formulario */
+String extraData = "";  
 
 WebServer server(80);
+
+/* Lista de criptomonedas para mostrar */
+const String tokens[] = {"bitcoin", "ethereum", "dogecoin"};
+const int numTokens = sizeof(tokens) / sizeof(tokens[0]);
+int currentTokenIndex = 0; // Índice de la criptomoneda actual
+
+/* Ticker para manejar interrupciones de tiempo */
+Ticker timer;
 
 // =================================== [ FUNCTIONS ] =================================== //
 
@@ -45,6 +58,10 @@ void setup() {
   setupAP(server);  // Configura el AP y el servidor web
 
   pinMode(2,OUTPUT);
+
+  // Configurar temporizador por interrupciones para cambiar la criptomoneda cada 10 segundos
+  timer.attach(10, switchToken);
+  displayTokenPrice(tokens[currentTokenIndex], getTokenPrice(tokens[currentTokenIndex])); /*  Mostrar el primer token al arrancar */
 }
 
 
@@ -78,4 +95,14 @@ void loop() {
       break;
 
   }
+}
+
+
+
+// ================================= [ CAMBIAR TOKEN CADA 10 SEGUNDOS ] ================================= //
+
+// Función llamada por el temporizador con interrupciones para cambiar el token
+void switchToken() {
+  currentTokenIndex = (currentTokenIndex + 1) % numTokens;
+  displayTokenPrice(tokens[currentTokenIndex], getTokenPrice(tokens[currentTokenIndex]));;
 }

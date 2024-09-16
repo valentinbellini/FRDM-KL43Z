@@ -70,3 +70,34 @@ void ssd1306_ShowSTAConnected(IPAddress ip, String str){
   display.println("BTC Address:");
   display.println(str);
 }
+
+
+// Función para mostrar el precio del token en el display OLED
+void displayTokenPrice(String token, float price) {
+  if (price != -1.0) {
+    display.clearDisplay();
+    display.setTextSize(2);
+    display.setCursor(0, 0);
+    display.println(token);
+    
+    display.setTextSize(1);
+    display.setCursor(0, 25);
+    display.println("Precio (USD):");
+    
+    display.setTextSize(2);
+    display.setCursor(0, 40);
+    display.println(price, 2); // Mostrar el precio con dos decimales
+    
+    display.display();
+  } else {
+    display.clearDisplay();
+    display.setTextSize(1);
+    display.setCursor(0, 0);
+    display.println("Error obteniendo");
+    display.println("el precio de:");
+    display.setTextSize(2);
+    display.setCursor(0, 40);
+    display.println(token);
+    display.display();
+  }
+}
