@@ -11,7 +11,6 @@ void setupAP(WebServer &server) {
   IPAddress IP = WiFi.softAPIP();
   Serial.print("IP del AP: ");
   Serial.println(IP);
-  ssd1306_ShowSetUpAP(IP); /* NO MUESTRA ESTE MENSAJE */
   
   server.on("/", handleRoot);
   server.on("/connect", handleConnect);

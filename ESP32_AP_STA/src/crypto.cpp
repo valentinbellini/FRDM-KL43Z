@@ -2,6 +2,7 @@
 
 // Función genérica para obtener el precio de un token
 float getTokenPrice(String token) {
+  token.toLowerCase();  // Convertir el token a minúsculas
   if (WiFi.status() == WL_CONNECTED) {
     HTTPClient http;
     String url = "https://api.coingecko.com/api/v3/simple/price?ids=" + token + "&vs_currencies=usd";

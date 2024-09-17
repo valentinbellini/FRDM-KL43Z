@@ -3,7 +3,7 @@
 
 const char HTML_FORM[] = R"rawliteral(
 <html><body>
-  <h1>Ingrese los datos de la red WiFi</h1>
+  <h1>Ingrese los datos de la red WiFi a conectar</h1>
   <form action="/connect" method="POST">
     SSID: <input type="text" name="ssid"><br>
     Password: <input type="password" name="password"><br>

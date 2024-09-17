@@ -16,12 +16,9 @@ extern Adafruit_SSD1306 display;
 void ssd1306_setupDisplay();
 void ssd1306_init();
 
-void ssd1306_showIP(IPAddress ip);
+void ssd1306_first_msg();
 void ssd1306_easyPrint(String str); // Imprime en pantalla el String enviado
-
-void ssd1306_ShowSetUpAP(IPAddress ip);
-void ssd1306_ShowSTAConnected(IPAddress ip, String str);
-
+void ssd1306_conexionExitosa();
 void displayTokenPrice(String token, float price);
 
 

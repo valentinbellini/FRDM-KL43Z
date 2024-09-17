@@ -16,66 +16,33 @@ void ssd1306_init() {
     Serial.println(F("Error al iniciar el display SSD1306"));
     for(;;); // Detener el programa si falla el display
   }
-  ssd1306_setupDisplay();
-  display.println("Welcome to ESP32");
-  display.println("Bienvenido!");
-  display.println("1.Conectar a ESP32_AP");
-  display.println("2.Abrir el explorador:");
-  display.println("http://192.168.4.1");
-  display.println("3.Completar los datos");
+  display.clearDisplay();
 }
 
-void ssd1306_showIP(IPAddress ip) {
+void ssd1306_first_msg(){
   ssd1306_setupDisplay();
-  
-  // Convertir la dirección IP en cadena de texto
-  String ipStr = ip.toString();
-
-  // Mostrar la dirección IP en el display
-  display.println("IP Address:");
-  display.println(ipStr);
-  display.display();                 // Actualizar el display con el contenido
+  display.println("Welcome to ESP32");
+  display.println("Conectar a ESP32_AP");
+  display.println("Pass: 12345678");
+  display.println("http://192.168.4.1");
 }
 
 void ssd1306_easyPrint(String str){
   ssd1306_setupDisplay();
-
   display.println(str);
   display.display();                 // Actualizar el display con el contenido
 }
 
-void ssd1306_printIPandString(IPAddress ip, String str){
+void ssd1306_conexionExitosa(){
   ssd1306_setupDisplay();
-  String ipStr = ip.toString();
-  display.println(str);
-  display.println(ipStr);
-  display.display();   
-}
-
-
-void ssd1306_ShowSetUpAP(IPAddress ip){
-  ssd1306_setupDisplay();
-  String ipStr = ip.toString();
-  display.println("Bienvenido!");
-  display.println("1.Conectar a ESP32_AP");
-  display.println("2.Abrir el explorador:");
-  display.println("http://"+ipStr);
-  display.println("3.Completar los datos");
-}
-
-void ssd1306_ShowSTAConnected(IPAddress ip, String str){
-  ssd1306_setupDisplay();
-  String ipStr = ip.toString();
-  display.println("Conexión Exitosa");
-  display.println("[ESP32] IP Address asignada:");
-  display.println(ipStr);
-  display.println("BTC Address:");
-  display.println(str);
+  display.println("Conexion exitosa.");
+  display.println("Cargando datos...");
 }
 
 
 // Función para mostrar el precio del token en el display OLED
 void displayTokenPrice(String token, float price) {
+  token.toUpperCase();  // Convertir el token a mayúsculas para impresion
   if (price != -1.0) {
     display.clearDisplay();
     display.setTextSize(2);

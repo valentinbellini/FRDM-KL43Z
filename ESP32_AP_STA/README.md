@@ -42,18 +42,20 @@ Instalar las siguientes bibliotecas en el entorno de Arduino:
     - SCL → GPIO 22
 
 ## Estructura del proyecto
-/proyecto-esp32-ap-sta/
-│
-├── /src/                  # Código fuente del proyecto
-│   ├── main.ino           # Código principal
-│   ├── wifi_manager.h     # Funciones de manejo WiFi (AP + STA)
-│   ├── crypto.h           # Funciones de consulta a la API de CoinGecko
-│   ├── ssd1306.h          # Funciones para controlar la pantalla OLED
-│   └── html.h             # Formulario HTML para la configuración de WiFi
-│
-├── README.md              # Documentación del proyecto
-└── LICENSE                # Licencia del proyecto
-
+    ```bash
+    /proyecto-esp32-ap-sta/
+    │
+    ├── /src/                  # Código fuente del proyecto
+    │   ├── main.ino           # Código principal
+    │   ├── wifi_manager.h     # Funciones de manejo WiFi (AP + STA)
+    │   ├── crypto.h           # Funciones de consulta a la API de CoinGecko
+    │   ├── ssd1306.h          # Funciones para controlar la pantalla OLED
+    │   └── html.h             # Formulario HTML para la configuración de WiFi
+    │
+    ├── README.md              # Documentación del proyecto
+    └── LICENSE                # Licencia del proyecto
+    ```
+    
 ## API Utilizada
 CoinGecko API: https://www.coingecko.com/es/api
 

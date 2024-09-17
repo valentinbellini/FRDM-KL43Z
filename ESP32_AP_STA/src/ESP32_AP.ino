@@ -6,10 +6,12 @@
 #include <Ticker.h>
 #include "crypto.h"
 
-// =================================== [ MACROS AND TYPEDEF ] =================================== //
+// =================================== [ MACROS AND VARIABLES ] =================================== //
 
 #define SERIAL_BAUDRATE 115200
-#define CHANGE_TOKEN_REQUEST_TIME 30
+#define CHANGE_TOKEN_REQUEST_TIME 20
+
+WebServer server(80);
 
 /* Estados MEF */
 enum Estado { AP_MODE, 
@@ -20,8 +22,6 @@ Estado estadoActual = AP_MODE;
 
 /* Almacena el dato extra recibido del formulario */
 String extraData = "";  
-
-WebServer server(80);
 
 /* Lista de criptomonedas para mostrar */
 const String tokens[] = {"bitcoin", "ethereum", "solana"};
@@ -42,7 +42,7 @@ void handleRoot() {
 void handleConnect() {
   String ssid = server.arg("ssid");
   String pass = server.arg("password");
-  extraData = server.arg("extraData");
+  extraData = server.arg("extraData"); // For future implementations. Get some data from de HTML page.
 
   server.send(200, "text/html", "<html><body><h1>Conectando a la red...</h1></body></html>");
 
@@ -59,6 +59,7 @@ void setup() {
 
   ssd1306_init();
   setupAP(server);  // Configura el AP y el servidor web
+  ssd1306_first_msg();
 
   pinMode(2,OUTPUT);
 
@@ -76,7 +77,7 @@ void loop() {
     case STA_MODE:
       if (WiFi.status() == WL_CONNECTED) {
         Serial.println("Conexión exitosa a la red WiFi!");
-        ssd1306_easyPrint("Conexion exitosa.");
+        ssd1306_conexionExitosa();
         estadoActual = CONECTADO;
       } else {
         Serial.println("Conectando...");
@@ -85,13 +86,11 @@ void loop() {
       }
       break;
 
-    case CONECTADO:
-      // Lugar para la ejecución principal
-      // ssd1306_ShowSTAConnected(WiFi.localIP(), extraData); /* NO MUESTRA ESTE MENSAJE */
+    case CONECTADO: // Operacion normal del programa
       digitalWrite(2, HIGH);
-      delay(500);
+      delay(250);
       digitalWrite(2, LOW);
-      delay(500);
+      delay(250);
 
       // Iniciar el temporizador si aún no se ha iniciado
       if (!timerStarted) {
