@@ -18,8 +18,11 @@ void ssd1306_init() {
   }
   ssd1306_setupDisplay();
   display.println("Welcome to ESP32");
-  display.println("Conectar a ESP32_AP");
-  display.display();
+  display.println("Bienvenido!");
+  display.println("1.Conectar a ESP32_AP");
+  display.println("2.Abrir el explorador:");
+  display.println("http://192.168.4.1");
+  display.println("3.Completar los datos");
 }
 
 void ssd1306_showIP(IPAddress ip) {
@@ -54,11 +57,10 @@ void ssd1306_ShowSetUpAP(IPAddress ip){
   ssd1306_setupDisplay();
   String ipStr = ip.toString();
   display.println("Bienvenido!");
-  display.println("Para conectar ESP32 A WiFi");
-  display.println("1. Conectarse a ESP32_AP");
-  display.println("2. Abrir el explorador en:");
+  display.println("1.Conectar a ESP32_AP");
+  display.println("2.Abrir el explorador:");
   display.println("http://"+ipStr);
-  display.println("3. Completar los datos");
+  display.println("3.Completar los datos");
 }
 
 void ssd1306_ShowSTAConnected(IPAddress ip, String str){

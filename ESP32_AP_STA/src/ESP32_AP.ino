@@ -9,6 +9,7 @@
 // =================================== [ MACROS AND TYPEDEF ] =================================== //
 
 #define SERIAL_BAUDRATE 115200
+#define CHANGE_TOKEN_REQUEST_TIME 30
 
 /* Estados MEF */
 enum Estado { AP_MODE, 
@@ -23,12 +24,14 @@ String extraData = "";
 WebServer server(80);
 
 /* Lista de criptomonedas para mostrar */
-const String tokens[] = {"bitcoin", "ethereum", "dogecoin"};
+const String tokens[] = {"bitcoin", "ethereum", "solana"};
 const int numTokens = sizeof(tokens) / sizeof(tokens[0]);
 int currentTokenIndex = 0; // Índice de la criptomoneda actual
 
 /* Ticker para manejar interrupciones de tiempo */
 Ticker timer;
+bool timerStarted = false;  // Bandera para verificar si el temporizador ya se inició
+
 
 // =================================== [ FUNCTIONS ] =================================== //
 
@@ -59,9 +62,6 @@ void setup() {
 
   pinMode(2,OUTPUT);
 
-  // Configurar temporizador por interrupciones para cambiar la criptomoneda cada 10 segundos
-  timer.attach(10, switchToken);
-  displayTokenPrice(tokens[currentTokenIndex], getTokenPrice(tokens[currentTokenIndex])); /*  Mostrar el primer token al arrancar */
 }
 
 
@@ -87,11 +87,18 @@ void loop() {
 
     case CONECTADO:
       // Lugar para la ejecución principal
-      ssd1306_ShowSTAConnected(WiFi.localIP(), extraData); /* NO MUESTRA ESTE MENSAJE */
+      // ssd1306_ShowSTAConnected(WiFi.localIP(), extraData); /* NO MUESTRA ESTE MENSAJE */
       digitalWrite(2, HIGH);
       delay(500);
       digitalWrite(2, LOW);
       delay(500);
+
+      // Iniciar el temporizador si aún no se ha iniciado
+      if (!timerStarted) {
+        timer.attach(CHANGE_TOKEN_REQUEST_TIME, switchToken);  // Cambiar el token cada 10 segundos
+        timerStarted = true;            // Marcar el temporizador como iniciado
+      }
+      
       break;
 
   }
@@ -99,7 +106,7 @@ void loop() {
 
 
 
-// ================================= [ CAMBIAR TOKEN CADA 10 SEGUNDOS ] ================================= //
+// ================================= [ CAMBIAR TOKEN ] ================================= //
 
 // Función llamada por el temporizador con interrupciones para cambiar el token
 void switchToken() {
